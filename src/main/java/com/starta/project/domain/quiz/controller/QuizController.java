@@ -51,7 +51,6 @@ public class QuizController {
         return quizService.display(id, userDetails.getMember().getId());
     }
 
-
     // 수정이라 주석처리
 //    @PutMapping("/quiz/{id}")
 //    public ResponseEntity<MsgResponse> updateQuiz (@PathVariable Long id,
