@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.starta.project.domain.answer.entity.MemberAnswer;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -58,6 +57,24 @@ public class MemberDetail {
     public void answer(MemberAnswer memberAnswer) {
         this.memberAnswer.add(memberAnswer);
         memberAnswer.got(this);
+    }
+
+    public void gainMileagePoint(Integer i) {
+        this.mileagePoint += i;
+    }
+
+    public void gainScore(Integer i) {
+        this.totalScore += i;
+    }
+
+    public void changeAnswer(MemberAnswer memberAnswer) {
+        for (MemberAnswer answer : this.memberAnswer) {
+            if (memberAnswer.getId().equals(answer.getId())) {
+                if (answer.isCorrect() == true) break;
+                answer.modify(memberAnswer.isCorrect());
+                break;
+            }
+        }
     }
 }
 

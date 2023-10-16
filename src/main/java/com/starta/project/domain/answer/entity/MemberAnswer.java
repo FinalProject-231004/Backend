@@ -40,6 +40,10 @@ public class MemberAnswer {
     public void got(MemberDetail memberDetail) {
         this.memberDetail = memberDetail;
     }
+
+    public void modify(boolean memberAnswer) {
+        this.correct = memberAnswer;
+    }
     // getters, setters, etc.
 }
 
