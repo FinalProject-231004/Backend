@@ -1,6 +1,8 @@
 package com.starta.project.domain.quiz.service;
 
 import com.starta.project.domain.member.entity.Member;
+import com.starta.project.domain.member.entity.MemberDetail;
+import com.starta.project.domain.member.repository.MemberDetailRepository;
 import com.starta.project.domain.quiz.dto.CreateQuizRequestDto;
 import com.starta.project.domain.quiz.dto.CreateQuizResponseDto;
 import com.starta.project.domain.quiz.dto.ShowQuizResponseDto;
@@ -21,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,10 +35,19 @@ public class QuizService {
     private final QuizChoicesRepository quizChoicesRepository;
     private final LikesRepository likesRepository;
     private final AmazonS3Service amazonS3Service;
+    private final MemberDetailRepository memberDetailRepository;
 
     //퀴즈 만들기
+    @Transactional
     public ResponseEntity<MsgDataResponse> createQuiz(MultipartFile multipartFile, CreateQuizRequestDto quizRequestDto,
                                                       Member member) {
+        Optional<Quiz> quizOptional = quizRepository.findByMember(member);
+        if(quizOptional.isEmpty()){
+            MemberDetail memberDetail = member.getMemberDetail();
+            memberDetail.gainMileagePoint(100);
+            memberDetailRepository.save(memberDetail);
+        }
+
         Quiz quiz = new Quiz();
         String image;
         //이미지
