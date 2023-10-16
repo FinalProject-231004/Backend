@@ -24,8 +24,8 @@ public class RefreshTokenService {
     private final RedisRepository redisRepository;
 
     public static final String REFRESH_PREFIX = "refresh:";
-    private final long REFRESH_TOKEN_TIME = 14 * 24 * 60 * 60L;  // 서버용 2주, 세컨드단위
-//    private final long REFRESH_TOKEN_TIME = 5 * 60L;  // TEST용 5분, 세컨드단위
+    // private final long REFRESH_TOKEN_TIME = 14 * 24 * 60 * 60L;  // 서버용 2주, 세컨드단위
+   private final long REFRESH_TOKEN_TIME = 5 * 60L;  // TEST용 5분, 세컨드단위
     /**
      * refresh 토큰 저장 및 ID 반환 메소드
      * @param userName 발급할 userName
