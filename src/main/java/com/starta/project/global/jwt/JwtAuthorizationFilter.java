@@ -28,9 +28,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
-
+        log.info("JWT 필터 시작");
+        String servletPath = req.getServletPath();
         //home 화면은 토큰 체크 x
-        if(!req.getRequestURL().equals("/") ) {
+        if(!(servletPath.equals("/") || servletPath.equals("/api/member/login") || servletPath.equals("/api/member/reissue"))) {
             //access 토큰 값
             String accessTokenValue = jwtUtil.getTokenFromHeader(req);
             String refreshTokenValue = jwtUtil.getRefreshTokenFromHeader(req);
@@ -38,10 +39,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             if (StringUtils.hasText(accessTokenValue)) {
                 // JWT 토큰 substring
                 accessTokenValue = jwtUtil.substringToken(accessTokenValue);
-
+                log.info("validateToken 시작");
                 //access 토큰이 유효하면 그대로 반환, 만료되어 refresh토큰 통해 반환되면 새로운 토큰 발급
-                String token = jwtUtil.validateToken(accessTokenValue, refreshTokenValue, res);
-                accessTokenValue = token;
+
+                if(!jwtUtil.validateToken(accessTokenValue, refreshTokenValue, res)){
+                    log.error("Token Error");
+                    return;
+                }
+
+
+//                accessTokenValue = token;
 
                 Claims info = jwtUtil.getUserInfoFromToken(accessTokenValue);
 

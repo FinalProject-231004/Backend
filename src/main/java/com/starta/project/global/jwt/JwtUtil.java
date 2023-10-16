@@ -7,6 +7,10 @@ import com.starta.project.domain.member.entity.RefreshToken;
 import com.starta.project.domain.member.entity.UserRoleEnum;
 import com.starta.project.domain.member.repository.RedisRepository;
 import com.starta.project.domain.member.service.RefreshTokenService;
+import com.starta.project.global.exception.Custom.CustomExpiredJwtException;
+import com.starta.project.global.exception.Custom.CustomInvalidJwtException;
+import com.starta.project.global.exception.Custom.CustomMalformedJwtException;
+import com.starta.project.global.exception.Custom.CustomUnsupportedJwtException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +22,7 @@ import org.springframework.util.StringUtils;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
@@ -38,8 +43,8 @@ public class JwtUtil {
     // Token 식별자
     public static final String BEARER_PREFIX = "Bearer ";
     // 토큰 만료시간
-    private final long TOKEN_TIME = 2 * 60 * 60 * 1000L; // 서버용 2시간, 밀리세컨드
-//    private final long TOKEN_TIME = 60 * 1000L; // TEST용 1분, 밀리세컨드
+//    private final long TOKEN_TIME = 2 * 60 * 60 * 1000L; // 서버용 2시간, 밀리세컨드
+    private final long TOKEN_TIME = 60 * 1000L; // TEST용 1분, 밀리세컨드
 
     private final RedisRepository redisRepository;
 
@@ -89,54 +94,66 @@ public class JwtUtil {
 
     // 토큰 검증, JWT 위변조 확인
     // parseBuilder() : 구성 성분을 분해하고 분석
-    public String validateToken(String accessToken, String refreshTokenValue, HttpServletResponse res) {
+    public boolean validateToken(String accessToken, String refreshTokenValue, HttpServletResponse res)throws IOException {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken);
-            return accessToken;
+//            return accessToken;
+            return true;
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
-            log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
-            throw new JwtException("Invalid JWT signature, 유효하지 않은 JWT 서명 입니다.");
+            log.info("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
+//            throw new CustomInvalidJwtException("Invalid JWT signature, 유효하지 않은 JWT 서명 입니다.");
         } catch (ExpiredJwtException e) {
-            return checkUsingRefreshToken(accessToken, refreshTokenValue, res);
+            log.info("Expired JWT token, 만료된 JWT token 입니다.");
+            // 액세스, 리프레시 재발급 로직
+            res.setContentType("application/json");
+            res.setCharacterEncoding("utf-8");
+            res.setStatus(401);
+            res.getWriter().write("{\"message\":\"Expired JWT token. 토큰이 만료되었습니다.\"}");
+        //            throw new CustomExpiredJwtException("Expired JWT, 만료된 JWT 입니다.");
         } catch (UnsupportedJwtException e) {
-            log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
-            throw new JwtException("Unsupported JWT, 지원되지 않는 JWT 입니다.");
+            log.info("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
+//            throw new CustomUnsupportedJwtException("Unsupported JWT, 지원되지 않는 JWT 입니다.");
         } catch (IllegalArgumentException e) {
-            log.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
-            throw new JwtException("JWT claims is empty, 잘못된 JWT 입니다.");
+            log.info("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
+//            throw new CustomMalformedJwtException("JWT claims is empty, 잘못된 JWT 입니다.");
         }
+        return false;
     }
-    private String checkUsingRefreshToken(String accessToken, String refreshTokenValue, HttpServletResponse res) {
-        String value = redisRepository.getValue(REFRESH_PREFIX + refreshTokenValue);
-        if (value == null) { // refresh 만료
-            log.error(REFRESH_PREFIX + refreshTokenValue);
-            log.error("Expired JWT token, 만료된 JWT token 입니다.");
-            throw new JwtException("Expired JWT, 만료된 JWT 입니다.");
-        }
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
 
-            //refreshToken 값
-            RefreshToken refreshToken = objectMapper.readValue(value, RefreshToken.class);
 
-            String username = refreshToken.getUsername();
-            UserRoleEnum role = refreshToken.getRole();
-            //access 토큰 다시 발급 (Bearer ~~)
-            accessToken = createToken(username, role);
 
-            //Refresh Token Rotation (기존 Refresh 토큰 제거 후 새로 발급)
-            Long refreshExpireTime = refreshTokenService.getRefreshTokenTimeToLive(REFRESH_PREFIX + refreshTokenValue);
-            redisRepository.setExpire(REFRESH_PREFIX + refreshTokenValue, 0L);
-
-            String newRefreshToken = refreshTokenService.refreshTokenRotation(username, role, refreshExpireTime);
-
-            addJwtToHeader(accessToken, newRefreshToken, res);
-
-            return accessToken;
-        } catch (JsonProcessingException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
+//
+//    private String checkUsingRefreshToken(String accessToken, String refreshTokenValue, HttpServletResponse res) {
+//        String value = redisRepository.getValue(REFRESH_PREFIX + refreshTokenValue);
+//        if (value == null) { // refresh 만료
+//            log.error(REFRESH_PREFIX + refreshTokenValue);
+//            log.error("Expired JWT token, 만료된 JWT token 입니다.");
+//            throw new JwtException("Expired JWT, 만료된 JWT 입니다.");
+//        }
+//        try {
+//            ObjectMapper objectMapper = new ObjectMapper();
+//
+//            //refreshToken 값
+//            RefreshToken refreshToken = objectMapper.readValue(value, RefreshToken.class);
+//
+//            String username = refreshToken.getUsername();
+//            UserRoleEnum role = refreshToken.getRole();
+//            //access 토큰 다시 발급 (Bearer ~~)
+//            accessToken = createToken(username, role);
+//
+//            //Refresh Token Rotation (기존 Refresh 토큰 제거 후 새로 발급)
+//            Long refreshExpireTime = refreshTokenService.getRefreshTokenTimeToLive(REFRESH_PREFIX + refreshTokenValue);
+//            redisRepository.setExpire(REFRESH_PREFIX + refreshTokenValue, 0L);
+//
+//            String newRefreshToken = refreshTokenService.refreshTokenRotation(username, role, refreshExpireTime);
+//
+//            addJwtToHeader(accessToken, newRefreshToken, res);
+//
+//            return accessToken;
+//        } catch (JsonProcessingException ex) {
+//            throw new RuntimeException(ex);
+//        }
+//    }
 
     // 토큰에서 사용자 정보 가져오기
     // Payload 부분에는 토큰에 담긴 정보
