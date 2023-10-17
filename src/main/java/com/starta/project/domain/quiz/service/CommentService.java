@@ -62,7 +62,6 @@ public class CommentService {
         return new MsgResponse("댓글 작성을 성공했습니다");
     }
 
-
     @Transactional
     public ResponseEntity<MsgResponse> updateComment(Long id, UpdateCommentResponseDto updateCommentResponseDto, Member member) {
         Comment comment = findComment(id);

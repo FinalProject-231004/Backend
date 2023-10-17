@@ -146,15 +146,11 @@ public class QuizQuestionService {
         return quizQuestionRepository.findByQuizAndQuestionNum(quiz, questionNum);
     }
 
-
-
-
     // 수정이라 주석 처리
 //    public MsgResponse updateQuizQuestion(Long id, UpdateQuizQuestionDto updateQuizQuestionDto) {
 //        QuizQuestion quizQuestion = quizQuestionRepository.findById(id).orElseThrow(()
 //                -> new NullPointerException("해당 퀴즈는 없는 퀴즈 입니다. ")
 //        );
-//
 //        quizQuestion.update(updateQuizQuestionDto);
 //        quizQuestionRepository.save(quizQuestion);
 //        MsgResponse msgResponse = new MsgResponse("문제 수정 성공! ");
