@@ -105,6 +105,7 @@ public class QuizService {
         }
 
         //하위 항목 + 이미지 찾아서 리스트 만들기
+        List<Likes> likes = likesRepository.findAllByQuiz(quiz);
         List<Comment> comments = getComment(id);
         List<QuizQuestion> quizQuestionList = quizQuestionRepository.findAllByQuiz(quiz);
         List<QuizChoices> quizChoicesList = new ArrayList<>();
@@ -124,6 +125,7 @@ public class QuizService {
             }
         }
         // 여기도 마찬가지로 효율이 좋다고하네요? (테스트 결과 문제수 22개, 문항 수 44개 before 1199ms | after 139 ms)
+        likesRepository.deleteAllInBatch(likes);
         commentRepository.deleteAllInBatch(comments);
         quizChoicesRepository.deleteAllInBatch(quizChoicesList);
         quizQuestionRepository.deleteAllInBatch(quizQuestionList);
