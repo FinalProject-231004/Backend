@@ -2,6 +2,7 @@ package com.starta.project.domain.member.controller;
 
 import com.starta.project.domain.member.dto.SignupRequestDto;
 import com.starta.project.domain.member.service.MemberService;
+import com.starta.project.global.messageDto.MsgDataResponse;
 import com.starta.project.global.messageDto.MsgResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -37,4 +38,6 @@ public class MemberController {
         }
         return ResponseEntity.ok(userService.signup(requestDto));
     }
+
+
 }

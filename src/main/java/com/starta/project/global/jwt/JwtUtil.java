@@ -7,6 +7,10 @@ import com.starta.project.domain.member.entity.RefreshToken;
 import com.starta.project.domain.member.entity.UserRoleEnum;
 import com.starta.project.domain.member.repository.RedisRepository;
 import com.starta.project.domain.member.service.RefreshTokenService;
+import com.starta.project.global.exception.Custom.CustomExpiredJwtException;
+import com.starta.project.global.exception.Custom.CustomInvalidJwtException;
+import com.starta.project.global.exception.Custom.CustomMalformedJwtException;
+import com.starta.project.global.exception.Custom.CustomUnsupportedJwtException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +22,7 @@ import org.springframework.util.StringUtils;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
@@ -38,8 +43,8 @@ public class JwtUtil {
     // Token 식별자
     public static final String BEARER_PREFIX = "Bearer ";
     // 토큰 만료시간
-    // private final long TOKEN_TIME = 2 * 60 * 60 * 1000L; // 서버용 2시간, 밀리세컨드
-   private final long TOKEN_TIME = 60 * 1000L; // TEST용 1분, 밀리세컨드
+//    private final long TOKEN_TIME = 2 * 60 * 60 * 1000L; // 서버용 2시간, 밀리세컨드
+    private final long TOKEN_TIME = 60 * 1000L; // TEST용 1분, 밀리세컨드
 
     private final RedisRepository redisRepository;
 
@@ -56,6 +61,7 @@ public class JwtUtil {
         byte[] bytes = Base64.getDecoder().decode(secretKey);
         key = Keys.hmacShaKeyFor(bytes);
     }
+
     //JWT 생성
     public String createToken(String username, UserRoleEnum role) {
         Date date = new Date();
@@ -69,6 +75,7 @@ public class JwtUtil {
                         .signWith(key, signatureAlgorithm) // 암호화 알고리즘
                         .compact();
     }
+
     // 토큰을 반환할 때 Header에 accessToken과 refreshToken을 담아준다:
     public void addJwtToHeader(String token, String refreshToken, HttpServletResponse res) {
         res.setHeader(AUTHORIZATION_HEADER, token);
@@ -85,33 +92,37 @@ public class JwtUtil {
     }
 
 
-
-
     // 토큰 검증, JWT 위변조 확인
     // parseBuilder() : 구성 성분을 분해하고 분석
-    public String validateToken(String accessToken, String refreshTokenValue, HttpServletResponse res) {
+    public boolean validateToken(String accessToken, String refreshTokenValue, HttpServletResponse res) throws IOException {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken);
-            return accessToken;
-        } catch (SecurityException | MalformedJwtException | SignatureException e) {
-            log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
-            throw new JwtException("Invalid JWT signature, 유효하지 않은 JWT 서명 입니다.");
+//            return accessToken;
+            log.info("validateToken 1번");
+            return true;
+        } catch (SecurityException | MalformedJwtException e) {
+            log.info("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
+            throw new CustomInvalidJwtException("Invalid JWT signature, 유효하지 않은 JWT 서명 입니다.");
         } catch (ExpiredJwtException e) {
-            return checkUsingRefreshToken(accessToken, refreshTokenValue, res);
+            log.info("Expired JWT token, 만료된 JWT token 입니다.");
+            throw new CustomExpiredJwtException("Expired JWT, 만료된 JWT 입니다.");
         } catch (UnsupportedJwtException e) {
-            log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
-            throw new JwtException("Unsupported JWT, 지원되지 않는 JWT 입니다.");
+            log.info("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
+            throw new CustomUnsupportedJwtException("Unsupported JWT, 지원되지 않는 JWT 입니다.");
         } catch (IllegalArgumentException e) {
-            log.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
-            throw new JwtException("JWT claims is empty, 잘못된 JWT 입니다.");
+            log.info("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
+            throw new CustomMalformedJwtException("JWT claims is empty, 잘못된 JWT 입니다.");
         }
+//        return false;
     }
-    private String checkUsingRefreshToken(String accessToken, String refreshTokenValue, HttpServletResponse res) {
+
+
+    public String checkUsingRefreshToken(String accessToken, String refreshTokenValue, HttpServletResponse res) throws JwtException {
         String value = redisRepository.getValue(REFRESH_PREFIX + refreshTokenValue);
         if (value == null) { // refresh 만료
             log.error(REFRESH_PREFIX + refreshTokenValue);
-            log.error("Expired JWT token, 만료된 JWT token 입니다.");
-            throw new JwtException("Expired JWT, 만료된 JWT 입니다.");
+            log.error("Expired Refresh Token, 만료된 Refresh Token 입니다.");
+            throw new JwtException("만료된 Refresh Token 입니다.");
         }
         try {
             ObjectMapper objectMapper = new ObjectMapper();

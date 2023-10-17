@@ -1,52 +1,86 @@
-name: Deploy to cloudtype
+name: BE - CI/CD
+
 on:
   push:
-    branches:
-      - develop
+    branches: ["main"]
+
+env:
+  RESOURCE_PATH: ./src/main/resources/application.yml
+
+
+permissions:
+  contents: read
+
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Connect deploy key
-        uses: cloudtype-github-actions/connect@v1
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
         with:
-          token: ${{ secrets.CLOUDTYPE_TOKEN }}
-          ghtoken: ${{ secrets.GHP_TOKEN }}
-      - name: Deploy
-        uses: cloudtype-github-actions/deploy@v1
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Gradle 캐싱
+        uses: actions/cache@v3
         with:
-          token: ${{ secrets.CLOUDTYPE_TOKEN }}
-          project: heypoppop/final
-          stage: main
-          yaml: |
-            name: backend
-            app: java@17
-            options:
-              ports: 8080
-              env:
-                - name: DB_URL
-                  secret: DB_URL
-                - name: DB_PASSWORD
-                  secret: DB_PASSWORD
-                - name: JWT_SecretKey
-                  secret: JWT_SecretKey
-                - name: S3_AccessKey
-                  secret: S3_AccessKey
-                - name: S3_SecretKey
-                  secret: S3_SecretKey
-                - name: REDIS_URL
-                  secret: REDIS_URL
-                - name: REDIS_PORT
-                  secret: REDIS_PORT
-                - name: REIDS_PASSWORD
-                  secret: REDIS_PASSWORD
-                - name: S3_Name
-                  secret: S3_Name
-                - name: SPRING_PROFILES_ACTIVE
-                  value: ""
-            context:
-              git:
-                url: git@github.com:${{ github.repository }}.git
-                ref: ${{ github.ref }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Set yml file
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: ${{ env.RESOURCE_PATH }}
+        env:
+          cloud.aws.s3.bucket: ${{ secrets.S3_Name }}
+          cloud.aws.credentials.access-key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          cloud.aws.credentials.secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          spring.datasource.url: ${{ secrets.DB_URL }}
+          spring.datasource.password: ${{ secrets.DB_PASSWORD }}
+          spring.data.redis.port: ${{ secrets.REDIS_PORT }}
+          spring.data.redis.host: ${{ secrets.REDIS_URL }}
+          spring.data.redis.password: ${{ secrets.REIDS_PASSWORD }}
+          jwt.secret.key: ${{ secrets.JWT_KEY }}
+
+      - name: Gradle 권한 부여
+        run: chmod +x gradlew
+
+      - name: Gradle로 빌드 실행
+        run: ./gradlew bootjar
+
+      - name: zip file 생성
+        run: |
+          mkdir deploy
+          cp ./docker/docker-compose.blue.yml ./deploy/
+          cp ./docker/docker-compose.green.yml ./deploy/
+          cp ./appspec.yml ./deploy/
+          cp ./docker/Dockerfile ./deploy/
+          cp ./scripts/*.sh ./deploy/
+          cp ./build/libs/*.jar ./deploy/
+          zip -r -qq -j ./spring-build.zip ./deploy
+
+      - name: AWS 연결
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_CI_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_CI_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: S3에 프로젝트 업로드
+        run: |
+          aws s3 cp \
+          --region ap-northeast-2 \
+          ./spring-build.zip s3://quizpop-server-bucket
+
+      - name: Code Deploy 배포 요청
+        run: aws deploy create-deployment --application-name quizpop
+          --deployment-config-name CodeDeployDefault.OneAtATime
+          --deployment-group-name quizpop
+          --s3-location bucket=quizpop-server-bucket,bundleType=zip,key=spring-build.zip
