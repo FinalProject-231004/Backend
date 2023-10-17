@@ -73,7 +73,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     res.setCharacterEncoding("utf-8");
                     res.setStatus(401);
                     res.getWriter().write("{\"msg\":\"Expired JWT token. 토큰이 만료되었습니다.\"}");
-                    return;
+                    return; // 필터 체인 종료
                 } catch (Exception e) {
                     log.info("Token validation failed.", e);
 
