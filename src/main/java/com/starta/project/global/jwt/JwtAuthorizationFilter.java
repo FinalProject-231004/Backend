@@ -47,7 +47,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 res.setContentType("application/json");
                 res.setCharacterEncoding("utf-8");
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                res.getWriter().write("{\"message\":\"만료된 리프레시 토큰입니다\"}");
+                res.getWriter().write("{\"message\":\"Expired Refresh Token. 토큰이 만료되었습니다.\"}");
                 return; // 필터 체인 종료
             }
         }
@@ -72,7 +72,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     res.setContentType("application/json");
                     res.setCharacterEncoding("utf-8");
                     res.setStatus(401);
-                    res.getWriter().write("{\"msg\":\"Expired JWT token. 토큰이 만료되었습니다.\"}");
+                    res.getWriter().write("{\"msg\":\"Expired Access Token. 토큰이 만료되었습니다.\"}");
                     return; // 필터 체인 종료
                 } catch (Exception e) {
                     log.info("Token validation failed.", e);
