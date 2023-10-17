@@ -34,7 +34,7 @@ public class QuizQuestionService {
 
     //퀴즈 생성
     @Transactional
-    public ResponseEntity<MsgResponse> createQuizQuestion(Long id, MultipartFile multipartFile,
+    public ResponseEntity<MsgResponse> createQuizQuestion(Long id, Optional<MultipartFile> multipartFile,
                                                           CreateQuestionRequestDto createQuestionRequestDto,
                                                           Member member) {
         //퀴즈 찾기
@@ -44,18 +44,18 @@ public class QuizQuestionService {
             MsgResponse msgResponse = new MsgResponse("퀴즈 생성자가 아닙니다. ");
             return ResponseEntity.badRequest().body(msgResponse);
         }
-
         //이미지 추가
         String image;
         //이미지
-        try {
-            if (multipartFile.isEmpty()) image = "";
-            else image = amazonS3Service.upload(multipartFile);
-        } catch (java.io.IOException e) {
-            throw new IOException("이미지 업로드에 문제가 있습니다!  ");
+        if(multipartFile.isPresent()){
+            try {
+                if (multipartFile.isEmpty()) image = "";
+                else image = amazonS3Service.upload(multipartFile.get());
+            } catch (java.io.IOException e) {
+                throw new IOException("이미지 업로드에 문제가 있습니다!  ");
+            }
+            createQuestionRequestDto.set(image);
         }
-        createQuestionRequestDto.set(image);
-
         //문제 번호 찾기
         Integer questionNum = 0;
         //findTop == 가장 먼저 찾을 수 있는 항목
