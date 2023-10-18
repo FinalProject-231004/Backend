@@ -21,7 +21,7 @@ public class SseController {
     /**
      * 로그인 시 SSE 구독(연결)
      */
-    @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/api/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> subscribe(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                 @RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId) {
         return ResponseEntity.ok(sseService.subscribe(userDetails.getMember(), lastEventId));
