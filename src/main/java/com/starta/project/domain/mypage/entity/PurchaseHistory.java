@@ -17,11 +17,11 @@ public class PurchaseHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mileageItem_id",nullable = false)
     private MileageShopItem mileageShopItem;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberDetail_id",nullable = false)
     private MemberDetail memberDetail;
 
