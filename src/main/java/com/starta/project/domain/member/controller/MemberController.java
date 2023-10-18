@@ -1,13 +1,11 @@
 package com.starta.project.domain.member.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.starta.project.domain.member.dto.MemberUpdateRequestDto;
 import com.starta.project.domain.member.dto.PasswordValidationRequestDto;
 import com.starta.project.domain.member.dto.SignupRequestDto;
-import com.starta.project.domain.member.dto.TokenResponseDto;
 import com.starta.project.domain.member.service.KakaoService;
 import com.starta.project.domain.member.service.MemberService;
-import com.starta.project.global.jwt.JwtUtil;
-import com.starta.project.global.messageDto.MsgDataResponse;
 import com.starta.project.global.messageDto.MsgResponse;
 import com.starta.project.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,6 +42,7 @@ public class MemberController {
             return ResponseEntity.badRequest().body(new MsgResponse("회원가입 실패"));
         }
         return ResponseEntity.ok(memberService.signup(requestDto));
+
     }
 
     @Operation(summary = "카카오 로그인용 서버컨트롤러")
@@ -55,9 +54,28 @@ public class MemberController {
         return ResponseEntity.ok(kakaoService.kakaoLogin(code, response));
     }
 
+    @Operation(summary = "Nickname 및 Password 수정")
+    @PutMapping("/update")
+    public ResponseEntity<MsgResponse> memberDetailUpdate(@Valid @RequestBody MemberUpdateRequestDto requestDto,
+                                                          @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                          BindingResult bindingResult){
+        // Validation 예외처리
+        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+        if (!fieldErrors.isEmpty()) {
+            for (FieldError fieldError : bindingResult.getFieldErrors()) {
+                log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(new MsgResponse("회원정보 수정 실패"));
+        }
+        return ResponseEntity.status(200).body(memberService.updateMemberDetail(requestDto, userDetails.getMember().getId()));
+
+    }
+
     @Operation(summary = "마이페이지 정보수정용 비밀번호 검증 API(validate Password)")
     @PostMapping("/validatePassword")
-    public ResponseEntity<MsgResponse> validatePassword(@RequestBody PasswordValidationRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<MsgResponse> validatePassword(@Valid @RequestBody PasswordValidationRequestDto requestDto,
+                                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(memberService.validatePassword(requestDto, userDetails.getMember()));
     }
+
 }

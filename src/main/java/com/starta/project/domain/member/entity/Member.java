@@ -46,5 +46,9 @@ public class Member {
         this.role = role;
         this.kakaoId =kakaoId;
     }
+
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
 }
 

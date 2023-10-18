@@ -85,5 +85,8 @@ public class MemberDetail {
             }
         }
     }
+    public void updateNickname(String newNickname)  {
+        this.nickname = newNickname;
+    }
 }
 
