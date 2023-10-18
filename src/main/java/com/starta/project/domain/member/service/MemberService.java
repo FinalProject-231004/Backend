@@ -1,5 +1,6 @@
 package com.starta.project.domain.member.service;
 
+import com.starta.project.domain.member.dto.PasswordValidationRequestDto;
 import com.starta.project.domain.member.dto.SignupRequestDto;
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.entity.MemberDetail;
@@ -9,6 +10,7 @@ import com.starta.project.domain.member.repository.MemberRepository;
 import com.starta.project.global.messageDto.MsgResponse;
 import com.starta.project.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -54,5 +56,15 @@ public class MemberService {
         memberDetailRepository.save(memberDetail);
 
         return new MsgResponse("회원가입 성공");
+    }
+
+
+
+
+    public MsgResponse validatePassword(PasswordValidationRequestDto requestDto, Member member) {
+        if (!passwordEncoder.matches(requestDto.getEnterPassword(), member.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+        return new MsgResponse("비밀번호 검증 성공");
     }
 }
