@@ -54,7 +54,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 
         // 로그인 또는 재발급 요청이 아닌 경우
-        if (!(requestURI.equals("/") || requestURI.equals("/api/member/login"))) {
+        if (!(requestURI.equals("/") || requestURI.equals("/api/member/login") || requestURI.equals("/api/member/signup"))) {
             if (StringUtils.hasText(accessTokenValue)) {
                 // JWT 토큰 substring
                 accessTokenValue = jwtUtil.substringToken(accessTokenValue);

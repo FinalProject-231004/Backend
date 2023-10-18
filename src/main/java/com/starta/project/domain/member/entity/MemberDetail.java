@@ -46,6 +46,15 @@ public class MemberDetail {
         this.complaint = 0;
         this.totalScore = 0;
     }
+
+    public MemberDetail(String nickname, String kakaoProfilImg) {
+        this.nickname = nickname;
+        this.image = kakaoProfilImg;
+        this.mileagePoint = 0;
+        this.complaint = 0;
+        this.totalScore = 0;
+    }
+
     public void setMember(Member member) {
         this.member = member;
     }

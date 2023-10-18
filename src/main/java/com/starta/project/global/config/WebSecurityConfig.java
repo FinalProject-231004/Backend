@@ -42,7 +42,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     public void addCorsMappings(final CorsRegistry registry) {
         registry.addMapping("/**")
-//                .allowedOrigins("http://localhost:3000", "http://localhost:8080")
                 .allowedOrigins("http://localhost:3000", "http://localhost:8080", "https://www.yulmoo.world", "https://yulmoo.world")
                 .allowedMethods(ALLOWED_METHOD_NAMES.split(","))
                 .allowedHeaders("*")
@@ -84,8 +83,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
 
+        System.out.println("예외되는 URL ");
         http.authorizeHttpRequests((authorizeHttpRequests) ->
-
                         authorizeHttpRequests
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .antMatchers("/").permitAll()
@@ -99,7 +98,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
         http.formLogin((formLogin) ->
                 formLogin
-                        .loginPage("/api/member/login").permitAll()
+                        .loginPage("/api/member/login-page").permitAll()
         );
 
         // 필터 관리

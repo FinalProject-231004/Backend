@@ -26,6 +26,9 @@ public class Member {
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum role;
 
+    @Column
+    private Long kakaoId;
+
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
     private MemberDetail memberDetail;
 
@@ -34,6 +37,14 @@ public class Member {
         this.password = password;
         this.block = false;
         this.role = role;
+    }
+
+    public Member(String username, String password, UserRoleEnum role, Long kakaoId) {
+        this.username = username;
+        this.password = password;
+        this.block = false;
+        this.role = role;
+        this.kakaoId =kakaoId;
     }
 }
 
