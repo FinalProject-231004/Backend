@@ -13,7 +13,7 @@ cloud:
 
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
     username: root
     url: ${DB_URL}
     password: ${DB_PASSWORD}
@@ -37,3 +37,12 @@ spring:
 jwt:
   secret:
     key: ${JWT_SecretKey}
+logging:
+  level:
+    jdbc:
+      connection: 'off'
+      sqlonly: 'off'
+      resultset: 'off'
+      resultsettable: info
+      sqltiming: info
+      audit: 'off'
