@@ -1,8 +1,5 @@
 package com.starta.project.domain.quiz.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.quiz.dto.CreateQuizRequestDto;
 import lombok.Getter;
@@ -38,8 +35,8 @@ public class Quiz {
     @Column
     private String image;
 
-    @Column(nullable = false)
-    private String category;
+    @Enumerated(value = EnumType.STRING)
+    private QuizCategoryEnum category;
 
     @Column
     private Boolean display = false;
