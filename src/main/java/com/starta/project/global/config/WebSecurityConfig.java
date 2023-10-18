@@ -14,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -91,15 +92,13 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                                 .antMatchers("/api/member/**").permitAll()
                                 .antMatchers("/v3/api-docs/**").permitAll()
                                 .antMatchers("/swagger-ui/**").permitAll()
+                                .antMatchers("/api/quiz/**").permitAll()
                                 .anyRequest().authenticated() // 그 외 모든 요청 인증처리
         );
 
         http.cors();
 
-        http.formLogin((formLogin) ->
-                formLogin
-                        .loginPage("/api/member/login-page").permitAll()
-        );
+        http.formLogin(AbstractHttpConfigurer::disable); // 폼 로그인 비활성화
 
         // 필터 관리
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
