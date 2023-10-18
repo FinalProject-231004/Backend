@@ -96,10 +96,10 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
         http.cors();
 
-        http.formLogin((formLogin) ->
-                formLogin
-                        .loginPage("/api/member/login-page").permitAll()
-        );
+//        http.formLogin((formLogin) ->
+//                formLogin
+//                        .loginPage("/api/member/login-page").permitAll()
+//        );
 
         // 필터 관리
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);

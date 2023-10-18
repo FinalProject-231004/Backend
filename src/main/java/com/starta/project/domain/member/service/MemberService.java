@@ -72,19 +72,19 @@ public class MemberService {
         );
         MemberDetail memberDetail = findMember.getMemberDetail();
 
-        if (requestDto.getNewNickname() != null && !requestDto.getNewNickname().isEmpty()) {
-            Optional<MemberDetail> newNickname = memberDetailRepository.findByNickname(requestDto.getNewNickname());
-            if (newNickname.isPresent()) {
-                throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
-            }
-            memberDetail.updateNickname(requestDto.getNewNickname());
-        }
+//        if (requestDto.getNewNickname() != null && !requestDto.getNewNickname().isEmpty()) {
+//            Optional<MemberDetail> newNickname = memberDetailRepository.findByNickname(requestDto.getNewNickname());
+//            if (newNickname.isPresent()) {
+//                throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+//            }
+//            memberDetail.updateNickname(requestDto.getNewNickname());
+//        }
 
-        if (!requestDto.getNewPassword().isEmpty()) {
-            findMember.updatePassword(passwordEncoder.encode(requestDto.getNewPassword()));
+        if (requestDto.getNewPassword() != null && !requestDto.getNewPassword().isEmpty()) {
+            String setPassword = passwordEncoder.encode(requestDto.getNewPassword());
+            findMember.updatePassword(setPassword);
             System.out.println(findMember.getPassword());
         }
-
         return new MsgResponse("회원정보 변경완료");
     }
 

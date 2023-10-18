@@ -60,8 +60,8 @@ public class MemberController {
     @Operation(summary = "Nickname 및 Password 수정")
     @PutMapping("/update")
     public ResponseEntity<MsgResponse> memberDetailUpdate(@Valid @RequestBody MemberUpdateRequestDto requestDto,
-                                                          @AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                          BindingResult bindingResult){
+                                                          BindingResult bindingResult,
+                                                          @AuthenticationPrincipal UserDetailsImpl userDetails){
         // Validation 예외처리
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
         if (!fieldErrors.isEmpty()) {
@@ -71,7 +71,6 @@ public class MemberController {
             return ResponseEntity.badRequest().body(new MsgResponse("회원정보 수정 실패"));
         }
         return ResponseEntity.status(200).body(memberService.updateMemberDetail(requestDto, userDetails.getMember().getId()));
-
     }
 
     @Operation(summary = "회원탈퇴")
