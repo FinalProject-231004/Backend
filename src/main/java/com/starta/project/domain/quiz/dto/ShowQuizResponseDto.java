@@ -3,6 +3,7 @@ package com.starta.project.domain.quiz.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.starta.project.domain.quiz.entity.Comment;
 import com.starta.project.domain.quiz.entity.Quiz;
+import com.starta.project.domain.quiz.entity.QuizCategoryEnum;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ public class ShowQuizResponseDto {
     private String image;
     private Integer viewCount;
     private LocalDateTime createdTime;
-    private String category;
+    private QuizCategoryEnum category;
     private String content;
     private List<Comment> comments;
 
