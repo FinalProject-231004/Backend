@@ -37,7 +37,3 @@ spring:
 jwt:
   secret:
     key: ${JWT_SecretKey}
-
-logging:
-  level:
-    org.springframework.web: DEBUG

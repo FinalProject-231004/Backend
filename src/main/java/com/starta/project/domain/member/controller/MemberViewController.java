@@ -12,16 +12,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class MemberViewController {
-
-    private MemberService memberService;
-
-    @Operation(summary = "(view) 로그인")
+    
+    @Operation(summary = "로그인.html (임시)")
     @GetMapping("/member/login-page")
     public String loginPage() {
         return "login";
     }
 
-    @Operation(summary = "임시테스트용 API(삭제예정)")
+    @Operation(summary = "회원가입.html (임시)")
     @GetMapping("/member/signup")
     public String signupPage() {
         return "signup";
