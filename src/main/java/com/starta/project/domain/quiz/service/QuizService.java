@@ -42,10 +42,10 @@ public class QuizService {
     private final NotificationService notificationService;
 
     //퀴즈 만들기
-    @Transactional
     public ResponseEntity<MsgDataResponse> createQuiz(MultipartFile multipartFile, CreateQuizRequestDto quizRequestDto,
                                                       Member member) {
-        Optional<Quiz> quizOptional = quizRepository.findByMember(member);
+
+        Optional<Quiz> quizOptional = quizRepository.findTopByMember(member);
         if(quizOptional.isEmpty()){
             MemberDetail memberDetail = member.getMemberDetail();
             memberDetail.gainMileagePoint(100);
