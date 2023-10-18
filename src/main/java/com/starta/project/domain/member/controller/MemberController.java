@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.starta.project.domain.member.dto.MemberUpdateRequestDto;
 import com.starta.project.domain.member.dto.PasswordValidationRequestDto;
 import com.starta.project.domain.member.dto.SignupRequestDto;
+import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.service.KakaoService;
 import com.starta.project.domain.member.service.MemberService;
 import com.starta.project.global.messageDto.MsgResponse;
@@ -18,6 +19,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -29,6 +31,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final KakaoService kakaoService;
+
 
     @Operation(summary = "회원가입")
     @PostMapping("/signup")
@@ -70,6 +73,15 @@ public class MemberController {
         return ResponseEntity.status(200).body(memberService.updateMemberDetail(requestDto, userDetails.getMember().getId()));
 
     }
+
+    @Operation(summary = "회원탈퇴")
+    @DeleteMapping("/delete")
+    public ResponseEntity<MsgResponse> deleteMember(@RequestBody String password,
+                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.status(200).body(memberService.deleteMember(password, userDetails.getMember()));
+    }
+
+
 
     @Operation(summary = "마이페이지 정보수정용 비밀번호 검증 API(validate Password)")
     @PostMapping("/validatePassword")

@@ -87,4 +87,16 @@ public class MemberService {
 
         return new MsgResponse("회원정보 변경완료");
     }
+
+    @Transactional
+    public MsgResponse deleteMember(String password, Member member) {
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new IllegalArgumentException("Incorrect password.");
+        }
+
+        memberRepository.delete(member);
+
+        return new MsgResponse("Account deleted successfully.");
+    }
+
 }
