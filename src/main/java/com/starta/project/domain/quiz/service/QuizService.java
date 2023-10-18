@@ -160,7 +160,7 @@ public class QuizService {
         String content = "["
                 + title.substring(0, 3) + "..."
                 + "]"
-                + "게시글 좋아요를 눌렀습니다. ";
+                + "게시글 좋아요가 추가되었습니다. ";
         String type = NotificationType.LIKEQUIZ.getAlias();
 
         Notification notification = Notification.builder()
