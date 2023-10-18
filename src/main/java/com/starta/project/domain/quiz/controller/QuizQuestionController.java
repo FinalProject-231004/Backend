@@ -29,7 +29,7 @@ public class QuizQuestionController {
                                                            @RequestPart("requestDto") CreateQuestionRequestDto createQuestionRequestDto,
                                                            @RequestPart("image") Optional<MultipartFile> multipartFile,
                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
-           return quizQuestionService.createQuizQuestion(id,multipartFile, createQuestionRequestDto, userDetails.getMember());
+        return quizQuestionService.createQuizQuestion(id,multipartFile, createQuestionRequestDto, userDetails.getMember());
     }
 
     @Operation(summary = "문제 개별 조회 -> 문제 번호에 따라 ")
