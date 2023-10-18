@@ -46,6 +46,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .allowedMethods(ALLOWED_METHOD_NAMES.split(","))
                 .allowedHeaders("*")
                 .exposedHeaders(JwtUtil.AUTHORIZATION_HEADER) // JWT 헤더를 노출
+                .exposedHeaders(JwtUtil.REFRESH_HEADER) // Refresh 헤더를 노출
                 .allowCredentials(true);
     }
 
