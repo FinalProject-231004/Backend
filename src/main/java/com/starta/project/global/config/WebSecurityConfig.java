@@ -45,8 +45,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:3000", "http://localhost:8080", "https://www.yulmoo.world", "https://yulmoo.world")
                 .allowedMethods(ALLOWED_METHOD_NAMES.split(","))
                 .allowedHeaders("*")
-                .exposedHeaders(JwtUtil.AUTHORIZATION_HEADER) // JWT 헤더를 노출
-                .exposedHeaders(JwtUtil.REFRESH_HEADER) // Refresh 헤더를 노출
+                .exposedHeaders(JwtUtil.AUTHORIZATION_HEADER, JwtUtil.REFRESH_HEADER) // JWT 헤더를 노출
                 .allowCredentials(true);
     }
 
