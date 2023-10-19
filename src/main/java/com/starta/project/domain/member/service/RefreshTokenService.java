@@ -25,8 +25,8 @@ public class RefreshTokenService {
 
     public static final String REFRESH_PREFIX = "refresh:";
 
-//    private final long REFRESH_TOKEN_TIME = 14 * 24 * 60 * 60L;  // 서버용 2주, 세컨드단위
-    private final long REFRESH_TOKEN_TIME = 10 * 60L;  // TEST용 10분, 세컨드단위
+    private final long REFRESH_TOKEN_TIME = 21 * 24 * 60 * 60L;  // 서버용 3주, 세컨드단위
+//    private final long REFRESH_TOKEN_TIME = 10 * 60L;  // TEST용 10분, 세컨드단위
 
     /**
      * refresh 토큰 저장 및 ID 반환 메소드

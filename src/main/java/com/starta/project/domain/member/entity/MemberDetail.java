@@ -32,7 +32,7 @@ public class MemberDetail {
     @Column(nullable = false)
     private Integer totalScore;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
