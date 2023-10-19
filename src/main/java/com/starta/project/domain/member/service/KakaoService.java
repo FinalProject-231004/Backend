@@ -51,7 +51,7 @@ public class KakaoService {
     public MsgResponse kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
-        log.info("accessToken값 : " +accessToken);
+        log.info("accessToken값 : " + accessToken);
         // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
         KakaoMemberDto kakaoMemberInfo = getKakaoUserInfo(accessToken);
         // 3. 로그인하기(필요시에 회원가입)
@@ -61,7 +61,7 @@ public class KakaoService {
         String jwtAccessToken = jwtUtil.createToken(kakaoMember.getUsername(), kakaoMember.getRole());
         String jwtRefreshToken = refreshTokenService.createRefreshToken(kakaoMember.getUsername(), kakaoMember.getRole());
 
-        jwtUtil.addJwtToHeader(jwtAccessToken,jwtRefreshToken, response);
+        jwtUtil.addJwtToHeader(jwtAccessToken, jwtRefreshToken, response);
 
         return new MsgResponse("카카오 로그인 성공!!");
 
@@ -110,6 +110,7 @@ public class KakaoService {
         return jsonNode.get("access_token").asText();
 
     }
+
     private KakaoMemberDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
         log.info("accessToken: " + accessToken);
 
@@ -124,7 +125,7 @@ public class KakaoService {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
-        log.info( "Authorization " +  "Bearer " + accessToken);
+        log.info("Authorization " + "Bearer " + accessToken);
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
         log.info("Content-type " + "application/x-www-form-urlencoded;charset=utf-8");
 
@@ -146,7 +147,7 @@ public class KakaoService {
 //        String nickname = jsonNode.get("properties").get("nickname").asText();
         String profileImg = jsonNode.get("properties").get("thumbnail_image").asText();
 
-        log.info("카카오 사용자 정보: " + id + ", "  + ", " + profileImg);
+        log.info("카카오 사용자 정보: " + id + ", " + ", " + profileImg);
         return new KakaoMemberDto(id, profileImg);
     }
 
@@ -170,7 +171,7 @@ public class KakaoService {
             String kakaoPassword = passwordEncoder.encode(UUID.randomUUID().toString());
 
             Member savedMember = memberRepository.save(new Member(kakaoUsername, kakaoPassword, UserRoleEnum.USER, kakaoId));
-            MemberDetail memberDetail = new MemberDetail(randomNickname,profilImg);
+            MemberDetail memberDetail = new MemberDetail(randomNickname, profilImg);
             memberDetail.setMember(savedMember);
             memberDetailRepository.save(memberDetail);
 
@@ -178,6 +179,7 @@ public class KakaoService {
         }
         return kakaoUser;
     }
+
     private String generateCustomNickname() {
         Random random = new Random();
         StringBuilder nickname = new StringBuilder();
@@ -191,4 +193,4 @@ public class KakaoService {
         }
         return nickname.toString();
     }
-    }
+}
