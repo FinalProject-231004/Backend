@@ -49,7 +49,7 @@ public class MemberController {
     }
 
     @Operation(summary = "카카오 로그인용 서버컨트롤러")
-    @GetMapping("/kakao/callback")
+    @PostMapping("/kakao/callback")
     public ResponseEntity<MsgResponse> kakaoLogin(@RequestParam String code,
                                                   HttpServletResponse response) throws JsonProcessingException {
         // code: 카카오 서버로부터 받은 인가 코드 Service 전달 후 인증 처리 및 JWT 반환
