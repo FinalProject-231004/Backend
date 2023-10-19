@@ -38,9 +38,6 @@ public class Notification {
     @Column(nullable = false)
     private LocalDateTime created_at;
 
-    @Column(nullable = false)
-    private LocalDateTime updated_at;
-
     public static Notification of(Notification notification) {
         return Notification.builder()
                 .notificationId(notification.getNotificationId())
@@ -51,7 +48,6 @@ public class Notification {
                 .readYn(notification.getReadYn())
                 .deletedYn(notification.getDeletedYn())
                 .created_at(notification.getCreated_at())
-                .updated_at(notification.getUpdated_at())
                 .build();
     }
 }

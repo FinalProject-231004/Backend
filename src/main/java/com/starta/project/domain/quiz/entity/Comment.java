@@ -26,15 +26,17 @@ public class Comment {
     @JoinColumn(name = "quiz_id",nullable = false)
     private Quiz quiz;
 
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @Column
+    private Long memberId;
+
+    @Column
+    private String nickname;
 
     public void set(Quiz quiz, CreateCommentRequestDto createCommentRequestDto, Member member) {
         this.comment = createCommentRequestDto.getContent();
         this.quiz = quiz;
-        this.member = member;
+        this.memberId = member.getId();
+        this.nickname = member.getMemberDetail().getNickname();
     }
 
     public void update(String content) {
