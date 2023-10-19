@@ -159,28 +159,32 @@ public class QuizService {
         quiz.pushLikes(likesNum);
 
         //알림
-        String sender = member.getUsername();
-        String receiver = memberRepository.findById(quiz.getMemberId()).get().getUsername();
-        String notificationId = receiver + "_" + System.currentTimeMillis();
-        String title = quiz.getTitle();
-        String content = "["
-                + title.substring(0, 3) + "..."
-                + "]"
-                + "게시글 좋아요가 추가되었습니다. ";
-        String type = NotificationType.LIKEQUIZ.getAlias();
+        Optional<Member> memberOptional =  memberRepository.findById(quiz.getMemberId());
 
-        Notification notification = Notification.builder()
-                .notificationId(notificationId)
-                .receiver(receiver)
-                .content(content)
-                .notificationType(type)
-                .url("/api/quiz/" + quiz.getId())
-                .readYn('N')
-                .deletedYn('N')
-                .build();
+        if(memberOptional.isPresent()) {
+            String sender = member.getUsername();
+            String receiver = memberOptional.get().getUsername();
+            String notificationId = receiver + "_" + System.currentTimeMillis();
+            String title = quiz.getTitle();
+            String content = "["
+                    + title.substring(0, 3) + "..."
+                    + "]"
+                    + "게시글 좋아요가 추가되었습니다. ";
+            String type = NotificationType.LIKEQUIZ.getAlias();
 
-        //작성자 본인이 댓글/대댓글을 단 것이 아닌 경우에 한하여 알림
-        if(!receiver.equals(sender)) notificationService.sendNotification(notification);
+            Notification notification = Notification.builder()
+                    .notificationId(notificationId)
+                    .receiver(receiver)
+                    .content(content)
+                    .notificationType(type)
+                    .url("/api/quiz/" + quiz.getId())
+                    .readYn('N')
+                    .deletedYn('N')
+                    .created_at(LocalDateTime.now())
+                    .build();
+            //작성자 본인이 댓글/대댓글을 단 것이 아닌 경우에 한하여 알림
+            if(!receiver.equals(sender)) notificationService.sendNotification(notification);
+        }
 
         return new MsgResponse("좋아요를 눌렀습니다. ");
     }
