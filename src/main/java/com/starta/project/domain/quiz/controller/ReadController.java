@@ -2,6 +2,7 @@ package com.starta.project.domain.quiz.controller;
 
 import com.starta.project.domain.quiz.dto.CategoryDto;
 import com.starta.project.domain.quiz.dto.SimpleQuizDto;
+import com.starta.project.domain.quiz.dto.TitleListsDto;
 import com.starta.project.domain.quiz.entity.QuizQuestion;
 import com.starta.project.domain.quiz.service.ReadService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,4 +54,11 @@ public class ReadController {
     public ResponseEntity<List<QuizQuestion>> showQuizQuestionList(@PathVariable Long id) {
         return ResponseEntity.ok(readService.showQuestionList(id));
     }
+
+    @Operation(summary = "키워드 제목 검색 - 검색창 내부 ")
+    @GetMapping("/quiz/search-bar")
+    public ResponseEntity<List<TitleListsDto>> searchBar(@RequestParam("keyword") String keyword) {
+        return ResponseEntity.ok(readService.searchBar(keyword));
+    }
+
 }
