@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.starta.project.domain.member.dto.KakaoMemberDto;
-import com.starta.project.domain.member.dto.TokenResponseDto;
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.entity.MemberDetail;
 import com.starta.project.domain.member.entity.UserRoleEnum;
@@ -14,7 +13,7 @@ import com.starta.project.global.jwt.JwtUtil;
 import com.starta.project.global.messageDto.MsgResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -43,17 +42,23 @@ public class KakaoService {
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
 
-    @Transactional
+    @Value("${kakao.client-id}")
+    private String client_id;
+
+    @Value("${kakao.redirect-uri}")
+    private String redirect_uri;
+
     public MsgResponse kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
         log.info("accessToken값 : " +accessToken);
         // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
         KakaoMemberDto kakaoMemberInfo = getKakaoUserInfo(accessToken);
-        // 3. 필요시에 회원가입
+        // 3. 로그인하기(필요시에 회원가입)
         Member kakaoMember = registerKakaoUserIfNeeded(kakaoMemberInfo);
 
-        String jwtAccessToken = jwtUtil.createToken(kakaoMember.getUsername(), kakaoMember.getRole()); // 최종적으로는 토큰이 반환됨
+        // 토큰 만들기
+        String jwtAccessToken = jwtUtil.createToken(kakaoMember.getUsername(), kakaoMember.getRole());
         String jwtRefreshToken = refreshTokenService.createRefreshToken(kakaoMember.getUsername(), kakaoMember.getRole());
 
         jwtUtil.addJwtToHeader(jwtAccessToken,jwtRefreshToken, response);
@@ -80,8 +85,8 @@ public class KakaoService {
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", "4ced98994663e71c06cadbedd2b2ac21");
-        body.add("redirect_uri", "http://localhost:8080/api/member/kakao/callback");
+        body.add("client_id", client_id);
+        body.add("redirect_uri", redirect_uri);
         body.add("code", code);
 
         RequestEntity<MultiValueMap<String, String>> requestEntity = RequestEntity
@@ -98,12 +103,10 @@ public class KakaoService {
         // HTTP 응답 (JSON) -> 액세스 토큰 파싱
         JsonNode jsonNode = new ObjectMapper().readTree(response.getBody());
 
-        log.info(jsonNode.toString());
-        jsonNode.get("access_token");
-        log.info(String.valueOf(jsonNode.get("access_token")));
-        log.info("카카오 API 응답: " + response.getBody());
-
-        log.info("getToken() 메서드 종료");
+//        log.info(jsonNode.toString());
+//        log.info(String.valueOf(jsonNode.get("access_token")));
+//        log.info("카카오 API 응답: " + response.getBody());
+//        log.info("getToken() 메서드 종료");
         return jsonNode.get("access_token").asText();
 
     }
@@ -148,25 +151,25 @@ public class KakaoService {
     }
 
 
-    private Member registerKakaoUserIfNeeded(KakaoMemberDto kakaoUserInfo) {
+    public Member registerKakaoUserIfNeeded(KakaoMemberDto kakaoUserInfo) {
         log.info("kakaoUserInfo 값 확인" + kakaoUserInfo.toString());
         Long kakaoId = kakaoUserInfo.getId();
         String profilImg = kakaoUserInfo.getProfilImg();
+        log.info("profilImg" + profilImg);
+
         Member kakaoUser = memberRepository.findByKakaoId(kakaoId).orElse(null);
 
         // 1. 카카오 신규로그인
         if (kakaoUser == null) {
-
             String randomNickname = generateCustomNickname();
-            // 중복 아닌 닉네임일 때까지 반복
+            // 2. 닉네임 중복여부 확인
             while (memberDetailRepository.findByNickname(randomNickname).isPresent()) {
                 randomNickname = generateCustomNickname();
             }
-            String kakaoUsername = "k" + kakaoId.toString();  // username은 nullable false이고
-            String password = UUID.randomUUID().toString();
-            String encodedPassword = passwordEncoder.encode(password);
+            String kakaoUsername = "k" + kakaoId.toString();
+            String kakaoPassword = passwordEncoder.encode(UUID.randomUUID().toString());
 
-            Member savedMember = memberRepository.save(new Member(kakaoUsername, encodedPassword, UserRoleEnum.USER, kakaoId));
+            Member savedMember = memberRepository.save(new Member(kakaoUsername, kakaoPassword, UserRoleEnum.USER, kakaoId));
             MemberDetail memberDetail = new MemberDetail(randomNickname,profilImg);
             memberDetail.setMember(savedMember);
             memberDetailRepository.save(memberDetail);
@@ -188,4 +191,4 @@ public class KakaoService {
         }
         return nickname.toString();
     }
-}
+    }

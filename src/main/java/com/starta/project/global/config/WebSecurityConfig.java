@@ -40,10 +40,15 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     public static final String ALLOWED_METHOD_NAMES = "GET,HEAD,POST,PUT,DELETE,TRACE,OPTIONS,PATCH";
 
-
     public void addCorsMappings(final CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000", "http://localhost:8080", "https://www.yulmoo.world", "https://yulmoo.world")
+                .allowedOrigins("http://localhost:3000",
+                                "http://localhost:8080",
+                                "https://www.yulmoo.world",
+                                "https://yulmoo.world",
+                                "https://api.quizpop.net",
+                                "https://www.quizpop.net",
+                                "https://quizpop.net")
                 .allowedMethods(ALLOWED_METHOD_NAMES.split(","))
                 .allowedHeaders("*")
                 .exposedHeaders(JwtUtil.AUTHORIZATION_HEADER, JwtUtil.REFRESH_HEADER) // JWT 헤더를 노출
@@ -72,8 +77,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         return new JwtAuthorizationFilter(jwtUtil, userDetailsService);
     }
 
-
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // CSRF 설정
@@ -84,7 +87,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
 
-        System.out.println("예외되는 URL ");
         http.authorizeHttpRequests((authorizeHttpRequests) ->
                         authorizeHttpRequests
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
