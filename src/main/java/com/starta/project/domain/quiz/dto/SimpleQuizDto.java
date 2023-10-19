@@ -24,6 +24,6 @@ public class SimpleQuizDto {
         this.category = quiz.getCategory();
         this.viewNum = quiz.getViewCount();
         this.likes = quiz.getViewCount();
-        this.username = quiz.getMember().getUsername();
+        this.username = quiz.getNickname();
     }
 }

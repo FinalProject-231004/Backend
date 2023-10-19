@@ -3,6 +3,7 @@ package com.starta.project.domain.quiz.service;
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.entity.MemberDetail;
 import com.starta.project.domain.member.repository.MemberDetailRepository;
+import com.starta.project.domain.member.repository.MemberRepository;
 import com.starta.project.domain.notification.entity.Notification;
 import com.starta.project.domain.notification.entity.NotificationType;
 import com.starta.project.domain.notification.service.NotificationService;
@@ -40,12 +41,14 @@ public class QuizService {
     private final AmazonS3Service amazonS3Service;
     private final MemberDetailRepository memberDetailRepository;
     private final NotificationService notificationService;
+    private final MemberRepository memberRepository;
 
     //퀴즈 만들기
+    @Transactional
     public ResponseEntity<MsgDataResponse> createQuiz(MultipartFile multipartFile, CreateQuizRequestDto quizRequestDto,
                                                       Member member) {
 
-        Optional<Quiz> quizOptional = quizRepository.findTopByMember(member);
+        Optional<Quiz> quizOptional = quizRepository.findTopByMemberId(member.getId());
         if(quizOptional.isEmpty()){
             MemberDetail memberDetail = member.getMemberDetail();
             memberDetail.gainMileagePoint(100);
@@ -62,10 +65,13 @@ public class QuizService {
             throw new IOException("이미지 업로드에 문제가 실패",e);
         }
         quizRequestDto.set(image);
+        //유저네임
+        String nickname = member.getMemberDetail().getNickname();
+        Long memberId = member.getId();
         //생성시간
         LocalDateTime now = LocalDateTime.now();
         //퀴즈 생성
-        quiz.set(quizRequestDto, now, member);
+        quiz.set(quizRequestDto, now, memberId,nickname);
         quizRepository.save(quiz);
         //퀴즈 반환
         CreateQuizResponseDto quizResponseDto = new CreateQuizResponseDto();
@@ -77,7 +83,7 @@ public class QuizService {
     public ResponseEntity<ShowQuizResponseDto> showQuiz(Long id, Member member) {
         ShowQuizResponseDto showQuizResponseDto = new ShowQuizResponseDto();
         Quiz quiz = findQuiz(id);
-        if(quiz.getDisplay()== false && !quiz.getMember().getId().equals(member.getId()))  {
+        if(quiz.getDisplay()== false && !quiz.getMemberId().equals(member.getId()))  {
             throw new IllegalArgumentException("게시된 퀴즈가 아닙니다. ");
         }
         //댓글 가져오기
@@ -99,7 +105,7 @@ public class QuizService {
         //이전의 것과 마찬가지 입니다.
         Quiz quiz = findQuiz(id);
         //유저 확인
-        if (!member.getId().equals(quiz.getMember().getId())) {
+        if (!member.getId().equals(quiz.getMemberId())) {
             MsgResponse msgResponse = new MsgResponse("퀴즈 생성자가 아닙니다. ");
             return ResponseEntity.badRequest().body(msgResponse);
         }
@@ -138,11 +144,11 @@ public class QuizService {
     public MsgResponse pushLikes(Long id, Member member) {
         Quiz quiz = findQuiz(id);
         Integer likesNum = quiz.getLikes();
-        if (likesRepository.findByMember(member).isPresent()){
+        if (likesRepository.findByMemberId(member.getId()).isPresent()){
             likesNum--;
             if(likesNum <= 0 ) likesNum = 0;
             quiz.pushLikes(likesNum);
-            likesRepository.delete(likesRepository.findByMember(member).get());
+            likesRepository.delete(likesRepository.findByMemberId(member.getId()).get());
             return new MsgResponse("좋아요를 취소했습니다! ");
         }
 
@@ -154,7 +160,7 @@ public class QuizService {
 
         //알림
         String sender = member.getUsername();
-        String receiver = quiz.getMember().getUsername();
+        String receiver = memberRepository.findById(quiz.getMemberId()).get().getUsername();
         String notificationId = receiver + "_" + System.currentTimeMillis();
         String title = quiz.getTitle();
         String content = "["
@@ -181,7 +187,7 @@ public class QuizService {
 
     public ResponseEntity<MsgResponse> display(Long id, Long memberId) {
         Quiz quiz = findQuiz(id);
-        if(!quiz.getMember().getId().equals(memberId)) {
+        if(!quiz.getMemberId().equals(memberId)) {
             return ResponseEntity.badRequest().body(new MsgResponse("작성자만 게시 가능합니다. "));
         }
         quiz.play(true);

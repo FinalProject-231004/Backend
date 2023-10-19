@@ -40,7 +40,7 @@ public class QuizQuestionService {
         //퀴즈 찾기
         Quiz quiz = findQuiz(id);
         //퀴즈 생성자 확인
-        if (!member.getId().equals(quiz.getMember().getId())) {
+        if (!member.getId().equals(quiz.getMemberId())) {
             MsgResponse msgResponse = new MsgResponse("퀴즈 생성자가 아닙니다. ");
             return ResponseEntity.badRequest().body(msgResponse);
         }
@@ -101,7 +101,7 @@ public class QuizQuestionService {
         // 퀴즈 찾기
         Quiz quiz = findQuiz(id);
 
-        if (!member.getId().equals(quiz.getMember().getId())) {
+        if (!member.getId().equals(quiz.getMemberId())) {
             MsgResponse msgResponse = new MsgResponse("퀴즈 생성자가 아닙니다. ");
             return ResponseEntity.badRequest().body(msgResponse);
         }
@@ -128,7 +128,7 @@ public class QuizQuestionService {
 
         QuizChoices quizChoices = quizChoicesRepository.findById(id).orElseThrow( ()
          -> new NullPointerException("해당 선택지는 없는 선택지입니다. "));
-        if (!member.getId().equals(quizChoices.getQuizQuestion().getQuiz().getMember().getId())) {
+        if (!member.getId().equals(quizChoices.getQuizQuestion().getQuiz().getMemberId())) {
             MsgResponse msgResponse = new MsgResponse("퀴즈 생성자가 아닙니다. ");
             return ResponseEntity.badRequest().body(msgResponse);
         }
