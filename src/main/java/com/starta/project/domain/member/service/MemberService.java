@@ -72,13 +72,13 @@ public class MemberService {
         );
         MemberDetail memberDetail = findMember.getMemberDetail();
 
-//        if (requestDto.getNewNickname() != null && !requestDto.getNewNickname().isEmpty()) {
-//            Optional<MemberDetail> newNickname = memberDetailRepository.findByNickname(requestDto.getNewNickname());
-//            if (newNickname.isPresent()) {
-//                throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
-//            }
-//            memberDetail.updateNickname(requestDto.getNewNickname());
-//        }
+        if (requestDto.getNewNickname() != null && !requestDto.getNewNickname().isEmpty()) {
+            Optional<MemberDetail> newNickname = memberDetailRepository.findByNickname(requestDto.getNewNickname());
+            if (newNickname.isPresent()) {
+                throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+            }
+            memberDetail.updateNickname(requestDto.getNewNickname());
+        }
 
         if (requestDto.getNewPassword() != null && !requestDto.getNewPassword().isEmpty()) {
             String setPassword = passwordEncoder.encode(requestDto.getNewPassword());
@@ -88,15 +88,19 @@ public class MemberService {
         return new MsgResponse("회원정보 변경완료");
     }
 
-    @Transactional
+//    @Transactional
     public MsgResponse deleteMember(String password, Member member) {
-        if (!passwordEncoder.matches(password, member.getPassword())) {
-            throw new IllegalArgumentException("Incorrect password.");
-        }
+        System.out.println(member.getPassword());
 
+        System.out.println(password);
+
+
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new IllegalArgumentException("비밀번호 불일치");
+        }
         memberRepository.delete(member);
 
-        return new MsgResponse("Account deleted successfully.");
+        return new MsgResponse("탈퇴완료.");
     }
 
 }

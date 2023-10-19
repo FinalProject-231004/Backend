@@ -75,9 +75,9 @@ public class MemberController {
 
     @Operation(summary = "회원탈퇴")
     @DeleteMapping("/delete")
-    public ResponseEntity<MsgResponse> deleteMember(@RequestBody String password,
+    public ResponseEntity<MsgResponse> deleteMember(@RequestBody PasswordValidationRequestDto requestDto,
                                                     @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.status(200).body(memberService.deleteMember(password, userDetails.getMember()));
+        return ResponseEntity.status(200).body(memberService.deleteMember(requestDto.getEnterPassword(), userDetails.getMember()));
     }
 
 
