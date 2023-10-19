@@ -41,6 +41,7 @@ public class ReadService {
         list = makeList(quizList,list);
         return list;
     }
+
     //좋아요 순
     @Transactional(readOnly = true)
     public List<SimpleQuizDto> readQuizByHot() {

@@ -1,6 +1,5 @@
 package com.starta.project.domain.quiz.entity;
 
-import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.quiz.dto.CreateQuizRequestDto;
 import lombok.Getter;
 
@@ -41,17 +40,20 @@ public class Quiz {
     @Column
     private Boolean display = false;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @Column
+    private Long memberId;
 
-    public void set(CreateQuizRequestDto quizRequestDto, LocalDateTime now, Member member) {
+    @Column
+    private String nickname;
+
+    public void set(CreateQuizRequestDto quizRequestDto, LocalDateTime now, Long memberId, String nickname) {
         this.title = quizRequestDto.getTitle();
         this.category = quizRequestDto.getCategory();
         this.image = quizRequestDto.getImage();
-        this.member = member;
         this.createdAt = now;
         this.content = quizRequestDto.getContent();
+        this.memberId = memberId;
+        this.nickname = nickname;
     }
 
     public void view(Integer viewCount) {

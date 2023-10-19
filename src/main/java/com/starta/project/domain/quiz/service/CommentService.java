@@ -17,6 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -24,6 +27,7 @@ public class CommentService {
     private final QuizRepository quizRepository;
     private final CommentRepository commentRepository;
     private final NotificationService notificationService;
+    private final MemberRepository memberRepository;
 
     public MsgResponse createComment(CreateCommentRequestDto createCommentRequestDto, Member member) {
         Quiz quiz = quizRepository.findById(createCommentRequestDto.getId()).orElseThrow( ()
@@ -33,31 +37,36 @@ public class CommentService {
         commentRepository.save(comment);
 
         //알림
-        String sender = member.getUsername();
-        String receiver = quiz.getMember().getUsername();
-        String notificationId = receiver + "_" + System.currentTimeMillis();
-        String title = quiz.getTitle();
-        String content = "["
-                + title.substring(0, 3) + "..."
-                + "]"
-                + "게시글에 댓글이 달렸습니다: "
-                + "["
-                + comment.getComment().substring(0, 3) + "..."
-                + "]";
-        String type = NotificationType.COMMENT.getAlias();
+        Optional<Member> memberOptional = memberRepository.findById(quiz.getMemberId());
 
-        Notification notification = Notification.builder()
-                .notificationId(notificationId)
-                .receiver(receiver)
-                .content(content)
-                .notificationType(type)
-                .url("/api/quiz/" + quiz.getId())
-                .readYn('N')
-                .deletedYn('N')
-                .build();
+        if (memberOptional.isPresent()) {
+            String sender = member.getUsername();
+            String receiver = memberOptional.get().getUsername();
+            String notificationId = receiver + "_" + System.currentTimeMillis();
+            String title = quiz.getTitle();
+            String content = "["
+                    + title.substring(0, 3) + "..."
+                    + "]"
+                    + "게시글에 댓글이 달렸습니다: "
+                    + "["
+                    + comment.getComment().substring(0, 3) + "..."
+                    + "]";
+            String type = NotificationType.COMMENT.getAlias();
 
-        //작성자 본인이 댓글/대댓글을 단 것이 아닌 경우에 한하여 알림
-        if(!receiver.equals(sender)) notificationService.sendNotification(notification);
+            Notification notification = Notification.builder()
+                    .notificationId(notificationId)
+                    .receiver(receiver)
+                    .content(content)
+                    .notificationType(type)
+                    .url("/api/quiz/" + quiz.getId())
+                    .readYn('N')
+                    .deletedYn('N')
+                    .created_at(LocalDateTime.now())
+                    .build();
+
+            //작성자 본인이 댓글/대댓글을 단 것이 아닌 경우에 한하여 알림
+            if (!receiver.equals(sender)) notificationService.sendNotification(notification);
+        }
 
         return new MsgResponse("댓글 작성을 성공했습니다");
     }
@@ -66,7 +75,7 @@ public class CommentService {
     public ResponseEntity<MsgResponse> updateComment(Long id, UpdateCommentResponseDto updateCommentResponseDto, Member member) {
         Comment comment = findComment(id);
 
-        if(!member.getId().equals(comment.getMember().getId()) ) {
+        if(!member.getId().equals(comment.getMemberId()) ) {
             return ResponseEntity.badRequest().body( new MsgResponse( "댓글을 작성한 유저만 수정 가능합니다. "));
         }
         comment.update(updateCommentResponseDto.getContent());
@@ -76,7 +85,7 @@ public class CommentService {
 
     public ResponseEntity<MsgResponse> deleteComment(Long id, Member member) {
         Comment comment = findComment(id);
-        if(!member.getId().equals(comment.getMember().getId()) ) {
+        if(!member.getId().equals(comment.getMemberId()) ) {
             return ResponseEntity.badRequest().body( new MsgResponse( "댓글을 작성한 유저만 삭제 가능합니다. "));
         }
         commentRepository.delete(comment);
