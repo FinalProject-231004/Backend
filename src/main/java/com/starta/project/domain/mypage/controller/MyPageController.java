@@ -2,6 +2,7 @@ package com.starta.project.domain.mypage.controller;
 
 import com.starta.project.domain.mileageshop.entity.ItemCategoryEnum;
 import com.starta.project.domain.mypage.service.MyPageService;
+import com.starta.project.domain.quiz.entity.Quiz;
 import com.starta.project.global.messageDto.MsgDataResponse;
 import com.starta.project.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -27,4 +30,9 @@ public class MyPageController {
         return ResponseEntity.status(HttpStatus.OK).body(myPageService.getPurchaseHistory(userDetails.getMember()));
     }
 
+    @Operation(summary = "임시 게시글 조회")
+    @GetMapping("/mypage/un-display")
+    public ResponseEntity<List<Quiz>> showUnDisplayQuiz(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(myPageService.showUnDisplayQuiz(userDetails.getMember()));
+    }
 }

@@ -42,10 +42,10 @@ public class QuizService {
     private final NotificationService notificationService;
 
     //퀴즈 만들기
-    @Transactional
     public ResponseEntity<MsgDataResponse> createQuiz(MultipartFile multipartFile, CreateQuizRequestDto quizRequestDto,
                                                       Member member) {
-        Optional<Quiz> quizOptional = quizRepository.findByMember(member);
+
+        Optional<Quiz> quizOptional = quizRepository.findTopByMember(member);
         if(quizOptional.isEmpty()){
             MemberDetail memberDetail = member.getMemberDetail();
             memberDetail.gainMileagePoint(100);
@@ -160,7 +160,7 @@ public class QuizService {
         String content = "["
                 + title.substring(0, 3) + "..."
                 + "]"
-                + "게시글 좋아요를 눌렀습니다. ";
+                + "게시글 좋아요가 추가되었습니다. ";
         String type = NotificationType.LIKEQUIZ.getAlias();
 
         Notification notification = Notification.builder()

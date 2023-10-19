@@ -49,5 +49,5 @@ logging:
 
 # 카카오 로그인
 kakao:
-   client-id: ${CLIENT_ID}
-   redirect-uri: ${REDIRECT_URI}
+  client-id: ${KAKAO_CLIENT_ID}
+  redirect-uri: ${KAKAO_REDIRECT_URI}

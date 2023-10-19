@@ -203,3 +203,4 @@ out/
 .github/*
 docker/*
 scripts/*
+logs/*
