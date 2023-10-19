@@ -10,6 +10,7 @@ import com.starta.project.domain.member.service.MemberService;
 import com.starta.project.global.messageDto.MsgResponse;
 import com.starta.project.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -32,10 +33,10 @@ public class MemberController {
     private final MemberService memberService;
     private final KakaoService kakaoService;
 
-
     @Operation(summary = "회원가입")
     @PostMapping("/signup")
-    public ResponseEntity<MsgResponse> signup(@Valid @RequestBody SignupRequestDto requestDto, BindingResult bindingResult) {
+    public ResponseEntity<MsgResponse> signup(@Valid @RequestBody SignupRequestDto requestDto,
+                                              BindingResult bindingResult) {
         // Validation 예외처리
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
         if (!fieldErrors.isEmpty()) {
@@ -45,7 +46,6 @@ public class MemberController {
             return ResponseEntity.badRequest().body(new MsgResponse("회원가입 실패"));
         }
         return ResponseEntity.ok(memberService.signup(requestDto));
-
     }
 
     @Operation(summary = "카카오 로그인용 서버컨트롤러")
@@ -61,7 +61,7 @@ public class MemberController {
     @PutMapping("/update")
     public ResponseEntity<MsgResponse> memberDetailUpdate(@Valid @RequestBody MemberUpdateRequestDto requestDto,
                                                           BindingResult bindingResult,
-                                                          @AuthenticationPrincipal UserDetailsImpl userDetails){
+                                                          @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         // Validation 예외처리
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
         if (!fieldErrors.isEmpty()) {
@@ -76,7 +76,7 @@ public class MemberController {
     @Operation(summary = "회원탈퇴")
     @DeleteMapping("/delete")
     public ResponseEntity<MsgResponse> deleteMember(@RequestBody PasswordValidationRequestDto requestDto,
-                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                                    @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.status(200).body(memberService.deleteMember(requestDto.getEnterPassword(), userDetails.getMember()));
     }
 
@@ -85,7 +85,7 @@ public class MemberController {
     @Operation(summary = "마이페이지 정보수정용 비밀번호 검증 API(validate Password)")
     @PostMapping("/validatePassword")
     public ResponseEntity<MsgResponse> validatePassword(@Valid @RequestBody PasswordValidationRequestDto requestDto,
-                                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                                        @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(memberService.validatePassword(requestDto, userDetails.getMember()));
     }
 
