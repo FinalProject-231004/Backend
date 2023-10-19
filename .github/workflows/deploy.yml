@@ -2,7 +2,7 @@ name: Deploy to cloudtype
 on:
   push:
     branches:
-      - develop
+      - main
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -44,6 +44,10 @@ jobs:
                   secret: REDIS_PASSWORD
                 - name: S3_Name
                   secret: S3_Name
+                - name: KAKAO_CLIENT_ID
+                  secret: KAKAO_CLIENT_ID
+                - name: KAKAO_REDIRECT_URI
+                  secret: KAKAO_REDIRECT_URI
                 - name: SPRING_PROFILES_ACTIVE
                   value: ""
             context:
