@@ -25,6 +25,6 @@ public class MyPageService {
     }
 
     public List<Quiz> showUnDisplayQuiz(Member member) {
-        return quizRepository.findAllByDisplayIsFalseAndMember(member);
+        return quizRepository.findAllByDisplayIsFalseAndMemberId(member.getId());
     }
 }

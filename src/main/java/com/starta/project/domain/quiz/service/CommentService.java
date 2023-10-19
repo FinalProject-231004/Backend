@@ -24,6 +24,7 @@ public class CommentService {
     private final QuizRepository quizRepository;
     private final CommentRepository commentRepository;
     private final NotificationService notificationService;
+    private final MemberRepository memberRepository;
 
     public MsgResponse createComment(CreateCommentRequestDto createCommentRequestDto, Member member) {
         Quiz quiz = quizRepository.findById(createCommentRequestDto.getId()).orElseThrow( ()
@@ -34,7 +35,7 @@ public class CommentService {
 
         //알림
         String sender = member.getUsername();
-        String receiver = quiz.getMember().getUsername();
+        String receiver = memberRepository.findById(quiz.getMemberId()).get().getUsername();
         String notificationId = receiver + "_" + System.currentTimeMillis();
         String title = quiz.getTitle();
         String content = "["
@@ -66,7 +67,7 @@ public class CommentService {
     public ResponseEntity<MsgResponse> updateComment(Long id, UpdateCommentResponseDto updateCommentResponseDto, Member member) {
         Comment comment = findComment(id);
 
-        if(!member.getId().equals(comment.getMember().getId()) ) {
+        if(!member.getId().equals(comment.getMemberId()) ) {
             return ResponseEntity.badRequest().body( new MsgResponse( "댓글을 작성한 유저만 수정 가능합니다. "));
         }
         comment.update(updateCommentResponseDto.getContent());
@@ -76,7 +77,7 @@ public class CommentService {
 
     public ResponseEntity<MsgResponse> deleteComment(Long id, Member member) {
         Comment comment = findComment(id);
-        if(!member.getId().equals(comment.getMember().getId()) ) {
+        if(!member.getId().equals(comment.getMemberId()) ) {
             return ResponseEntity.badRequest().body( new MsgResponse( "댓글을 작성한 유저만 삭제 가능합니다. "));
         }
         commentRepository.delete(comment);
