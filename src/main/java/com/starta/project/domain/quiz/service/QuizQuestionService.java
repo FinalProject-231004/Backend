@@ -58,7 +58,7 @@ public class QuizQuestionService {
         }
         //문제 번호 찾기
         Integer questionNum = 0;
-        //findTop == 가장 먼저 찾을 수 있는 항목
+        //findTop == 가장 먼저 찾을 수 있는 항목(살짝 다르긴 하지만 가장 큰 값이라는 것은 있다.)
         Optional<QuizQuestion> question =  quizQuestionRepository.findTopByQuizOrderByQuestionNumDesc(quiz);
         if (question.isPresent()){
             questionNum = question.get().getQuestionNum();

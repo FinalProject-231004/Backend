@@ -16,7 +16,7 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
 
     List<Quiz> findAllByDisplayIsTrueAndTitleContainingOrderById(String keyword);
 
-    Optional<Quiz> findTopByMemberId(Long id);
-
     List<Quiz> findAllByDisplayIsFalseAndMemberId(Long id);
+
+    Optional<Quiz> findFirstByMemberId(Long id);
 }

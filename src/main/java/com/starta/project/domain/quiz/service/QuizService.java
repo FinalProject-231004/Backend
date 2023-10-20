@@ -48,7 +48,7 @@ public class QuizService {
     public ResponseEntity<MsgDataResponse> createQuiz(MultipartFile multipartFile, CreateQuizRequestDto quizRequestDto,
                                                       Member member) {
 
-        Optional<Quiz> quizOptional = quizRepository.findTopByMemberId(member.getId());
+        Optional<Quiz> quizOptional = quizRepository.findFirstByMemberId(member.getId());
         if(quizOptional.isEmpty()){
             MemberDetail memberDetail = member.getMemberDetail();
             memberDetail.gainMileagePoint(100);
@@ -185,7 +185,6 @@ public class QuizService {
             //작성자 본인이 댓글/대댓글을 단 것이 아닌 경우에 한하여 알림
             if(!receiver.equals(sender)) notificationService.sendNotification(notification);
         }
-
         return new MsgResponse("좋아요를 눌렀습니다. ");
     }
 
