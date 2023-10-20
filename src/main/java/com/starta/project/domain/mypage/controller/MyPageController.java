@@ -42,4 +42,10 @@ public class MyPageController {
     public ResponseEntity<MsgResponse> attendance(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(myPageService.attendanceCheck(userDetails.getMember()));
     }
+
+    @Operation(summary = "회원정보 조회")
+    @GetMapping("/mypage/memberInfo")
+    public ResponseEntity<MsgDataResponse> memberInfo(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.status(HttpStatus.OK).body(myPageService.memberInfo(userDetails.getMember()));
+    }
 }

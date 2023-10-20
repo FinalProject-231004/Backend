@@ -2,6 +2,7 @@ package com.starta.project.domain.mypage.service;
 
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.repository.MemberRepository;
+import com.starta.project.domain.mypage.dto.MyPageMemberInfoDto;
 import com.starta.project.domain.mypage.dto.PurchaseHistoryItemDto;
 import com.starta.project.domain.mypage.entity.AttendanceCheck;
 import com.starta.project.domain.mypage.repository.AttendanceCheckRepository;
@@ -59,8 +60,17 @@ public class MyPageService {
         return new MsgResponse("출석체크에 성공하셨습니다.");
     }
 
+    // 회원 정보 조회 (헤더 정보값)
+    public MsgDataResponse memberInfo(Member member) {
+        Member findMember = findMember(member.getId());
+        MyPageMemberInfoDto myPageMemberInfoDto = new MyPageMemberInfoDto(findMember);
+        return new MsgDataResponse("조회에 성공하셨습니다.", myPageMemberInfoDto);
+    }
+
     // 유저 정보 검색
     private Member findMember(Long id) {
         return memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
     }
+
+
 }
