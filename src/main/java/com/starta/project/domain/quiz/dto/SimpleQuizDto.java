@@ -15,7 +15,7 @@ public class SimpleQuizDto {
     private QuizCategoryEnum category;
     private String title;
     private String image;
-    private String username;
+    private String nickname;
 
     public void set(Quiz quiz) {
         this.id = quiz.getId();
@@ -24,6 +24,6 @@ public class SimpleQuizDto {
         this.category = quiz.getCategory();
         this.viewNum = quiz.getViewCount();
         this.likes = quiz.getLikes();
-        this.username = quiz.getNickname();
+        this.nickname = quiz.getNickname();
     }
 }

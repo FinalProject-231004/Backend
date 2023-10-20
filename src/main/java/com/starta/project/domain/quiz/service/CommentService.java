@@ -29,6 +29,7 @@ public class CommentService {
     private final NotificationService notificationService;
     private final MemberRepository memberRepository;
 
+    //댓글 생성
     public MsgResponse createComment(CreateCommentRequestDto createCommentRequestDto, Member member) {
         Quiz quiz = quizRepository.findById(createCommentRequestDto.getId()).orElseThrow( ()
         -> new NullPointerException("해당 퀴즈가 없습니다. "));
@@ -71,6 +72,7 @@ public class CommentService {
         return new MsgResponse("댓글 작성을 성공했습니다");
     }
 
+    //댓글 수정
     @Transactional
     public ResponseEntity<MsgResponse> updateComment(Long id, UpdateCommentResponseDto updateCommentResponseDto, Member member) {
         Comment comment = findComment(id);
@@ -83,6 +85,7 @@ public class CommentService {
         return ResponseEntity.ok().body(new MsgResponse("댓글 수정을 성공했습니다. "));
     }
 
+    //댓글 삭제
     public ResponseEntity<MsgResponse> deleteComment(Long id, Member member) {
         Comment comment = findComment(id);
         if(!member.getId().equals(comment.getMemberId()) ) {
@@ -92,6 +95,7 @@ public class CommentService {
         return ResponseEntity.ok().body(new MsgResponse("댓글 삭제를 성공했습니다. "));
     }
 
+    //해당 댓글 찾기
     private Comment findComment (Long id) {
         return commentRepository.findById(id).orElseThrow( () ->
                 new NullPointerException("해당 댓글이 없습니다. "));

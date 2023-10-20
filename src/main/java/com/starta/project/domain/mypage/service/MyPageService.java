@@ -32,6 +32,7 @@ public class MyPageService {
         return new MsgDataResponse("조회에 성공하셨습니다.", purchaseHistoryRepository.findByMemberDetailIdOrderByOrderedAtDesc(member.getId()).stream().map(PurchaseHistoryItemDto::new));
     }
 
+    //미 게시 퀴즈 찾아옴
     public List<Quiz> showUnDisplayQuiz(Member member) {
         return quizRepository.findAllByDisplayIsFalseAndMemberId(member.getId());
     }

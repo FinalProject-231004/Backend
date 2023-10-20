@@ -61,6 +61,7 @@ public class ReadService {
         return list;
     }
 
+    //검색기능
     @Transactional(readOnly = true)
     public List<SimpleQuizDto> search(String keyword) {
         List<SimpleQuizDto> list = new ArrayList<>();
@@ -69,6 +70,7 @@ public class ReadService {
         return list;
     }
 
+    //검색바 안에 제목만 보이기
     public List<TitleListsDto> searchBar(String keyword) {
         List<TitleListsDto> list = new ArrayList<>();
         List<Quiz> quizList = findQuizLists(keyword);
@@ -79,6 +81,7 @@ public class ReadService {
         return list;
     }
 
+    //퀴즈 안에 있는 문제 리스트
     public List<QuizQuestion> showQuestionList(Long id) {
         Quiz quiz = quizRepository.findById(id).orElseThrow(
                 () -> new NullPointerException("해당 퀴즈는 없는 퀴즈입니다. "));
@@ -86,9 +89,11 @@ public class ReadService {
        return quizQuestion;
     }
 
+    //퀴즈 리스트
     private List<Quiz> findQuizLists (String keyword) {
         return quizRepository.findAllByDisplayIsTrueAndTitleContainingOrderById(keyword);
     }
+
     //리스트 만들기
     private List<SimpleQuizDto> makeList (List<Quiz> quizList , List<SimpleQuizDto> list) {
         for (Quiz quiz : quizList) {

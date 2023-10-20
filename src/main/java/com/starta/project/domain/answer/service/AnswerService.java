@@ -33,7 +33,7 @@ public class AnswerService {
     private final MemberDetailRepository memberDetailRepository;
 
 
-    @Transactional
+    @Transactional     // 퀴즈 선택지 (응답)
     public void choice(Long id, Member member) {
         QuizChoices quizChoices = quizChoicesRepository.findById(id).orElseThrow(
                 () -> new NullPointerException("해당 선택지는 잘못된 선택지입니다.! "));
@@ -47,8 +47,8 @@ public class AnswerService {
         } else if(answer.isEmpty()) {
             memberDetail.gainMileagePoint(10);
         }
-        //정답 체크
 
+        //정답 체크
         if (quizChoices.isChecks() == true &&
                 (memberAnswer.isCorrect() == false || answer.isEmpty())) {
             memberDetail.gainScore(10);
@@ -67,6 +67,7 @@ public class AnswerService {
         memberDetailRepository.save(memberDetail);
     }
 
+    //결과창 보기
     public ResponseEntity<MsgDataResponse> result(Long id, Member member) {
                         QuizQuestion quizQuestion = quizQuestionRepository.findById(id).orElseThrow(
                         () -> new NullPointerException("해당 문제는 잘못된 문제입니다.! ")

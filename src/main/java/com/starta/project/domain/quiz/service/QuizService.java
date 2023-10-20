@@ -47,8 +47,8 @@ public class QuizService {
     @Transactional
     public ResponseEntity<MsgDataResponse> createQuiz(MultipartFile multipartFile, CreateQuizRequestDto quizRequestDto,
                                                       Member member) {
-
         Optional<Quiz> quizOptional = quizRepository.findFirstByMemberId(member.getId());
+
         if(quizOptional.isEmpty()){
             MemberDetail memberDetail = member.getMemberDetail();
             memberDetail.gainMileagePoint(100);
@@ -80,6 +80,7 @@ public class QuizService {
         return ResponseEntity.ok().body(msgDataResponse);
     }
 
+    // 문제 상세 보기
     public ResponseEntity<ShowQuizResponseDto> showQuiz(Long id, Member member) {
         ShowQuizResponseDto showQuizResponseDto = new ShowQuizResponseDto();
         Quiz quiz = findQuiz(id);
@@ -100,7 +101,7 @@ public class QuizService {
         return ResponseEntity.status(200).body(showQuizResponseDto);
     }
 
-    @Transactional
+    @Transactional //퀴즈 삭제
     public ResponseEntity<MsgResponse> deleteQuiz(Long id, Member member) {
         //이전의 것과 마찬가지 입니다.
         Quiz quiz = findQuiz(id);
@@ -140,7 +141,8 @@ public class QuizService {
         return ResponseEntity.ok(new MsgResponse("퀴즈 삭제 성공! "));
     }
 
-    @Transactional
+
+    @Transactional //좋아요
     public MsgResponse pushLikes(Long id, Member member) {
         Quiz quiz = findQuiz(id);
         Integer likesNum = quiz.getLikes();
@@ -160,7 +162,6 @@ public class QuizService {
 
         //알림
         Optional<Member> memberOptional =  memberRepository.findById(quiz.getMemberId());
-
         if(memberOptional.isPresent()) {
             String sender = member.getUsername();
             String receiver = memberOptional.get().getUsername();
@@ -188,6 +189,7 @@ public class QuizService {
         return new MsgResponse("좋아요를 눌렀습니다. ");
     }
 
+    //게시하기
     public ResponseEntity<MsgResponse> display(Long id, Long memberId) {
         Quiz quiz = findQuiz(id);
         if(!quiz.getMemberId().equals(memberId)) {
@@ -199,12 +201,13 @@ public class QuizService {
     }
 
 
-
+    //퀴즈 찾기
     private Quiz findQuiz (Long id) {
        return quizRepository.findById(id).orElseThrow(() ->
                 new NullPointerException("해당 퀴즈가 없습니다."));
     }
 
+    //댓글 찾기
     private List<Comment> getComment(Long id) {
         List<Comment> commentList = commentRepository.findAllByQuizId(id);
         return commentList;
