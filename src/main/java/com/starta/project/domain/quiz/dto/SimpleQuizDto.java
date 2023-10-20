@@ -23,7 +23,7 @@ public class SimpleQuizDto {
         this.title = quiz.getTitle();
         this.category = quiz.getCategory();
         this.viewNum = quiz.getViewCount();
-        this.likes = quiz.getViewCount();
+        this.likes = quiz.getLikes();
         this.username = quiz.getNickname();
     }
 }
