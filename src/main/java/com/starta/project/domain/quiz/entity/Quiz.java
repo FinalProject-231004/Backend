@@ -46,10 +46,10 @@ public class Quiz {
     @Column
     private String nickname;
 
-    public void set(CreateQuizRequestDto quizRequestDto, LocalDateTime now, Long memberId, String nickname) {
+    public void set(CreateQuizRequestDto quizRequestDto, String image, LocalDateTime now, Long memberId, String nickname) {
         this.title = quizRequestDto.getTitle();
         this.category = quizRequestDto.getCategory();
-        this.image = quizRequestDto.getImage();
+        this.image = image;
         this.createdAt = now;
         this.content = quizRequestDto.getContent();
         this.memberId = memberId;

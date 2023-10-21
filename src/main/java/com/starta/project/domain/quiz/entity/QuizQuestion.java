@@ -30,11 +30,11 @@ public class QuizQuestion {
     @JoinColumn(name = "quiz_id", nullable = false)
     private Quiz quiz;
 
-    public void set(Quiz quiz, Integer questionNum, String title, String content, String dtoImage) {
+    public void set(Quiz quiz, Integer questionNum, String title, String content, String image) {
         this.quiz = quiz;
         this.quizTitle = title;
         this.quizContent = content;
-        this.image = dtoImage;
+        this.image = image;
         this.questionNum = questionNum;
     }
 

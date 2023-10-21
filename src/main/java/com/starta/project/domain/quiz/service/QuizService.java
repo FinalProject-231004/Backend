@@ -54,24 +54,22 @@ public class QuizService {
             memberDetail.gainMileagePoint(100);
             memberDetailRepository.save(memberDetail);
         }
-
         Quiz quiz = new Quiz();
         String image;
         //이미지
         try {
-            if (multipartFile.isEmpty()) image = "";
-            else image = amazonS3Service.upload(multipartFile);
+             image = amazonS3Service.upload(multipartFile);
         } catch (java.io.IOException e) {
             throw new IOException("이미지 업로드에 문제가 실패",e);
         }
-        quizRequestDto.set(image);
+
         //유저네임
         String nickname = member.getMemberDetail().getNickname();
         Long memberId = member.getId();
         //생성시간
         LocalDateTime now = LocalDateTime.now();
         //퀴즈 생성
-        quiz.set(quizRequestDto, now, memberId,nickname);
+        quiz.set(quizRequestDto,image, now, memberId,nickname);
         quizRepository.save(quiz);
         //퀴즈 반환
         CreateQuizResponseDto quizResponseDto = new CreateQuizResponseDto();

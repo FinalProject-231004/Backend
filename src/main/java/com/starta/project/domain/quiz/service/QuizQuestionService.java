@@ -45,16 +45,14 @@ public class QuizQuestionService {
             return ResponseEntity.badRequest().body(msgResponse);
         }
         //이미지 추가
-        String image;
+        String image = "";
         //이미지
         if(multipartFile.isPresent()){
             try {
-                if (multipartFile.isEmpty()) image = "";
-                else image = amazonS3Service.upload(multipartFile.get());
+                 image = amazonS3Service.upload(multipartFile.get());
             } catch (java.io.IOException e) {
                 throw new IOException("이미지 업로드에 문제가 있습니다!  ");
             }
-            createQuestionRequestDto.set(image);
         }
         //문제 번호 찾기
         Integer questionNum = 0;
@@ -67,7 +65,7 @@ public class QuizQuestionService {
         QuizQuestion quizQuestion = new QuizQuestion();
         questionNum++;
         quizQuestion.set(quiz,questionNum , createQuestionRequestDto.getTitle(), createQuestionRequestDto.getContent(),
-                createQuestionRequestDto.getImage());
+                image);
         quizQuestionRepository.save(quizQuestion);
         //선택지 만들기 [] 형식
         List<CreateQuizChoicesDto> quizChoicesList = createQuestionRequestDto.getQuizChoices();

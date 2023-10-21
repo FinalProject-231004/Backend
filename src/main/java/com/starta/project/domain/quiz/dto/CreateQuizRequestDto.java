@@ -8,9 +8,5 @@ public class CreateQuizRequestDto {
     private String title;
     private QuizCategoryEnum category;
     private String content;
-    private String image;
 
-    public void set(String image) {
-        this.image = image;
-    }
 }
