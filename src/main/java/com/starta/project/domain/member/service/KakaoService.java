@@ -3,7 +3,7 @@ package com.starta.project.domain.member.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.starta.project.domain.member.dto.KakaoMemberDto;
+import com.starta.project.domain.member.dto.KakaoMemberResponseDto;
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.entity.MemberDetail;
 import com.starta.project.domain.member.entity.UserRoleEnum;
@@ -25,7 +25,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.transaction.Transactional;
 import java.net.URI;
 import java.util.Random;
 import java.util.UUID;
@@ -53,7 +52,7 @@ public class KakaoService {
         String accessToken = getToken(code);
         log.info("accessToken값 : " + accessToken);
         // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
-        KakaoMemberDto kakaoMemberInfo = getKakaoUserInfo(accessToken);
+        KakaoMemberResponseDto kakaoMemberInfo = getKakaoUserInfo(accessToken);
         // 3. 로그인하기(필요시에 회원가입)
         Member kakaoMember = registerKakaoUserIfNeeded(kakaoMemberInfo);
 
@@ -111,7 +110,7 @@ public class KakaoService {
 
     }
 
-    private KakaoMemberDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
+    private KakaoMemberResponseDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
         log.info("accessToken: " + accessToken);
 
         // 요청 URL 만들기
@@ -148,11 +147,11 @@ public class KakaoService {
         String profileImg = jsonNode.get("properties").get("thumbnail_image").asText();
 
         log.info("카카오 사용자 정보: " + id + ", " + ", " + profileImg);
-        return new KakaoMemberDto(id, profileImg);
+        return new KakaoMemberResponseDto(id, profileImg);
     }
 
 
-    public Member registerKakaoUserIfNeeded(KakaoMemberDto kakaoUserInfo) {
+    public Member registerKakaoUserIfNeeded(KakaoMemberResponseDto kakaoUserInfo) {
         log.info("kakaoUserInfo 값 확인" + kakaoUserInfo.toString());
         Long kakaoId = kakaoUserInfo.getId();
         String profilImg = kakaoUserInfo.getProfilImg();
