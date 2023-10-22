@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+
 
 @Entity
 @Getter
@@ -20,7 +20,7 @@ public class MileageGetHistory {
     @Column
     private String description;
 
-    @Column
+    @Enumerated(value = EnumType.STRING)
     private TypeEnum type;
 
     @Column
