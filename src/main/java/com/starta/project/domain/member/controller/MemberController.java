@@ -38,16 +38,16 @@ public class MemberController {
     public ResponseEntity<MsgResponse> signup(@Valid @RequestBody SignupRequestDto requestDto,
                                               BindingResult bindingResult) {
         // Validation 예외처리
-        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-        if (!fieldErrors.isEmpty()) {
-            for (FieldError fieldError : bindingResult.getFieldErrors()) {
-                log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
-            }
-            return ResponseEntity.badRequest().body(new MsgResponse("회원가입 실패"));
-        }
-//        if (bindingResult.hasErrors()) {
+//        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+//        if (!fieldErrors.isEmpty()) {
+//            for (FieldError fieldError : bindingResult.getFieldErrors()) {
+//                log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
+//            }
 //            return ResponseEntity.badRequest().body(new MsgResponse("회원가입 실패"));
 //        }
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(new MsgResponse("회원가입 실패"));
+        }
         return ResponseEntity.ok(memberService.signup(requestDto));
     }
 
@@ -63,13 +63,12 @@ public class MemberController {
                                                       BindingResult bindingResult,
                                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
         // Validation 예외처리
-        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-        if (!fieldErrors.isEmpty()) {
-            for (FieldError fieldError : bindingResult.getFieldErrors()) {
-                log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
-            }
-        // Validation 예외처리
-//        if (bindingResult.hasErrors()) {
+//        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+//        if (!fieldErrors.isEmpty()) {
+//            for (FieldError fieldError : bindingResult.getFieldErrors()) {
+//                log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
+//            }
+        if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new MsgResponse("닉네임 수정 실패"));
         }
         return ResponseEntity.ok(memberService.updateNickname(requestDto, userDetails.getMember().getId()));
@@ -81,17 +80,16 @@ public class MemberController {
                                                       BindingResult bindingResult,
                                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
         // Validation 예외처리
-        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-        if (!fieldErrors.isEmpty()) {
-            for (FieldError fieldError : bindingResult.getFieldErrors()) {
-                log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
-            }
-            return ResponseEntity.badRequest().body(new MsgResponse("비밀번호 수정 실패"));
-        }
-        // Validation 예외처리
-//        if (bindingResult.hasErrors()) {
+//        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+//        if (!fieldErrors.isEmpty()) {
+//            for (FieldError fieldError : bindingResult.getFieldErrors()) {
+//                log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
+//            }
 //            return ResponseEntity.badRequest().body(new MsgResponse("비밀번호 수정 실패"));
 //        }
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(new MsgResponse("비밀번호 수정 실패"));
+        }
         return ResponseEntity.ok(memberService.updatePassword(requestDto, userDetails.getMember().getId()));
     }
 
