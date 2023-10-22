@@ -6,6 +6,8 @@ import com.starta.project.domain.answer.repository.MemberAnswerRepository;
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.entity.MemberDetail;
 import com.starta.project.domain.member.repository.MemberDetailRepository;
+import com.starta.project.domain.mypage.entity.MileageGetHistory;
+import com.starta.project.domain.mypage.repository.MileageGetHistoryRepository;
 import com.starta.project.domain.quiz.entity.Comment;
 import com.starta.project.domain.quiz.entity.Quiz;
 import com.starta.project.domain.quiz.entity.QuizChoices;
@@ -31,6 +33,7 @@ public class AnswerService {
     private final QuizQuestionRepository quizQuestionRepository;
     private final CommentRepository commentRepository;
     private final MemberDetailRepository memberDetailRepository;
+    private final MileageGetHistoryRepository mileageGetHistoryRepository;
 
 
     @Transactional     // 퀴즈 선택지 (응답)
@@ -45,7 +48,12 @@ public class AnswerService {
         if(answer.isPresent()) {
              memberAnswer = answer.get();
         } else if(answer.isEmpty()) {
-            memberDetail.gainMileagePoint(10);
+            Integer i = 10;
+            memberDetail.gainMileagePoint(i);
+            String des = "퀴즈 문제풀이 참여로 획득";
+            MileageGetHistory mileageGetHistory = new MileageGetHistory();
+            mileageGetHistory.getFromAnswer(i,des,memberDetail);
+            mileageGetHistoryRepository.save(mileageGetHistory);
         }
 
         //정답 체크
