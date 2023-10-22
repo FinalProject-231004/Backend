@@ -8,7 +8,7 @@ public class PurchaseHistoryItemDto {
     private Long id;
     private Integer totalPrice;
     private String itemName;
-    private String quantity;
+    private Integer quantity;
     private String email;
     private String orderedAt;
 
@@ -16,7 +16,7 @@ public class PurchaseHistoryItemDto {
         this.id = purchaseHistory.getId();
         this.totalPrice = purchaseHistory.getTotalPrice();
         this.itemName = purchaseHistory.getMileageShopItem().getItemName();
-        this.quantity = purchaseHistory.getQuantity().toString();
+        this.quantity = purchaseHistory.getQuantity();
         this.email = purchaseHistory.getEmail();
         this.orderedAt = purchaseHistory.getOrderedAt().toString();
     }
