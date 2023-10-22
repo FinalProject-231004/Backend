@@ -1,8 +1,9 @@
 package com.starta.project.domain.member.service;
 
-import com.starta.project.domain.member.dto.MemberUpdateRequestDto;
 import com.starta.project.domain.member.dto.PasswordValidationRequestDto;
 import com.starta.project.domain.member.dto.SignupRequestDto;
+import com.starta.project.domain.member.dto.UpdateNicknameRequestDto;
+import com.starta.project.domain.member.dto.UpdatePasswordRequestDto;
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.entity.MemberDetail;
 import com.starta.project.domain.member.entity.UserRoleEnum;
@@ -45,7 +46,6 @@ public class MemberService {
         if(requestDto.isAdmin()){
             role = UserRoleEnum.ADMIN;
         }
-
         // 회원 정보 저장
         Member savedMember = memberRepository.save(new Member(username, password, role));
 
@@ -65,42 +65,41 @@ public class MemberService {
     }
 
     @Transactional
-    public MsgResponse updateMemberDetail(MemberUpdateRequestDto requestDto, Long id) {
-
-        Member findMember = memberRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("없는 회원입니다.")
-        );
-        MemberDetail memberDetail = findMember.getMemberDetail();
-
-        if (requestDto.getNewNickname() != null && !requestDto.getNewNickname().isEmpty()) {
-            Optional<MemberDetail> newNickname = memberDetailRepository.findByNickname(requestDto.getNewNickname());
-            if (newNickname.isPresent()) {
-                throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
-            }
-            memberDetail.updateNickname(requestDto.getNewNickname());
+    public MsgResponse updateNickname(UpdateNicknameRequestDto requestDto, Long id) {
+        Member member = findMember(id);
+        MemberDetail memberDetail = member.getMemberDetail();
+        if (memberDetailRepository.findByNickname(requestDto.getNewNickname()).isPresent()) {
+            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
         }
 
-        if (requestDto.getNewPassword() != null && !requestDto.getNewPassword().isEmpty()) {
-            String setPassword = passwordEncoder.encode(requestDto.getNewPassword());
-            findMember.updatePassword(setPassword);
-            System.out.println(findMember.getPassword());
-        }
-        return new MsgResponse("회원정보 변경완료");
+        memberDetail.updateNickname(requestDto.getNewNickname());
+        return new MsgResponse("닉네임 변경완료.");
+
+
+    }
+    @Transactional
+    public MsgResponse updatePassword(UpdatePasswordRequestDto requestDto, Long id) {
+
+        Member member = findMember(id);
+        MemberDetail memberDetail = member.getMemberDetail();
+        String encodedPassword = passwordEncoder.encode(requestDto.getNewPassword());
+        member.updatePassword(encodedPassword);
+        return new MsgResponse("비밀번호 변경완료");
     }
 
-//    @Transactional
+    @Transactional  // 일관성 유지를 위해 사용
     public MsgResponse deleteMember(String password, Member member) {
-        System.out.println(member.getPassword());
-
-        System.out.println(password);
-
-
         if (!passwordEncoder.matches(password, member.getPassword())) {
-            throw new IllegalArgumentException("비밀번호 불일치");
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
         memberRepository.delete(member);
-
         return new MsgResponse("탈퇴완료.");
+    }
+
+    private Member findMember(Long id) {
+        return memberRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("회원을 찾을 수 없습니다.")
+        );
     }
 
 }
