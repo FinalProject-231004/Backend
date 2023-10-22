@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,12 +24,12 @@ public class MileageGetHistory {
     private TypeEnum type;
 
     @Column
-    private LocalDateTime date;
+    private LocalDate date;
 
     @Column
     private Integer points;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_detail_id")
     private MemberDetail memberDetail;
 
