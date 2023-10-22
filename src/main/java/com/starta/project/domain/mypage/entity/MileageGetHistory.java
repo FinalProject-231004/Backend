@@ -24,7 +24,7 @@ public class MileageGetHistory {
     private TypeEnum type;
 
     @Column
-    private LocalDate date;
+    private LocalDate date = LocalDate.now();
 
     @Column
     private Integer points;
@@ -33,4 +33,17 @@ public class MileageGetHistory {
     @JoinColumn(name = "member_detail_id")
     private MemberDetail memberDetail;
 
+    public void getFromQuiz(MemberDetail memberDetail, Integer i, String des) {
+        this.description = des;
+        this.points = i;
+        this.memberDetail = memberDetail;
+        this.type = TypeEnum.QUIZ;
+    }
+
+    public void getFromAnswer(Integer i, String des, MemberDetail memberDetail) {
+        this.description = des;
+        this.points = i;
+        this.memberDetail = memberDetail;
+        this.type = TypeEnum.QUIZ;
+    }
 }

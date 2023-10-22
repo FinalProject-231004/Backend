@@ -4,6 +4,8 @@ import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.entity.MemberDetail;
 import com.starta.project.domain.member.repository.MemberDetailRepository;
 import com.starta.project.domain.member.repository.MemberRepository;
+import com.starta.project.domain.mypage.entity.MileageGetHistory;
+import com.starta.project.domain.mypage.repository.MileageGetHistoryRepository;
 import com.starta.project.domain.notification.entity.Notification;
 import com.starta.project.domain.notification.entity.NotificationType;
 import com.starta.project.domain.notification.service.NotificationService;
@@ -42,6 +44,7 @@ public class QuizService {
     private final MemberDetailRepository memberDetailRepository;
     private final NotificationService notificationService;
     private final MemberRepository memberRepository;
+    private final MileageGetHistoryRepository getHistoryRepository;
 
     //퀴즈 만들기
     @Transactional
@@ -51,8 +54,13 @@ public class QuizService {
 
         if(quizOptional.isEmpty()){
             MemberDetail memberDetail = member.getMemberDetail();
-            memberDetail.gainMileagePoint(100);
+            Integer i = 100;
+            memberDetail.gainMileagePoint(i);
             memberDetailRepository.save(memberDetail);
+            MileageGetHistory mileageGetHistory = new MileageGetHistory();
+            String des = "퀴즈 최초 생성 ";
+            mileageGetHistory.getFromQuiz(memberDetail,i,des);
+            getHistoryRepository.save(mileageGetHistory);
         }
         Quiz quiz = new Quiz();
         String image;
