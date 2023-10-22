@@ -2,6 +2,7 @@ package com.starta.project.domain.mypage.service;
 
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.repository.MemberRepository;
+import com.starta.project.domain.mypage.dto.MileageGetHistoryDto;
 import com.starta.project.domain.mypage.dto.MyPageMemberInfoDto;
 import com.starta.project.domain.mypage.dto.PurchaseHistoryItemDto;
 import com.starta.project.domain.mypage.entity.AttendanceCheck;
@@ -41,6 +42,7 @@ public class MyPageService {
         return quizRepository.findAllByDisplayIsFalseAndMemberId(member.getId());
     }
 
+    // 출석 체크
     @Transactional
     public MsgResponse attendanceCheck(Member member) {
         Member findMember = findMember(member.getId());
@@ -77,10 +79,15 @@ public class MyPageService {
         return new MsgDataResponse("조회에 성공하셨습니다.", myPageMemberInfoDto);
     }
 
+    // 마일리지 적립 내역
+    @Transactional(readOnly = true)
+    public MsgDataResponse mileageGetHistory(Member member) {
+        Member findMember = findMember(member.getId());
+        return new MsgDataResponse("조회에 성공하셨습니다.", mileageGetHistoryRepository.findByMemberDetailIdOrderByDateDesc(findMember.getMemberDetail().getId()).stream().map(MileageGetHistoryDto::new));
+    }
+
     // 유저 정보 검색
     private Member findMember(Long id) {
         return memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
     }
-
-
 }
