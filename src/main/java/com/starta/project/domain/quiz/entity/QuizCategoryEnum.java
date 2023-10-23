@@ -1,7 +1,8 @@
 package com.starta.project.domain.quiz.entity;
 
 public enum QuizCategoryEnum {
-    MOVIE_TV_CARTOON,
+    MOVIE_TV,
+    CARTOON,
     GAME,
     IQ_TEST,
     PERSON,

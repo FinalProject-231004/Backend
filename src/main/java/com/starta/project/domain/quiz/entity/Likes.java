@@ -15,7 +15,7 @@ public class Likes {
     @Column
     private Long memberId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "quiz_id",nullable = false)
     private Quiz quiz;
 
