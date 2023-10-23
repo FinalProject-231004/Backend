@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class SimpleQuizDto {
 
     private Long id;
-    private Integer viewNum;
+    private Integer viewCount;
     private Integer likes;
     private QuizCategoryEnum category;
     private String title;
@@ -22,7 +22,7 @@ public class SimpleQuizDto {
         this.image = quiz.getImage();
         this.title = quiz.getTitle();
         this.category = quiz.getCategory();
-        this.viewNum = quiz.getViewCount();
+        this.viewCount = quiz.getViewCount();
         this.likes = quiz.getLikes();
         this.nickname = quiz.getNickname();
     }

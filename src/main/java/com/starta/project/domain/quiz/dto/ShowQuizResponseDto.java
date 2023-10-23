@@ -17,6 +17,7 @@ public class ShowQuizResponseDto {
     private String username;
     private String image;
     private Integer viewCount;
+    private Integer likes;
     private LocalDateTime createdTime;
     private QuizCategoryEnum category;
     private String content;
@@ -30,8 +31,8 @@ public class ShowQuizResponseDto {
         this.username = quiz.getNickname();
         this.createdTime = quiz.getCreatedAt();
         this.image = quiz.getImage();
+        this.likes = quiz.getLikes();
         this.content = quiz.getContent();
         this.viewCount = viewcount;
     }
-
 }

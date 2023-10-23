@@ -12,8 +12,8 @@ public class ResultResponseDto {
     private String title;
     private String content;
     private String image;
-    private Integer likeNum;
-    private Integer viewNum;
+    private Integer likes;
+    private Integer viewCount;
     private List<Comment> comments;
 
     public void set(Quiz quiz, List<Comment> list) {
@@ -21,8 +21,8 @@ public class ResultResponseDto {
         this.title = quiz.getTitle();
         this.content = quiz.getContent();
         this.image = quiz.getImage();
-        this.viewNum = quiz.getViewCount();
-        this.likeNum = quiz.getLikes();
+        this.viewCount = quiz.getViewCount();
+        this.likes = quiz.getLikes();
         this.comments = list;
     }
 }
