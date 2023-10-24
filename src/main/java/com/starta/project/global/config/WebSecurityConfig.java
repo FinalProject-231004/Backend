@@ -91,7 +91,9 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         authorizeHttpRequests
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .antMatchers("/").permitAll()
-                                .antMatchers("/api/member/**").permitAll()
+                                .antMatchers("/api/member/login").permitAll()
+                                .antMatchers("/api/member/signup").permitAll()
+                                .antMatchers("/api/member/kakao/callback").permitAll()
                                 .antMatchers("/v3/api-docs/**").permitAll()
                                 .antMatchers("/swagger-ui/**").permitAll()
                                 .antMatchers("/api/quiz/**").permitAll()
