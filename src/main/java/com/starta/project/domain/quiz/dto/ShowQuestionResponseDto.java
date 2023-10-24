@@ -18,7 +18,6 @@ public class ShowQuestionResponseDto {
     public void set(QuizQuestion quizQuestion, List<QuizChoices> list) {
         this.id = quizQuestion.getId();
         this.title = quizQuestion.getQuizTitle();
-        this.content = quizQuestion.getQuizContent();
         this.image = quizQuestion.getImage();;
         this.quizChoices = list;
     }

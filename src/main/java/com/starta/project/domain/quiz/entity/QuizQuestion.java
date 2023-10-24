@@ -23,17 +23,13 @@ public class QuizQuestion {
     @Column
     private String image;
 
-    @Column(nullable = false)
-    private String quizContent;
-
     @ManyToOne
     @JoinColumn(name = "quiz_id", nullable = false)
     private Quiz quiz;
 
-    public void set(Quiz quiz, Integer questionNum, String title, String content, String image) {
+    public void set(Quiz quiz, Integer questionNum, String title, String image) {
         this.quiz = quiz;
         this.quizTitle = title;
-        this.quizContent = content;
         this.image = image;
         this.questionNum = questionNum;
     }
@@ -41,6 +37,5 @@ public class QuizQuestion {
     public void update(UpdateQuizQuestionDto updateQuizQuestionDto) {
         this.quizTitle = updateQuizQuestionDto.getTitle();
         this.image = updateQuizQuestionDto.getImage();
-        this.quizContent = updateQuizQuestionDto.getContent();
     }
 }

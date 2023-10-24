@@ -10,7 +10,6 @@ import java.util.List;
 public class CreateQuestionRequestDto {
 
     private String title;
-    private String content;
     private List<CreateQuizChoicesDto> quizChoices;
 
 }

@@ -64,8 +64,7 @@ public class QuizQuestionService {
         //문제 만들기
         QuizQuestion quizQuestion = new QuizQuestion();
         questionNum++;
-        quizQuestion.set(quiz,questionNum , createQuestionRequestDto.getTitle(), createQuestionRequestDto.getContent(),
-                image);
+        quizQuestion.set(quiz,questionNum , createQuestionRequestDto.getTitle(), image);
         quizQuestionRepository.save(quizQuestion);
         //선택지 만들기 [] 형식
         List<CreateQuizChoicesDto> quizChoicesList = createQuestionRequestDto.getQuizChoices();
