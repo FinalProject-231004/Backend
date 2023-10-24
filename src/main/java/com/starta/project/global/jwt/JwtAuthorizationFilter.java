@@ -2,6 +2,8 @@ package com.starta.project.global.jwt;
 
 
 import com.starta.project.global.exception.Custom.CustomExpiredJwtException;
+import com.starta.project.global.exception.Custom.CustomMalformedJwtException;
+import com.starta.project.global.exception.Custom.CustomUnsupportedJwtException;
 import com.starta.project.global.security.UserDetailsServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -74,13 +76,23 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     res.setStatus(401);
                     res.getWriter().write("{\"msg\":\"Expired Access Token. 토큰이 만료되었습니다.\"}");
                     return; // 필터 체인 종료
-                } catch (Exception e) {
-                    log.info("Token validation failed.", e);
-
+                } catch (CustomUnsupportedJwtException e) {
                     res.setContentType("application/json");
                     res.setCharacterEncoding("utf-8");
-                    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    res.getWriter().write("{\"msg\":\"토큰 검증 실패\"}");
+                    res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    res.getWriter().write("{\"msg\":\"Unsupported JWT Token. 지원하지 않는 JWT 토큰입니다.\"}");
+                    return; // 필터 체인 종료
+                } catch (CustomMalformedJwtException e) {
+                    res.setContentType("application/json");
+                    res.setCharacterEncoding("utf-8");
+                    res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    res.getWriter().write("{\"msg\":\"Malformed JWT Token. 형식이 잘못된 JWT 토큰입니다.\"}");
+                    return; // 필터 체인 종료
+                } catch (Exception e) {
+                    res.setContentType("application/json");
+                    res.setCharacterEncoding("utf-8");
+                    res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    res.getWriter().write("{\"msg\":\"서버 내부 오류가 발생했습니다.\"}");
                     return; // 필터 체인 종료
                 }
             }
