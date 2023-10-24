@@ -25,8 +25,8 @@ public class QuizQuestionController {
     @Operation(summary = "문제 생성 ")
     @PostMapping("/quiz/{id}/quizQuestion")
     public ResponseEntity<MsgResponse> createQuizQuestion (@PathVariable Long id,
-                                                           @RequestPart("requestDto") CreateQuestionRequestDto createQuestionRequestDto,
                                                            @RequestPart("image") Optional<MultipartFile> multipartFile,
+                                                           @RequestPart("requestDto") CreateQuestionRequestDto createQuestionRequestDto,
                                                            @Parameter(hidden = true)
                                                                @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return quizQuestionService.createQuizQuestion(id,multipartFile, createQuestionRequestDto, userDetails.getMember());

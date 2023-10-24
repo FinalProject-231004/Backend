@@ -24,8 +24,8 @@ public class QuizController {
 
     @Operation(summary = "퀴즈 생성")
     @PostMapping("/quiz")
-    public ResponseEntity<MsgDataResponse> createQuiz (@RequestPart("requestDto") CreateQuizRequestDto quizRequestDto,
-                                                       @RequestPart("image") MultipartFile multipartFile,
+    public ResponseEntity<MsgDataResponse> createQuiz (@RequestPart("image") MultipartFile multipartFile,
+                                                       @RequestPart("requestDto") CreateQuizRequestDto quizRequestDto,
                                                        @Parameter(hidden = true)
                                                            @AuthenticationPrincipal UserDetailsImpl userDetails)  {
         return quizService.createQuiz(multipartFile ,quizRequestDto, userDetails.getMember() );
