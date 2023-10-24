@@ -61,12 +61,6 @@ public class MemberService {
         return new MsgResponse("회원가입 성공");
     }
 
-    public MsgResponse validatePassword(PasswordValidationRequestDto requestDto, Member member) {
-        if (!passwordEncoder.matches(requestDto.getEnterPassword(), member.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-        }
-        return new MsgResponse("비밀번호 검증 성공");
-    }
 
     public MsgDataResponse getUserDetailView(Member member) {
         String image = member.getMemberDetail().getImage();
@@ -121,6 +115,19 @@ public class MemberService {
         return new MsgResponse("비밀번호 변경완료");
     }
 
+    public MsgResponse validateNickname(UpdateNicknameRequestDto requestDto) {
+        if (memberDetailRepository.findByNickname(requestDto.getNewNickname()).isPresent()) {
+            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다!");
+        }
+        return new MsgResponse("사용 가능한 닉네임입니다!");
+    }
+    public MsgResponse validatePassword(PasswordValidationRequestDto requestDto, Member member) {
+        if (!passwordEncoder.matches(requestDto.getEnterPassword(), member.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+        return new MsgResponse("비밀번호 검증 성공");
+    }
+
     @Transactional  // 일관성 유지를 위해 사용
     public MsgResponse deleteMember(String password, Member member) {
         if (!passwordEncoder.matches(password, member.getPassword())) {
@@ -136,6 +143,7 @@ public class MemberService {
                 new IllegalArgumentException("회원을 찾을 수 없습니다.")
         );
     }
+
 
 
 }

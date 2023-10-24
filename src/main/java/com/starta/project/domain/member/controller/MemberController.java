@@ -95,8 +95,19 @@ public class MemberController {
         return ResponseEntity.ok(new MsgDataResponse("내 정보 변경 화면로딩 성공!", userDetails.getMember().getUsername()));
     }
 
+    @Operation(summary = "Nickname 수정 - 중복검증")
+    @PostMapping("/validate/nickname")
+    public ResponseEntity<MsgResponse> validateNickname(@Valid @RequestBody UpdateNicknameRequestDto requestDto,
+                                                        BindingResult bindingResult) {
+        // Validation 예외처리
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(new MsgResponse("닉네임은 5글자 이하의 한글, 숫자, 영소문자로만 적어주세요."));
+        }
+        return ResponseEntity.ok(memberService.validateNickname(requestDto));
+    }
+
     @Operation(summary = "마이페이지 내 정보 변경 비밀번호 검증")
-    @PostMapping("/validatePassword")
+    @PostMapping("/validate/password")
     public ResponseEntity<MsgResponse> validatePassword(@Valid @RequestBody PasswordValidationRequestDto requestDto,
                                                         @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(memberService.validatePassword(requestDto, userDetails.getMember()));
