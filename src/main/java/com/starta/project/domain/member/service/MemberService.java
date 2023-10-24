@@ -1,14 +1,12 @@
 package com.starta.project.domain.member.service;
 
-import com.starta.project.domain.member.dto.PasswordValidationRequestDto;
-import com.starta.project.domain.member.dto.SignupRequestDto;
-import com.starta.project.domain.member.dto.UpdateNicknameRequestDto;
-import com.starta.project.domain.member.dto.UpdatePasswordRequestDto;
+import com.starta.project.domain.member.dto.*;
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.entity.MemberDetail;
 import com.starta.project.domain.member.entity.UserRoleEnum;
 import com.starta.project.domain.member.repository.MemberDetailRepository;
 import com.starta.project.domain.member.repository.MemberRepository;
+import com.starta.project.global.messageDto.MsgDataResponse;
 import com.starta.project.global.messageDto.MsgResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -64,6 +62,14 @@ public class MemberService {
         return new MsgResponse("비밀번호 검증 성공");
     }
 
+    public MsgDataResponse getUserDetailView(Member member) {
+        String image = member.getMemberDetail().getImage();
+        String nickname = member.getMemberDetail().getNickname();
+
+        return new MsgDataResponse("내 정보 불러오기 성공!", new MemberViewResponseDto(image,nickname));
+    }
+
+
     @Transactional
     public MsgResponse updateNickname(UpdateNicknameRequestDto requestDto, Long id) {
         Member member = findMember(id);
@@ -96,10 +102,12 @@ public class MemberService {
         return new MsgResponse("탈퇴완료.");
     }
 
+    // 현재 유저 정보 찾기
     private Member findMember(Long id) {
         return memberRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("회원을 찾을 수 없습니다.")
         );
     }
+
 
 }

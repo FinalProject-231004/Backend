@@ -38,13 +38,6 @@ public class MemberController {
     public ResponseEntity<MsgResponse> signup(@Valid @RequestBody SignupRequestDto requestDto,
                                               BindingResult bindingResult) {
         // Validation 예외처리
-//        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-//        if (!fieldErrors.isEmpty()) {
-//            for (FieldError fieldError : bindingResult.getFieldErrors()) {
-//                log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
-//            }
-//            return ResponseEntity.badRequest().body(new MsgResponse("회원가입 실패"));
-//        }
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new MsgResponse("회원가입 실패"));
         }
@@ -57,17 +50,19 @@ public class MemberController {
                                                   HttpServletResponse response) throws JsonProcessingException {
         return ResponseEntity.ok(kakaoService.kakaoLogin(code, response));
     }
+
+    @Operation(summary = "마이페이지 내 정보 불러오기(프로필, 닉네임, 비밀번호)")
+    @GetMapping("/update/view")
+    public ResponseEntity<MsgDataResponse> getUserDetailView(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(memberService.getUserDetailView(userDetails.getMember()));
+    }
+
     @Operation(summary = "Nickname 수정")
     @PutMapping("/update/nickname")
     public ResponseEntity<MsgResponse> updateNickname(@Valid @RequestBody UpdateNicknameRequestDto requestDto,
                                                       BindingResult bindingResult,
-                                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                                      @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         // Validation 예외처리
-//        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-//        if (!fieldErrors.isEmpty()) {
-//            for (FieldError fieldError : bindingResult.getFieldErrors()) {
-//                log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
-//            }
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new MsgResponse("닉네임 수정 실패"));
         }
@@ -78,32 +73,19 @@ public class MemberController {
     @PutMapping("/update/password")
     public ResponseEntity<MsgResponse> updatePassword(@Valid @RequestBody UpdatePasswordRequestDto requestDto,
                                                       BindingResult bindingResult,
-                                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                                      @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         // Validation 예외처리
-//        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-//        if (!fieldErrors.isEmpty()) {
-//            for (FieldError fieldError : bindingResult.getFieldErrors()) {
-//                log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
-//            }
-//            return ResponseEntity.badRequest().body(new MsgResponse("비밀번호 수정 실패"));
-//        }
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new MsgResponse("비밀번호 수정 실패"));
         }
         return ResponseEntity.ok(memberService.updatePassword(requestDto, userDetails.getMember().getId()));
     }
 
-    @Operation(summary = "회원탈퇴")
-    @DeleteMapping("/delete")
-    public ResponseEntity<MsgResponse> deleteMember(@RequestBody PasswordValidationRequestDto requestDto,
-                                                    @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.status(200).body(memberService.deleteMember(requestDto.getEnterPassword(), userDetails.getMember()));
-    }
 
 
     @Operation(summary = "마이페이지 내 정보 변경")
     @GetMapping("/validatePassword")
-    public ResponseEntity<MsgDataResponse> getUserId(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<MsgDataResponse> getUserId(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(new MsgDataResponse("내 정보 변경 화면로딩 성공!", userDetails.getMember().getUsername()));
     }
 
@@ -113,4 +95,12 @@ public class MemberController {
                                                         @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(memberService.validatePassword(requestDto, userDetails.getMember()));
     }
+
+    @Operation(summary = "회원탈퇴")
+    @DeleteMapping("/delete")
+    public ResponseEntity<MsgResponse> deleteMember(@RequestBody PasswordValidationRequestDto requestDto,
+                                                    @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.status(200).body(memberService.deleteMember(requestDto.getEnterPassword(), userDetails.getMember()));
+    }
+
 }
