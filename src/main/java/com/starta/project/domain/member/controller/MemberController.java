@@ -19,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -57,6 +58,13 @@ public class MemberController {
         return ResponseEntity.ok(memberService.getUserDetailView(userDetails.getMember()));
     }
 
+    @Operation(summary = "profile 수정")
+    @PutMapping("/update/profile")
+    public ResponseEntity<MsgResponse> updateProfile(@RequestPart("newImage") MultipartFile newImage,
+                                                     @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(memberService.updateProfile(newImage, userDetails.getMember().getId()));
+    }
+
     @Operation(summary = "Nickname 수정")
     @PutMapping("/update/nickname")
     public ResponseEntity<MsgResponse> updateNickname(@Valid @RequestBody UpdateNicknameRequestDto requestDto,
@@ -81,9 +89,7 @@ public class MemberController {
         return ResponseEntity.ok(memberService.updatePassword(requestDto, userDetails.getMember().getId()));
     }
 
-
-
-    @Operation(summary = "마이페이지 내 정보 변경")
+    @Operation(summary = "마이페이지 내 정보 변경 비밀번호 검증(Id값 로딩)")
     @GetMapping("/validatePassword")
     public ResponseEntity<MsgDataResponse> getUserId(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(new MsgDataResponse("내 정보 변경 화면로딩 성공!", userDetails.getMember().getUsername()));

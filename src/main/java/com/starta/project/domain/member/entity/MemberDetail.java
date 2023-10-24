@@ -58,6 +58,12 @@ public class MemberDetail {
     public void setMember(Member member) {
         this.member = member;
     }
+    public void updateNickname(String newNickname)  {
+        this.nickname = newNickname;
+    }
+    public void updateImage(String newImage)  {
+        this.image = newImage;
+    }
 
     public void changeMileagePoint(Integer totalPrice) {
         this.mileagePoint -= totalPrice;
@@ -84,9 +90,6 @@ public class MemberDetail {
                 break;
             }
         }
-    }
-    public void updateNickname(String newNickname)  {
-        this.nickname = newNickname;
     }
 }
 
