@@ -11,7 +11,6 @@ public class ShowQuestionResponseDto {
 
     private Long id;
     private String title;
-    private String content;
     private String image;
     private List<QuizChoices> quizChoices;
 
