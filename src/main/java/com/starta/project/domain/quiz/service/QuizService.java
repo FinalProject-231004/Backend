@@ -150,13 +150,15 @@ public class QuizService {
 
     @Transactional //좋아요
     public MsgResponse pushLikes(Long id, Member member) {
+
         Quiz quiz = findQuiz(id);
         Integer likesNum = quiz.getLikes();
-        if (likesRepository.findByMemberId(member.getId()).isPresent()){
+        Optional<Likes> likesOptional = likesRepository.findByMemberIdAndQuiz(member.getId(),quiz);
+
+        if (likesOptional.isPresent()){
             likesNum--;
-            if(likesNum <= 0 ) likesNum = 0;
             quiz.pushLikes(likesNum);
-            likesRepository.delete(likesRepository.findByMemberId(member.getId()).get());
+            likesRepository.delete(likesOptional.get());
             return new MsgResponse("좋아요를 취소했습니다! ");
         }
 
