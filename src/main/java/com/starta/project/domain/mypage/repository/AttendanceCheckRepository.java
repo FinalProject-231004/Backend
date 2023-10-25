@@ -9,4 +9,6 @@ import java.util.Optional;
 
 public interface AttendanceCheckRepository extends JpaRepository<AttendanceCheck, Long> {
     Optional<AttendanceCheck> findByMemberAndCheckDate(Member member, LocalDate today);
+
+    void deleteAllByMember(Member member);
 }

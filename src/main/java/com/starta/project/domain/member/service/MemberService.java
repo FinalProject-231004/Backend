@@ -1,5 +1,6 @@
 package com.starta.project.domain.member.service;
 
+import com.starta.project.domain.answer.repository.MemberAnswerRepository;
 import com.starta.project.domain.member.dto.*;
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.entity.MemberDetail;
@@ -7,6 +8,9 @@ import com.starta.project.domain.member.entity.UserRoleEnum;
 import com.starta.project.domain.member.repository.MemberDetailRepository;
 import com.starta.project.domain.member.repository.MemberRepository;
 import com.starta.project.domain.mileageshop.entity.MileageShopItem;
+import com.starta.project.domain.mypage.repository.AttendanceCheckRepository;
+import com.starta.project.domain.mypage.repository.MileageGetHistoryRepository;
+import com.starta.project.domain.mypage.repository.PurchaseHistoryRepository;
 import com.starta.project.global.aws.AmazonS3Service;
 import com.starta.project.global.messageDto.MsgDataResponse;
 import com.starta.project.global.messageDto.MsgResponse;
@@ -25,6 +29,10 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberDetailRepository memberDetailRepository;
+    private final MileageGetHistoryRepository mileageGetHistoryRepository;
+    private final MemberAnswerRepository memberAnswerRepository;
+    private final PurchaseHistoryRepository purchaseHistoryRepository;
+    private final AttendanceCheckRepository attendanceCheckRepository;
     private final PasswordEncoder passwordEncoder;
     private final AmazonS3Service amazonS3Service;
 
@@ -128,14 +136,29 @@ public class MemberService {
         return new MsgResponse("비밀번호 검증 성공");
     }
 
-    @Transactional  // 일관성 유지를 위해 사용
+    @Transactional
     public MsgResponse deleteMember(String password, Member member) {
         if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
+
+        // MemberDetail과 연관된 엔터티들을 삭제
+        MemberDetail memberDetail = member.getMemberDetail();
+        if (memberDetail != null) {
+            mileageGetHistoryRepository.deleteAllByMemberDetail(memberDetail);
+            purchaseHistoryRepository.deleteAllByMemberDetail(memberDetail);
+            memberAnswerRepository.deleteAllByMemberDetail(memberDetail);
+        }
+
+        // AttendanceCheck와의 연관관계 끊기
+        attendanceCheckRepository.deleteAllByMember(member);
+
+        // Member 엔터티 삭제
         memberRepository.delete(member);
+
         return new MsgResponse("탈퇴완료.");
     }
+
 
     // 현재 유저 정보 찾기
     private Member findMember(Long id) {
