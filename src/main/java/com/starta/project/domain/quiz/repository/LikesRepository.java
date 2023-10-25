@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LikesRepository extends JpaRepository<Likes, Long> {
-    Optional<Likes> findByMemberId(Long member);
-
     List<Likes> findAllByQuiz(Quiz quiz);
+
+    Optional<Likes> findByMemberIdAndQuiz(Long id, Quiz quiz);
 }
