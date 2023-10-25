@@ -40,6 +40,7 @@ public class Notification {
 
     public static Notification of(Notification notification) {
         return Notification.builder()
+                .id(notification.getId())
                 .notificationId(notification.getNotificationId())
                 .receiver(notification.getReceiver())
                 .content(notification.getContent())
