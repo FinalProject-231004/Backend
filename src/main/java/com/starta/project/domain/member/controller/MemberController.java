@@ -46,10 +46,12 @@ public class MemberController {
     }
 
     @Operation(summary = "카카오 로그인")
-    @PostMapping("/kakao/callback")
+    @GetMapping("/kakao/callback")
     public ResponseEntity<MsgResponse> kakaoLogin(@RequestParam String code,
                                                   HttpServletResponse response) throws JsonProcessingException {
+       log.info("카카오 백엔드 로그인 진입");
         return ResponseEntity.ok(kakaoService.kakaoLogin(code, response));
+
     }
 
     @Operation(summary = "마이페이지 내 정보 불러오기(프로필, 닉네임, 비밀번호)")

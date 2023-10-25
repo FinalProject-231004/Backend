@@ -103,10 +103,10 @@ public class KakaoService {
         // HTTP 응답 (JSON) -> 액세스 토큰 파싱
         JsonNode jsonNode = new ObjectMapper().readTree(response.getBody());
 
-//        log.info(jsonNode.toString());
-//        log.info(String.valueOf(jsonNode.get("access_token")));
-//        log.info("카카오 API 응답: " + response.getBody());
-//        log.info("getToken() 메서드 종료");
+        log.info(jsonNode.toString());
+        log.info(String.valueOf(jsonNode.get("access_token")));
+        log.info("카카오 API 응답: " + response.getBody());
+        log.info("getToken() 메서드 종료");
         return jsonNode.get("access_token").asText();
 
     }
