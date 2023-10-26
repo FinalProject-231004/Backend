@@ -1,6 +1,7 @@
 package com.starta.project.domain.quiz.controller;
 
 import com.starta.project.domain.quiz.dto.CategoryDto;
+import com.starta.project.domain.quiz.dto.ShowQuestionResponseDto;
 import com.starta.project.domain.quiz.dto.SimpleQuizDto;
 import com.starta.project.domain.quiz.dto.TitleListsDto;
 import com.starta.project.domain.quiz.entity.QuizQuestion;
@@ -51,7 +52,7 @@ public class ReadController {
 
     @Operation(summary = "퀴즈에 있는 모든 문제 리스트 ")
     @GetMapping("/quiz/quizQuestion/{id}")
-    public ResponseEntity<List<QuizQuestion>> showQuizQuestionList(@PathVariable Long id) {
+    public ResponseEntity<List<ShowQuestionResponseDto>> showQuizQuestionList(@PathVariable Long id) {
         return ResponseEntity.ok(readService.showQuestionList(id));
     }
 

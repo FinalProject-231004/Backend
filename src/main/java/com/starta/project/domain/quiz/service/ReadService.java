@@ -1,10 +1,13 @@
 package com.starta.project.domain.quiz.service;
 
 import com.starta.project.domain.quiz.dto.CategoryDto;
+import com.starta.project.domain.quiz.dto.ShowQuestionResponseDto;
 import com.starta.project.domain.quiz.dto.SimpleQuizDto;
 import com.starta.project.domain.quiz.dto.TitleListsDto;
 import com.starta.project.domain.quiz.entity.Quiz;
+import com.starta.project.domain.quiz.entity.QuizChoices;
 import com.starta.project.domain.quiz.entity.QuizQuestion;
+import com.starta.project.domain.quiz.repository.QuizChoicesRepository;
 import com.starta.project.domain.quiz.repository.QuizQuestionRepository;
 import com.starta.project.domain.quiz.repository.QuizRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +24,7 @@ public class ReadService {
 
     private final QuizRepository quizRepository;
     private final QuizQuestionRepository quizQuestionRepository;
-
+    private final QuizChoicesRepository quizChoicesRepository;
     // 카테고리 별 정렬
     @Transactional(readOnly = true)
     public List<SimpleQuizDto> readByCategory(CategoryDto categoryDto) {
@@ -80,11 +83,19 @@ public class ReadService {
     }
 
     //퀴즈 안에 있는 문제 리스트
-    public List<QuizQuestion> showQuestionList(Long id) {
+    public List<ShowQuestionResponseDto> showQuestionList(Long id) {
         Quiz quiz = quizRepository.findById(id).orElseThrow(
                 () -> new NullPointerException("해당 퀴즈는 없는 퀴즈입니다. "));
         List<QuizQuestion> quizQuestion = quizQuestionRepository.findAllByQuiz(quiz);
-       return quizQuestion;
+        List<ShowQuestionResponseDto> showQuestionResponseDtos = new ArrayList<>();
+        for (QuizQuestion question : quizQuestion) {
+            List<QuizChoices> list = quizChoicesRepository.findAllByQuizQuestion(question);
+            // 반환
+            ShowQuestionResponseDto showQuestionResponseDto = new ShowQuestionResponseDto();
+            showQuestionResponseDto.set(question, list);
+            showQuestionResponseDtos.add(showQuestionResponseDto);
+        }
+       return showQuestionResponseDtos;
     }
 
     //퀴즈 리스트
@@ -101,6 +112,4 @@ public class ReadService {
         }
         return list;
     }
-
-
 }
