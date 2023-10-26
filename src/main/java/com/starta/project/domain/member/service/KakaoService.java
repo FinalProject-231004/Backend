@@ -84,7 +84,7 @@ public class KakaoService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", client_id);
-        body.add("redirect_uri",  "http://localhost:3000/login/kakao");   /// 프론트 서버임
+        body.add("redirect_uri", redirect_uri);
         body.add("code", code);
 
         RequestEntity<MultiValueMap<String, String>> requestEntity = RequestEntity
