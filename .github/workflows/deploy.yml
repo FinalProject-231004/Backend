@@ -21,33 +21,33 @@ jobs:
           project: quizpop9916/backend
           stage: main
           yaml: |
-            name: backend
+            name: backend1
             app: java@17
             options:
               ports: 8080
               env:
                 - name: DB_PASSWORD
                   secret: DB_PASSWORD
+                - name: DB_URL
+                  secret: DB_URL
                 - name: JWT_SecretKey
                   secret: JWT_SecretKey
-                - name: S3_AccessKey
-                  secret: S3_AccessKey
-                - name: S3_SecretKey
-                  secret: S3_SecretKey
-                - name: REDIS_URL
-                  secret: REDIS_URL
-                - name: REDIS_PORT
-                  secret: REDIS_PORT
-                - name: REIDS_PASSWORD
-                  secret: DB_PASSWORD
-                - name: S3_NAME
-                  secret: S3_NAME
                 - name: KAKAO_CLIENT_ID
                   secret: KAKAO_CLIENT_ID
                 - name: KAKAO_REDIRECT_URI
                   secret: KAKAO_REDIRECT_URI
-                - name: DB_URL
-                  secret: DB_URL
+                - name: REDIS_PORT
+                  secret: REDIS_PORT
+                - name: REDIS_URL
+                  secret: REDIS_URL
+                - name: REIDS_PASSWORD
+                  secret: REIDS_PASSWORD
+                - name: S3_AccessKey
+                  secret: S3_AccessKey
+                - name: S3_NAME
+                  secret: S3_NAME
+                - name: S3_SecretKey
+                  secret: S3_SecretKey
                 - name: SPRING_PROFILES_ACTIVE
                   value: ""
             context:
