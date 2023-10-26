@@ -18,7 +18,7 @@ jobs:
         uses: cloudtype-github-actions/deploy@v1
         with:
           token: ${{ secrets.CLOUDTYPE_TOKEN }}
-          project: heypoppop/final
+          project: quizpop9916/backend
           stage: main
           yaml: |
             name: backend
@@ -26,8 +26,6 @@ jobs:
             options:
               ports: 8080
               env:
-                - name: DB_URL
-                  secret: DB_URL
                 - name: DB_PASSWORD
                   secret: DB_PASSWORD
                 - name: JWT_SecretKey
@@ -41,13 +39,15 @@ jobs:
                 - name: REDIS_PORT
                   secret: REDIS_PORT
                 - name: REIDS_PASSWORD
-                  secret: REDIS_PASSWORD
-                - name: S3_Name
-                  secret: S3_Name
+                  secret: DB_PASSWORD
+                - name: S3_NAME
+                  secret: S3_NAME
                 - name: KAKAO_CLIENT_ID
                   secret: KAKAO_CLIENT_ID
                 - name: KAKAO_REDIRECT_URI
                   secret: KAKAO_REDIRECT_URI
+                - name: DB_URL
+                  secret: DB_URL
                 - name: SPRING_PROFILES_ACTIVE
                   value: ""
             context:
