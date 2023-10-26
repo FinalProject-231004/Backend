@@ -46,7 +46,7 @@ public class MemberController {
     }
 
     @Operation(summary = "카카오 로그인")
-    @PostMapping("/kakao/callback")
+    @GetMapping("/kakao/callback")
     public ResponseEntity<MsgResponse> kakaoLogin(@RequestParam String code,
                                                   HttpServletResponse response) throws JsonProcessingException {
         return ResponseEntity.ok(kakaoService.kakaoLogin(code, response));
