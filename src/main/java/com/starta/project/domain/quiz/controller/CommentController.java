@@ -20,11 +20,12 @@ public class CommentController {
     private final CommentService commentService;
 
     @Operation(summary = "댓글 생성 ")
-    @PostMapping("/comment")
+    @PostMapping("/comment/{id}")
     public ResponseEntity<MsgResponse> createComment (@RequestBody CreateCommentRequestDto createCommentRequestDto,
+                                                      @PathVariable Long id,
                                                       @Parameter(hidden = true)
                                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(commentService.createComment(createCommentRequestDto, userDetails.getMember()));
+        return ResponseEntity.ok(commentService.createComment(id,createCommentRequestDto, userDetails.getMember()));
     }
 
     @Operation(summary = "댓글 수정")
