@@ -1,6 +1,7 @@
 package com.starta.project.domain.quiz.service;
 
 import com.starta.project.domain.member.entity.Member;
+import com.starta.project.domain.quiz.dto.ChoicesList;
 import com.starta.project.domain.quiz.dto.CreateQuestionRequestDto;
 import com.starta.project.domain.quiz.dto.CreateQuizChoicesDto;
 import com.starta.project.domain.quiz.dto.ShowQuestionResponseDto;
@@ -85,7 +86,13 @@ public class QuizQuestionService {
         // 해당 퀴즈의 n번 문제 찾기
         QuizQuestion quizQuestion = findQuizQuestion(quiz, questionNum);
         // 선택지 찾아오기
-        List<QuizChoices> list = quizChoicesRepository.findAllByQuizQuestion(quizQuestion);
+        List<QuizChoices> quizChoicesList = quizChoicesRepository.findAllByQuizQuestion(quizQuestion);
+
+        List<ChoicesList> list = new ArrayList<>();
+        for (QuizChoices quizChoices : quizChoicesList) {
+            ChoicesList choicesList = new ChoicesList(quizChoices);
+            list.add(choicesList);
+        }
         // 반환
         ShowQuestionResponseDto showQuestionResponseDto = new ShowQuestionResponseDto();
         showQuestionResponseDto.set(quizQuestion, list);

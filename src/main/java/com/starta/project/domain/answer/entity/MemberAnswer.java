@@ -1,5 +1,6 @@
 package com.starta.project.domain.answer.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.starta.project.domain.member.entity.MemberDetail;
 import lombok.Getter;
 
@@ -23,8 +24,8 @@ public class MemberAnswer {
     @Column
     private Long memberId;
 
-    @ManyToOne
-    @JoinColumn(name = "member_detail_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn( name = "member_detail_id")
     private MemberDetail memberDetail;
 
     public void set(boolean b) {

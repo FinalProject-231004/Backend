@@ -1,5 +1,6 @@
 package com.starta.project.domain.answer.service;
 
+import com.starta.project.domain.answer.dto.ChoiceRequestDto;
 import com.starta.project.domain.answer.dto.ResultResponseDto;
 import com.starta.project.domain.answer.entity.MemberAnswer;
 import com.starta.project.domain.answer.repository.MemberAnswerRepository;
@@ -37,13 +38,17 @@ public class AnswerService {
 
 
     @Transactional     // 퀴즈 선택지 (응답)
-    public void choice(Long id, Member member) {
-        QuizChoices quizChoices = quizChoicesRepository.findById(id).orElseThrow(
-                () -> new NullPointerException("해당 선택지는 잘못된 선택지입니다.! "));
-        MemberDetail memberDetail = member.getMemberDetail();
-        Optional<MemberAnswer> answer = memberAnswerRepository.findByMemberIdAndQuizQuestionNum(member.getId() ,
-                quizChoices.getQuizQuestion().getQuestionNum());
+    public void choice(ChoiceRequestDto choiceRequestDto, Member member) {
 
+        QuizChoices quizChoices = quizChoicesRepository.findById(choiceRequestDto.getId()).orElseThrow(
+                () -> new NullPointerException("해당 선택지는 잘못된 선택지입니다. ㅋ "));
+        Long quizId = quizChoices.getQuizQuestion().getQuiz().getId();
+        Integer quizQuestionNum = quizChoices.getQuizQuestion().getQuestionNum();
+
+        MemberDetail memberDetail = member.getMemberDetail();
+        Optional<MemberAnswer> answer = memberAnswerRepository.findByMemberIdAndQuizQuestionNum(
+                member.getId(),quizQuestionNum);
+        System.out.println(quizQuestionNum);
         MemberAnswer memberAnswer = new MemberAnswer();
         if(answer.isPresent()) {
              memberAnswer = answer.get();
@@ -64,9 +69,10 @@ public class AnswerService {
 
         System.out.println(memberDetail.getTotalScore());
         memberAnswer.set(quizChoices.isChecks());
+
         //응답 저장
-        Long quizId = quizChoices.getQuizQuestion().getQuiz().getId();
-        memberAnswer.answer(member.getId(),quizId,quizChoices.getQuizQuestion().getQuestionNum());
+
+        memberAnswer.answer(quizId,member.getId(),quizQuestionNum);
 
         if (answer.isEmpty()) memberDetail.answer(memberAnswer);
         else {

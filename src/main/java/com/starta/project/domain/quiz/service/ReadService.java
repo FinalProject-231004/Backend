@@ -1,9 +1,6 @@
 package com.starta.project.domain.quiz.service;
 
-import com.starta.project.domain.quiz.dto.CategoryDto;
-import com.starta.project.domain.quiz.dto.ShowQuestionResponseDto;
-import com.starta.project.domain.quiz.dto.SimpleQuizDto;
-import com.starta.project.domain.quiz.dto.TitleListsDto;
+import com.starta.project.domain.quiz.dto.*;
 import com.starta.project.domain.quiz.entity.Quiz;
 import com.starta.project.domain.quiz.entity.QuizChoices;
 import com.starta.project.domain.quiz.entity.QuizQuestion;
@@ -89,7 +86,12 @@ public class ReadService {
         List<QuizQuestion> quizQuestion = quizQuestionRepository.findAllByQuiz(quiz);
         List<ShowQuestionResponseDto> showQuestionResponseDtos = new ArrayList<>();
         for (QuizQuestion question : quizQuestion) {
-            List<QuizChoices> list = quizChoicesRepository.findAllByQuizQuestion(question);
+            List<QuizChoices> quizChoicesList = quizChoicesRepository.findAllByQuizQuestion(question);
+            List<ChoicesList> list = new ArrayList<>();
+            for (QuizChoices quizChoices : quizChoicesList) {
+                ChoicesList choicesList = new ChoicesList(quizChoices);
+                list.add(choicesList);
+            }
             // 반환
             ShowQuestionResponseDto showQuestionResponseDto = new ShowQuestionResponseDto();
             showQuestionResponseDto.set(question, list);
