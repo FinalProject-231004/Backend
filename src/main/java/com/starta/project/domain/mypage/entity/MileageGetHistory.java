@@ -29,7 +29,7 @@ public class MileageGetHistory {
     @Column
     private Integer points;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_detail_id")
     private MemberDetail memberDetail;
 
