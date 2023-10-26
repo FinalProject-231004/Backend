@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@JsonSerialize
 public class ShowQuizResponseDto {
     private Long id;
     private String title;
