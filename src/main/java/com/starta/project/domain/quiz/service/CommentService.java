@@ -30,8 +30,8 @@ public class CommentService {
     private final MemberRepository memberRepository;
 
     //댓글 생성
-    public MsgResponse createComment(CreateCommentRequestDto createCommentRequestDto, Member member) {
-        Quiz quiz = quizRepository.findById(createCommentRequestDto.getId()).orElseThrow( ()
+    public MsgResponse createComment(Long id, CreateCommentRequestDto createCommentRequestDto, Member member) {
+        Quiz quiz = quizRepository.findById(id).orElseThrow( ()
         -> new NullPointerException("해당 퀴즈가 없습니다. "));
         Comment comment = new Comment();
         comment.set(quiz,createCommentRequestDto,member);
