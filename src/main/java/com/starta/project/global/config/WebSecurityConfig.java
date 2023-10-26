@@ -43,13 +43,12 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     public void addCorsMappings(final CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:3000",
-                                "https://localhost:3000",
-                                "http://localhost:8080",
-                                "https://www.yulmoo.world",
-                                "https://yulmoo.world",
-                                "https://api.quizpop.net",
-                                "https://www.quizpop.net",
-                                "https://quizpop.net")
+                        "http://localhost:8080",
+                        "https://www.yulmoo.world",
+                        "https://yulmoo.world",
+                        "https://api.quizpop.net",
+                        "https://www.quizpop.net",
+                        "https://quizpop.net")
                 .allowedMethods(ALLOWED_METHOD_NAMES.split(","))
                 .allowedHeaders("*")
                 .exposedHeaders(JwtUtil.AUTHORIZATION_HEADER, JwtUtil.REFRESH_HEADER) // JWT 헤더를 노출
@@ -89,17 +88,16 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         );
 
         http.authorizeHttpRequests((authorizeHttpRequests) ->
-                        authorizeHttpRequests
-                                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                                .antMatchers("/").permitAll()
-//                                .antMatchers("/api/member/login").permitAll()
-                                .antMatchers("/api/member/**").permitAll()
-//                                .antMatchers("/api/member/signup").permitAll()
-//                                .antMatchers("/api/member/kakao/callback").permitAll()
-                                .antMatchers("/v3/api-docs/**").permitAll()
-                                .antMatchers("/swagger-ui/**").permitAll()
-                                .antMatchers("/api/quiz/**").permitAll()
-                                .anyRequest().authenticated() // 그 외 모든 요청 인증처리
+                authorizeHttpRequests
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                        .antMatchers("/").permitAll()
+                        .antMatchers("/api/member/login").permitAll()
+                        .antMatchers("/api/member/signup").permitAll()
+                        .antMatchers("/api/member/kakao/callback").permitAll()
+                        .antMatchers("/v3/api-docs/**").permitAll()
+                        .antMatchers("/swagger-ui/**").permitAll()
+                        .antMatchers("/api/quiz/**").permitAll()
+                        .anyRequest().authenticated() // 그 외 모든 요청 인증처리
         );
 
         http.cors();
