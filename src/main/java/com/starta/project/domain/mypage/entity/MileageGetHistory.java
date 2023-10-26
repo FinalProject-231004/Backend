@@ -1,5 +1,6 @@
 package com.starta.project.domain.mypage.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.starta.project.domain.member.entity.MemberDetail;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,7 +30,8 @@ public class MileageGetHistory {
     @Column
     private Integer points;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @ManyToOne
     @JoinColumn(name = "member_detail_id")
     private MemberDetail memberDetail;
 

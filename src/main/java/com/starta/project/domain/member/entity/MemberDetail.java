@@ -37,7 +37,7 @@ public class MemberDetail {
     private Member member;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "memberDetail",cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "memberDetail",cascade = CascadeType.ALL)
     private List<MemberAnswer> memberAnswer = new ArrayList<>();
 
     public MemberDetail(String nickname) {
