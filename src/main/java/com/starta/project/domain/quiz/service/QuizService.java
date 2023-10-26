@@ -111,11 +111,11 @@ public class QuizService {
     public ResponseEntity<MsgResponse> deleteQuiz(Long id, Member member) {
         //이전의 것과 마찬가지 입니다.
         Quiz quiz = findQuiz(id);
-        //유저 확인
-        if (!member.getId().equals(quiz.getMemberId())) {
-            MsgResponse msgResponse = new MsgResponse("퀴즈 생성자가 아닙니다. ");
-            return ResponseEntity.badRequest().body(msgResponse);
-        }
+//        //유저 확인
+//        if (!member.getId().equals(quiz.getMemberId())) {
+//            MsgResponse msgResponse = new MsgResponse("퀴즈 생성자가 아닙니다. ");
+//            return ResponseEntity.badRequest().body(msgResponse);
+//        }
 
         //하위 항목 + 이미지 찾아서 리스트 만들기
         List<Likes> likes = likesRepository.findAllByQuiz(quiz);

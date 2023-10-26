@@ -10,7 +10,7 @@ public interface MemberAnswerRepository extends JpaRepository<MemberAnswer,Long>
 
     int countByQuizIdAndCorrectIsTrueAndMemberId(Long quizId, Long member);
 
-    Optional<MemberAnswer> findByMemberIdAndQuizQuestionNum(Long id, Integer questionNum);
-
     void deleteAllByMemberDetail(MemberDetail memberDetail);
+
+    Optional<MemberAnswer> findByMemberIdAndQuizQuestionNum(Long id, Integer quizQuestionNum);
 }

@@ -12,10 +12,10 @@ public class ShowQuestionResponseDto {
     private Long id;
     private String title;
     private String image;
-    private List<QuizChoices> quizChoices;
+    private List<ChoicesList> quizChoices;
 
 
-    public void set(QuizQuestion quizQuestion, List<QuizChoices> list) {
+    public void set(QuizQuestion quizQuestion, List<ChoicesList> list) {
         this.id = quizQuestion.getId();
         this.title = quizQuestion.getQuizTitle();
         this.image = quizQuestion.getImage();;
