@@ -1,6 +1,7 @@
 package com.starta.project.domain.quiz.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.starta.project.domain.quiz.dto.UpdateQuizQuestionDto;
 import lombok.Getter;
@@ -23,7 +24,8 @@ public class QuizQuestion {
     @Column
     private String image;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "quiz_id", nullable = false)
     private Quiz quiz;
 
