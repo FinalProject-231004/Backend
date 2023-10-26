@@ -14,6 +14,7 @@ public class ShowQuestionResponseDto {
     private String image;
     private List<QuizChoices> quizChoices;
 
+
     public void set(QuizQuestion quizQuestion, List<QuizChoices> list) {
         this.id = quizQuestion.getId();
         this.title = quizQuestion.getQuizTitle();

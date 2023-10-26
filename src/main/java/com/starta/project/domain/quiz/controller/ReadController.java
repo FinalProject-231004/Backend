@@ -38,7 +38,7 @@ public class ReadController {
         return ResponseEntity.ok(readService.readQuizByHot());
     }
 
-    @Operation(summary = "죄회수 순 조회")
+    @Operation(summary = "조회수 순 조회")
     @GetMapping("/quiz/viewCount")
     public ResponseEntity<List<SimpleQuizDto>> readByView () {
         return ResponseEntity.ok(readService.readByView());
