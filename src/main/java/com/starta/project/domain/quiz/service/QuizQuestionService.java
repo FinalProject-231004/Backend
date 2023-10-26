@@ -1,10 +1,7 @@
 package com.starta.project.domain.quiz.service;
 
 import com.starta.project.domain.member.entity.Member;
-import com.starta.project.domain.quiz.dto.ChoicesList;
-import com.starta.project.domain.quiz.dto.CreateQuestionRequestDto;
-import com.starta.project.domain.quiz.dto.CreateQuizChoicesDto;
-import com.starta.project.domain.quiz.dto.ShowQuestionResponseDto;
+import com.starta.project.domain.quiz.dto.*;
 import com.starta.project.domain.quiz.entity.Quiz;
 import com.starta.project.domain.quiz.entity.QuizChoices;
 import com.starta.project.domain.quiz.entity.QuizQuestion;
@@ -35,47 +32,61 @@ public class QuizQuestionService {
 
     //퀴즈 생성
     @Transactional
-    public ResponseEntity<MsgResponse> createQuizQuestion(Long id, Optional<MultipartFile> multipartFile,
-                                                          CreateQuestionRequestDto createQuestionRequestDto,
-                                                          Member member) {
+    public ResponseEntity<MsgResponse> createQuizQuestion(
+            Long id,
+            List<MultipartFile> images,
+            List<CreateQuestionRequestDto> questionListRequestDto,
+            Member member) {
+
         //퀴즈 찾기
         Quiz quiz = findQuiz(id);
+
         //퀴즈 생성자 확인
         if (!member.getId().equals(quiz.getMemberId())) {
             MsgResponse msgResponse = new MsgResponse("퀴즈 생성자가 아닙니다. ");
             return ResponseEntity.badRequest().body(msgResponse);
         }
-        //이미지 추가
-        String image = "";
-        //이미지
-        if(multipartFile.isPresent()){
-            try {
-                 image = amazonS3Service.upload(multipartFile.get());
-            } catch (java.io.IOException e) {
-                throw new IOException("이미지 업로드에 문제가 있습니다!  ");
+
+        int imageIndex = 0;
+        for (CreateQuestionRequestDto questionDto : questionListRequestDto) {
+
+            //이미지 추가
+            String img = "";
+            if (imageIndex < images.size()) {
+                MultipartFile imageFile = images.get(imageIndex);
+                try {
+                    img = amazonS3Service.upload(imageFile);
+                } catch (java.io.IOException e) {
+                    throw new RuntimeException("이미지 업로드에 문제가 있습니다!  "); // 또는 적절한 예외 클래스를 사용하세요.
+                }
             }
+
+            //문제 번호 찾기
+            Integer questionNum = 0;
+            Optional<QuizQuestion> question = quizQuestionRepository.findTopByQuizOrderByQuestionNumDesc(quiz);
+            if (question.isPresent()){
+                questionNum = question.get().getQuestionNum();
+            }
+
+            //문제 만들기
+            QuizQuestion quizQuestion = new QuizQuestion();
+            questionNum++;
+            quizQuestion.set(quiz, questionNum, questionDto.getTitle(), img);
+            quizQuestionRepository.save(quizQuestion);
+
+            //선택지 만들기
+            List<CreateQuizChoicesDto> quizChoicesList = questionDto.getQuizChoices();
+            List<QuizChoices> quizChoices = new ArrayList<>();
+            for (CreateQuizChoicesDto createQuizChoicesDto : quizChoicesList) {
+                QuizChoices quizChoice = new QuizChoices();
+                quizChoice.set(createQuizChoicesDto, quizQuestion);
+                quizChoices.add(quizChoice);
+            }
+            quizChoicesRepository.saveAll(quizChoices);
+
+            imageIndex++;
         }
-        //문제 번호 찾기
-        Integer questionNum = 0;
-        //findTop == 가장 먼저 찾을 수 있는 항목(살짝 다르긴 하지만 가장 큰 값이라는 것은 있다.)
-        Optional<QuizQuestion> question =  quizQuestionRepository.findTopByQuizOrderByQuestionNumDesc(quiz);
-        if (question.isPresent()){
-            questionNum = question.get().getQuestionNum();
-        }
-        //문제 만들기
-        QuizQuestion quizQuestion = new QuizQuestion();
-        questionNum++;
-        quizQuestion.set(quiz,questionNum , createQuestionRequestDto.getTitle(), image);
-        quizQuestionRepository.save(quizQuestion);
-        //선택지 만들기 [] 형식
-        List<CreateQuizChoicesDto> quizChoicesList = createQuestionRequestDto.getQuizChoices();
-        List<QuizChoices> quizChoices = new ArrayList<>();
-        for (CreateQuizChoicesDto createQuizChoicesDto : quizChoicesList) {
-            QuizChoices quizChoices1 = new QuizChoices();
-            quizChoices1.set(createQuizChoicesDto,quizQuestion);
-            quizChoices.add(quizChoices1);
-        }
-        quizChoicesRepository.saveAll(quizChoices);
+
         return ResponseEntity.ok(new MsgResponse("문제 생성을 성공 하셨습니다!"));
     }
 

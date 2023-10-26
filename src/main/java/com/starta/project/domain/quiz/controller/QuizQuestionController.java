@@ -1,6 +1,7 @@
 package com.starta.project.domain.quiz.controller;
 
 import com.starta.project.domain.quiz.dto.CreateQuestionRequestDto;
+import com.starta.project.domain.quiz.dto.QuestionListRequestDto;
 import com.starta.project.domain.quiz.dto.ShowQuestionResponseDto;
 import com.starta.project.domain.quiz.service.QuizQuestionService;
 import com.starta.project.global.messageDto.MsgResponse;
@@ -13,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -24,12 +26,13 @@ public class QuizQuestionController {
 
     @Operation(summary = "문제 생성 ")
     @PostMapping("/quiz/{id}/quizQuestion")
-    public ResponseEntity<MsgResponse> createQuizQuestion (@PathVariable Long id,
-                                                           @RequestPart("image") Optional<MultipartFile> multipartFile,
-                                                           @RequestPart("requestDto") CreateQuestionRequestDto createQuestionRequestDto,
-                                                           @Parameter(hidden = true)
-                                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return quizQuestionService.createQuizQuestion(id,multipartFile, createQuestionRequestDto, userDetails.getMember());
+    public ResponseEntity<MsgResponse> createQuizQuestion(
+            @PathVariable Long id,
+            @RequestPart("image") List<MultipartFile> images, // 이미지 리스트로 변경
+            @RequestPart("requestDto") List<CreateQuestionRequestDto> requestDto,
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        return quizQuestionService.createQuizQuestion(id, images, requestDto, userDetails.getMember());
     }
 
     @Operation(summary = "문제 개별 조회 -> 문제 번호에 따라 ")
