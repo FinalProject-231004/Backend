@@ -38,7 +38,7 @@ public class Quiz {
     private QuizCategoryEnum category;
 
     @Column
-    private Boolean display = false;
+    private Boolean display = true;
 
     @Column
     private Long memberId;
