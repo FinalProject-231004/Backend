@@ -22,7 +22,7 @@ public class AnswerController {
     private final AnswerService answerService;
 
     @Operation(summary = "문제풀이")
-    @PostMapping("quiz/choice")
+    @PostMapping("/quiz/choice")
     public void choice (@RequestBody ChoiceRequestDto choiceRequestDto,
                         @Parameter(hidden = true)
                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
