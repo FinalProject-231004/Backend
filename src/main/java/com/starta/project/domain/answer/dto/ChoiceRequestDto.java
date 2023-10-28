@@ -4,5 +4,5 @@ import lombok.Getter;
 
 @Getter
 public class ChoiceRequestDto {
-    private Long id;
+    private Long choiceId;
 }

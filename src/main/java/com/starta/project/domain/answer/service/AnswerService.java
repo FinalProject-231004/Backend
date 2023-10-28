@@ -42,7 +42,7 @@ public class AnswerService {
     @Transactional     // 퀴즈 선택지 (응답)
     public void choice(ChoiceRequestDto choiceRequestDto, Member member) {
 
-        QuizChoices quizChoices = quizChoicesRepository.findById(choiceRequestDto.getId()).orElseThrow(
+        QuizChoices quizChoices = quizChoicesRepository.findById(choiceRequestDto.getChoiceId()).orElseThrow(
                 () -> new NullPointerException("해당 선택지는 잘못된 선택지입니다. ㅋ "));
         Long quizId = quizChoices.getQuizQuestion().getQuiz().getId();
         Integer quizQuestionNum = quizChoices.getQuizQuestion().getQuestionNum();
