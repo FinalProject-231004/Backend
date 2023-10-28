@@ -12,5 +12,5 @@ public interface MemberAnswerRepository extends JpaRepository<MemberAnswer,Long>
 
     void deleteAllByMemberDetail(MemberDetail memberDetail);
 
-    Optional<MemberAnswer> findByMemberIdAndQuizQuestionNum(Long id, Integer quizQuestionNum);
+    Optional<MemberAnswer> findByMemberIdAndQuizQuestionNumAndQuizId(Long id, Integer quizQuestionNum, Long quizId);
 }
