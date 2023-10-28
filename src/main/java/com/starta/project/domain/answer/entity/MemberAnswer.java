@@ -24,7 +24,9 @@ public class MemberAnswer {
     @Column
     private Long memberId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+
+    @JsonIgnore
+    @ManyToOne
     @JoinColumn( name = "member_detail_id")
     private MemberDetail memberDetail;
 
@@ -40,6 +42,7 @@ public class MemberAnswer {
 
     public void got(MemberDetail memberDetail) {
         this.memberDetail = memberDetail;
+
     }
 
     public void modify(boolean memberAnswer) {

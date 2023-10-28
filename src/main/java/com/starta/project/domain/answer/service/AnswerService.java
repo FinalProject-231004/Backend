@@ -16,6 +16,7 @@ import com.starta.project.domain.quiz.entity.QuizQuestion;
 import com.starta.project.domain.quiz.repository.CommentRepository;
 import com.starta.project.domain.quiz.repository.QuizChoicesRepository;
 import com.starta.project.domain.quiz.repository.QuizQuestionRepository;
+import com.starta.project.domain.quiz.repository.QuizRepository;
 import com.starta.project.global.messageDto.MsgDataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,7 @@ public class AnswerService {
     private final CommentRepository commentRepository;
     private final MemberDetailRepository memberDetailRepository;
     private final MileageGetHistoryRepository mileageGetHistoryRepository;
+    private final QuizRepository quizRepository;
 
 
     @Transactional     // 퀴즈 선택지 (응답)
@@ -48,7 +50,6 @@ public class AnswerService {
         MemberDetail memberDetail = member.getMemberDetail();
         Optional<MemberAnswer> answer = memberAnswerRepository.findByMemberIdAndQuizQuestionNum(
                 member.getId(),quizQuestionNum);
-        System.out.println(quizQuestionNum);
         MemberAnswer memberAnswer = new MemberAnswer();
         if(answer.isPresent()) {
              memberAnswer = answer.get();
@@ -78,19 +79,20 @@ public class AnswerService {
         else {
             memberDetail.changeAnswer(memberAnswer);
         }
+
         memberDetailRepository.save(memberDetail);
     }
 
     //결과창 보기
     public ResponseEntity<MsgDataResponse> result(Long id, Member member) {
-                        QuizQuestion quizQuestion = quizQuestionRepository.findById(id).orElseThrow(
-                        () -> new NullPointerException("해당 문제는 잘못된 문제입니다.! ")
-                );
-        Quiz quiz = quizQuestion.getQuiz();
+
+        Quiz quiz = quizRepository.findById(id).orElseThrow(
+                () -> new NullPointerException("해당 퀴즈는 없는 퀴즈입니다. ")
+        );
         Long quizId = quiz.getId();
         List<Comment> List = commentRepository.findAllByQuizId(quizId);
 
-        int totalQuiz = quizQuestion.getQuestionNum();
+        int totalQuiz = quizQuestionRepository.countByQuiz(quiz);
         int correctQuiz = memberAnswerRepository.countByQuizIdAndCorrectIsTrueAndMemberId(quizId,member.getId());
         ResultResponseDto resultResponseDto = new ResultResponseDto();
         resultResponseDto.set(quiz, List);
