@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -91,6 +92,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         authorizeHttpRequests
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .antMatchers("/").permitAll()
+                                .antMatchers(HttpMethod.GET, "/**").permitAll()
                                 .antMatchers("/api/member/login").permitAll()
                                 .antMatchers("/api/member/signup").permitAll()
                                 .antMatchers("/api/member/kakao/callback").permitAll()
