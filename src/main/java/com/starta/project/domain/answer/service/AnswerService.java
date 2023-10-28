@@ -48,8 +48,8 @@ public class AnswerService {
         Integer quizQuestionNum = quizChoices.getQuizQuestion().getQuestionNum();
 
         MemberDetail memberDetail = member.getMemberDetail();
-        Optional<MemberAnswer> answer = memberAnswerRepository.findByMemberIdAndQuizQuestionNum(
-                member.getId(),quizQuestionNum);
+        Optional<MemberAnswer> answer = memberAnswerRepository.findByMemberIdAndQuizQuestionNumAndQuizId(
+                member.getId(),quizQuestionNum,quizId);
         MemberAnswer memberAnswer = new MemberAnswer();
         if(answer.isPresent()) {
              memberAnswer = answer.get();
