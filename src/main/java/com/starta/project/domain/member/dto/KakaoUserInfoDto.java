@@ -5,12 +5,12 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class KakaoMemberResponseDto {
+public class KakaoUserInfoDto {
     private Long id;
     private String nickname;
     private String profilImg;
 
-    public KakaoMemberResponseDto(Long id, String profilImg) {
+    public KakaoUserInfoDto(Long id, String profilImg) {
         this.id = id;
         this.profilImg = profilImg;
     }

@@ -17,15 +17,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.List;
 
-@Slf4j
+@Slf4j(topic = "Member Controller")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/member")
@@ -50,6 +48,7 @@ public class MemberController {
     public ResponseEntity<MsgResponse> kakaoLogin(@RequestParam String code,
                                                   HttpServletResponse response) throws JsonProcessingException {
         return ResponseEntity.ok(kakaoService.kakaoLogin(code, response));
+
     }
 
     @Operation(summary = "마이페이지 내 정보 불러오기(프로필, 닉네임, 비밀번호)")

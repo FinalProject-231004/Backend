@@ -3,14 +3,13 @@ package com.starta.project.domain.member.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.starta.project.domain.member.dto.KakaoMemberResponseDto;
+import com.starta.project.domain.member.dto.KakaoUserInfoDto;
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.entity.MemberDetail;
 import com.starta.project.domain.member.entity.UserRoleEnum;
 import com.starta.project.domain.member.repository.MemberDetailRepository;
 import com.starta.project.domain.member.repository.MemberRepository;
 import com.starta.project.global.jwt.JwtUtil;
-import com.starta.project.global.messageDto.MsgDataResponse;
 import com.starta.project.global.messageDto.MsgResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,9 +50,8 @@ public class KakaoService {
     public MsgResponse kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
-        log.info("accessToken값 : " + accessToken);
         // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
-        KakaoMemberResponseDto kakaoMemberInfo = getKakaoUserInfo(accessToken);
+        KakaoUserInfoDto kakaoMemberInfo = getKakaoUserInfo(accessToken);
         // 3. 로그인하기(필요시에 회원가입)
         Member kakaoMember = registerKakaoUserIfNeeded(kakaoMemberInfo);
 
@@ -103,16 +101,11 @@ public class KakaoService {
         // HTTP 응답 (JSON) -> 액세스 토큰 파싱
         JsonNode jsonNode = new ObjectMapper().readTree(response.getBody());
 
-//        log.info(jsonNode.toString());
-//        log.info(String.valueOf(jsonNode.get("access_token")));
-//        log.info("카카오 API 응답: " + response.getBody());
-//        log.info("getToken() 메서드 종료");
         return jsonNode.get("access_token").asText();
 
     }
 
-    private KakaoMemberResponseDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
-        log.info("accessToken: " + accessToken);
+    private KakaoUserInfoDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
 
         // 요청 URL 만들기
         URI uri = UriComponentsBuilder
@@ -125,9 +118,7 @@ public class KakaoService {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
-        log.info("Authorization " + "Bearer " + accessToken);
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-        log.info("Content-type " + "application/x-www-form-urlencoded;charset=utf-8");
 
         RequestEntity<MultiValueMap<String, String>> requestEntity = RequestEntity
                 .post(uri)
@@ -141,27 +132,24 @@ public class KakaoService {
         );
 
         JsonNode jsonNode = new ObjectMapper().readTree(response.getBody());
-        System.out.println(jsonNode);
 
         Long id = jsonNode.get("id").asLong();
 //        String nickname = jsonNode.get("properties").get("nickname").asText();
         String profileImg = jsonNode.get("properties").get("thumbnail_image").asText();
 
         log.info("카카오 사용자 정보: " + id + ", " + ", " + profileImg);
-        return new KakaoMemberResponseDto(id, profileImg);
+        return new KakaoUserInfoDto(id, profileImg);
     }
 
 
-    public Member registerKakaoUserIfNeeded(KakaoMemberResponseDto kakaoUserInfo) {
-        log.info("kakaoUserInfo 값 확인" + kakaoUserInfo.toString());
+    public Member registerKakaoUserIfNeeded(KakaoUserInfoDto kakaoUserInfo) {
         Long kakaoId = kakaoUserInfo.getId();
         String profilImg = kakaoUserInfo.getProfilImg();
-        log.info("profilImg" + profilImg);
 
-        Member kakaoUser = memberRepository.findByKakaoId(kakaoId).orElse(null);
+        Member kakaoMember = memberRepository.findByKakaoId(kakaoId).orElse(null);
 
         // 1. 카카오 신규로그인
-        if (kakaoUser == null) {
+        if (kakaoMember == null) {
             String randomNickname = generateCustomNickname();
             // 2. 닉네임 중복여부 확인
             while (memberDetailRepository.findByNickname(randomNickname).isPresent()) {
@@ -177,7 +165,7 @@ public class KakaoService {
 
             return savedMember;
         }
-        return kakaoUser;
+        return kakaoMember;
     }
 
     private String generateCustomNickname() {
