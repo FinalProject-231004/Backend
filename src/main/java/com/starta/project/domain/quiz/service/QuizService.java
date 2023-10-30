@@ -5,6 +5,7 @@ import com.starta.project.domain.member.entity.MemberDetail;
 import com.starta.project.domain.member.repository.MemberDetailRepository;
 import com.starta.project.domain.member.repository.MemberRepository;
 import com.starta.project.domain.mypage.entity.MileageGetHistory;
+import com.starta.project.domain.mypage.entity.TypeEnum;
 import com.starta.project.domain.mypage.repository.MileageGetHistoryRepository;
 import com.starta.project.domain.notification.entity.Notification;
 import com.starta.project.domain.notification.entity.NotificationType;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,15 +52,19 @@ public class QuizService {
     @Transactional
     public ResponseEntity<MsgDataResponse> createQuiz(MultipartFile multipartFile, CreateQuizRequestDto quizRequestDto,
                                                       Member member) {
-        Optional<Quiz> quizOptional = quizRepository.findFirstByMemberId(member.getId());
+        LocalDate localDate = LocalDate.now();
+        System.out.println(localDate);
 
-        if(quizOptional.isEmpty()){
+        Optional<MileageGetHistory> getHistory = getHistoryRepository.findByDateAndMemberDetailAndType(
+                localDate, member.getMemberDetail(), TypeEnum.QUIZ_CREATE);
+
+        if(getHistory.isEmpty()){
             MemberDetail memberDetail = member.getMemberDetail();
-            Integer i = 100;
+            Integer i = 50;
             memberDetail.gainMileagePoint(i);
             memberDetailRepository.save(memberDetail);
             MileageGetHistory mileageGetHistory = new MileageGetHistory();
-            String des = "퀴즈 최초 생성 ";
+            String des = "오늘의 퀴즈 생성";
             mileageGetHistory.getFromQuiz(memberDetail,i,des);
             getHistoryRepository.save(mileageGetHistory);
         }

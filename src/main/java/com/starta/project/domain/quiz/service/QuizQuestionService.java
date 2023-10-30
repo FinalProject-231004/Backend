@@ -86,7 +86,8 @@ public class QuizQuestionService {
 
             imageIndex++;
         }
-
+        quiz.playOn(true);
+        quizRepository.save(quiz);
         return ResponseEntity.ok(new MsgResponse("문제 생성을 성공 하셨습니다!"));
     }
 
