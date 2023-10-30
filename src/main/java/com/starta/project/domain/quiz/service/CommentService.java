@@ -44,37 +44,37 @@ public class CommentService {
         commentRepository.save(comment);
 
         //알림
-//        Optional<Member> memberOptional = memberRepository.findById(quiz.getMemberId());
-//
-//        if (memberOptional.isPresent()) {
-//            String sender = member.getUsername();
-//            String receiver = memberOptional.get().getUsername();
-//            String notificationId = receiver + "_" + System.currentTimeMillis();
-//            String title = quiz.getTitle();
-//            String content = "["
-//                    + title.substring(0, 3) + "..."
-//                    + "]"
-//                    + "게시글에 댓글이 달렸습니다: "
-//                    + "["
-//                    + comment.getComment().substring(0, 3) + "..."
-//                    + "]";
-//            String type = NotificationType.COMMENT.getAlias();
-//
-//            Notification notification = Notification.builder()
-//                    .notificationId(notificationId)
-//                    .receiver(receiver)
-//                    .content(content)
-//                    .notificationType(type)
-//                    .url("/api/quiz/" + quiz.getId())
-//                    .readYn('N')
-//                    .deletedYn('N')
-//                    .created_at(LocalDateTime.now())
-//                    .build();
-//
-//            //작성자 본인이 댓글/대댓글을 단 것이 아닌 경우에 한하여 알림
-//            if (!receiver.equals(sender)) notificationService.sendNotification(notification);
-//        }
+        Optional<Member> memberOptional = memberRepository.findById(quiz.getMemberId());
 
+        if (memberOptional.isPresent()) {
+            String sender = member.getUsername();
+            String receiver = memberOptional.get().getUsername();
+            String notificationId = receiver + "_" + System.currentTimeMillis();
+            String title = quiz.getTitle();
+            // 3글자 아닐때 문제가 발생해서 그거 예외처리 해야함
+            String content = "["
+                    + title
+                    + "]"
+                    + "게시글에 댓글이 달렸습니다: "
+                    + "["
+                    + comment.getComment()
+                    + "]";
+            String type = NotificationType.COMMENT.getAlias();
+
+            Notification notification = Notification.builder()
+                    .notificationId(notificationId)
+                    .receiver(receiver)
+                    .content(content)
+                    .notificationType(type)
+                    .url("/api/quiz/" + quiz.getId())
+                    .readYn('N')
+                    .deletedYn('N')
+                    .created_at(LocalDateTime.now())
+                    .build();
+
+            //작성자 본인이 댓글/대댓글을 단 것이 아닌 경우에 한하여 알림
+            if (!receiver.equals(sender)) notificationService.sendNotification(notification);
+        }
         return new MsgDataResponse("댓글 작성을 성공했습니다", new CommentResponseDto(comment));
     }
 

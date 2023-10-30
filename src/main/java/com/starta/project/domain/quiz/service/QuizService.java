@@ -176,7 +176,7 @@ public class QuizService {
             String notificationId = receiver + "_" + System.currentTimeMillis();
             String title = quiz.getTitle();
             String content = "["
-                    + title.substring(0, 3) + "..."
+                    + title
                     + "]"
                     + "게시글 좋아요가 추가되었습니다. ";
             String type = NotificationType.LIKEQUIZ.getAlias();
