@@ -45,12 +45,13 @@ public class CommentService {
             String receiver = memberOptional.get().getUsername();
             String notificationId = receiver + "_" + System.currentTimeMillis();
             String title = quiz.getTitle();
+            // 3글자 아닐때 문제가 발생해서 그거 예외처리 해야함
             String content = "["
-                    + title.substring(0, 3) + "..."
+                    + title
                     + "]"
                     + "게시글에 댓글이 달렸습니다: "
                     + "["
-                    + comment.getComment().substring(0, 3) + "..."
+                    + comment.getComment()
                     + "]";
             String type = NotificationType.COMMENT.getAlias();
 
