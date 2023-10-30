@@ -37,7 +37,7 @@ public class ReadService {
     public List<SimpleQuizDto> readQuiz() {
         List<SimpleQuizDto> list = new ArrayList<>();
         List<Quiz> quizList = quizRepository.findAllByDisplayIsTrue(Sort.by(Sort.Direction.DESC,"id"));
-        list = makeList(quizList,list);
+        list = makeMainList(quizList,list);
         return list;
     }
 
@@ -46,7 +46,7 @@ public class ReadService {
     public List<SimpleQuizDto> readQuizByHot() {
         List<SimpleQuizDto> list = new ArrayList<>();
         List<Quiz> quizList = quizRepository.findAllByDisplayIsTrue(Sort.by(Sort.Direction.DESC, "likes","id"));
-        list = makeList(quizList,list);
+        list = makeMainList(quizList,list);
         return list;
     }
 
@@ -55,7 +55,7 @@ public class ReadService {
     public List<SimpleQuizDto> readByView() {
         List<SimpleQuizDto> list = new ArrayList<>();
         List<Quiz> quizList = quizRepository.findAllByDisplayIsTrue(Sort.by(Sort.Direction.DESC, "viewCount","id"));
-        list = makeList(quizList,list);
+        list = makeMainList(quizList,list);
         return list;
     }
 
@@ -111,6 +111,16 @@ public class ReadService {
             SimpleQuizDto simpleQuizDto = new SimpleQuizDto();
             simpleQuizDto.set(quiz);
             list.add(simpleQuizDto);
+        }
+        return list;
+    }
+
+    private List<SimpleQuizDto> makeMainList (List<Quiz> quizList , List<SimpleQuizDto> list) {
+        for (Quiz quiz : quizList) {
+            SimpleQuizDto simpleQuizDto = new SimpleQuizDto();
+            simpleQuizDto.set(quiz);
+            list.add(simpleQuizDto);
+            if (list.size() == 8 ) break;
         }
         return list;
     }
