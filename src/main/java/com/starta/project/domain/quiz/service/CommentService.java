@@ -51,7 +51,7 @@ public class CommentService {
             String receiver = memberOptional.get().getUsername();
             String notificationId = receiver + "_" + System.currentTimeMillis();
             String title = quiz.getTitle();
-            // 3글자 아닐때 문제가 발생해서 그거 예외처리 해야함
+            // 3글자 아닐때 문제가 발생해서 그거 예외처리 해야함`
             String content = "["
                     + title
                     + "]"
