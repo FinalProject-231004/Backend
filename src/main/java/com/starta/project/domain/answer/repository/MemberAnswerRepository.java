@@ -8,9 +8,11 @@ import java.util.Optional;
 
 public interface MemberAnswerRepository extends JpaRepository<MemberAnswer,Long> {
 
-    int countByQuizIdAndCorrectIsTrueAndMemberId(Long quizId, Long member);
-
     void deleteAllByMemberDetail(MemberDetail memberDetail);
 
-    Optional<MemberAnswer> findByMemberIdAndQuizQuestionNumAndQuizId(Long id, Integer quizQuestionNum, Long quizId);
+    Optional<MemberAnswer> findTopByMemberIdAndQuizQuestionNumAndQuizId(Long id, Integer quizQuestionNum, Long quizId);
+
+
+
+    int countByQuizIdAndCorrectIsTrueAndMemberId(Long quizId, Long id);
 }

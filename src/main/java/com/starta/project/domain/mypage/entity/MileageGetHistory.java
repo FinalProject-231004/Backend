@@ -45,13 +45,13 @@ public class MileageGetHistory {
         this.description = des;
         this.points = i;
         this.memberDetail = memberDetail;
-        this.type = TypeEnum.QUIZ;
+        this.type = TypeEnum.QUIZ_CREATE;
     }
 
     public void getFromAnswer(Integer i, String des, MemberDetail memberDetail) {
         this.description = des;
         this.points = i;
         this.memberDetail = memberDetail;
-        this.type = TypeEnum.QUIZ;
+        this.type = TypeEnum.QUIZ_SOLVE;
     }
 }

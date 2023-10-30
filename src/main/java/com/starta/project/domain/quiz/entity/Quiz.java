@@ -38,7 +38,7 @@ public class Quiz {
     private QuizCategoryEnum category;
 
     @Column
-    private Boolean display = true;
+    private Boolean display = false;
 
     @Column
     private Long memberId;
@@ -65,6 +65,10 @@ public class Quiz {
     }
 
     public void play(boolean b) {
+        this.display = b;
+    }
+
+    public void playOn(boolean b) {
         this.display = b;
     }
 
