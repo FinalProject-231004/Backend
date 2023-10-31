@@ -69,6 +69,15 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler({CustomRateLimiterException.class})
+    public ResponseEntity<RestApiException> customRateLimiterExceptionHandler (CustomRateLimiterException ex) {
+        RestApiException restApiException = new RestApiException(ex.getMessage(), HttpStatus.TOO_MANY_REQUESTS.value());
+        return new ResponseEntity<>(
+                restApiException,
+                HttpStatus.TOO_MANY_REQUESTS
+        );
+    }
+
 //    @ExceptionHandler(MethodArgumentNotValidException.class)
 //    public ResponseEntity<RestApiException> handleValidationExceptions(MethodArgumentNotValidException ex) {
 //        StringBuilder errorMessage = new StringBuilder("Validation Failed: ");

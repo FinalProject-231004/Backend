@@ -1,9 +1,11 @@
 package com.starta.project.domain.quiz.controller;
 
+import com.google.common.util.concurrent.RateLimiter;
 import com.starta.project.domain.quiz.dto.CreateQuestionRequestDto;
 import com.starta.project.domain.quiz.dto.QuestionListRequestDto;
 import com.starta.project.domain.quiz.dto.ShowQuestionResponseDto;
 import com.starta.project.domain.quiz.service.QuizQuestionService;
+import com.starta.project.global.exception.Custom.CustomRateLimiterException;
 import com.starta.project.global.messageDto.MsgResponse;
 import com.starta.project.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +25,7 @@ import java.util.Optional;
 public class QuizQuestionController {
 
     private final QuizQuestionService quizQuestionService;
+    private static final RateLimiter rateLimiter = RateLimiter.create(0.25);
 
     @Operation(summary = "문제 생성 ")
     @PostMapping("/quiz/{id}/quizQuestion")
@@ -31,7 +34,7 @@ public class QuizQuestionController {
             @RequestPart("image") List<MultipartFile> images, // 이미지 리스트로 변경
             @RequestPart("requestDto") List<CreateQuestionRequestDto> requestDto,
             @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-
+        if(!rateLimiter.tryAcquire()) throw new CustomRateLimiterException("잠시만 기다려 주시면 감사하겠습니다. ");
         return quizQuestionService.createQuizQuestion(id, images, requestDto, userDetails.getMember());
     }
 
