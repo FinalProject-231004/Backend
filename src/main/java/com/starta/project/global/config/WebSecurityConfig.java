@@ -44,12 +44,14 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     public void addCorsMappings(final CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:3000",
-                                "http://localhost:8080",
-                                "https://www.yulmoo.world",
-                                "https://yulmoo.world",
-                                "https://api.quizpop.net",
-                                "https://www.quizpop.net",
-                                "https://quizpop.net")
+                        "http://localhost:8080",
+                        "https://www.yulmoo.world",
+                        "https://yulmoo.world",
+                        "https://api.quizpop.net",
+                        "https://www.quizpop.net",
+                        "https://quizpop.net",
+                        "https://fe-test-tau.vercel.app",    // 테스트용 프론트
+                        "https://www.fe-test-tau.vercel.app") // 테스트용 프론트
                 .allowedMethods(ALLOWED_METHOD_NAMES.split(","))
                 .allowedHeaders("*")
                 .exposedHeaders(JwtUtil.AUTHORIZATION_HEADER, JwtUtil.REFRESH_HEADER) // JWT 헤더를 노출

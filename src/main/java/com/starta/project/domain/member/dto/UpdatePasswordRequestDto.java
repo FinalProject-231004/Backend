@@ -11,4 +11,6 @@ public class UpdatePasswordRequestDto {
             message = "비밀번호는 알파벳 대소문자, 숫자, 특수문자를 적어도 하나씩 포함하여 8자 이상, 20자 이하로 적어주세요."
     )
     private String newPassword;
+
+    private String newCheckPassword;
 }

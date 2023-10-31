@@ -11,7 +11,7 @@ public class SimpleQuizDto {
 
     private Long id;
     private Integer viewCount;
-    private Integer likes;
+//    private Integer likes;
     private QuizCategoryEnum category;
     private String title;
     private String image;
@@ -23,7 +23,7 @@ public class SimpleQuizDto {
         this.title = quiz.getTitle();
         this.category = quiz.getCategory();
         this.viewCount = quiz.getViewCount();
-        this.likes = quiz.getLikes();
+//        this.likes = quiz.getLikes();
         this.nickname = quiz.getNickname();
     }
 }

@@ -25,7 +25,7 @@ public class MemberAnswer {
     private Long memberId;
 
     @Column
-    private boolean getScore =false;
+    private boolean getScore = false;
 
     @JsonIgnore
     @ManyToOne
@@ -44,7 +44,6 @@ public class MemberAnswer {
 
     public void got(MemberDetail memberDetail) {
         this.memberDetail = memberDetail;
-
     }
 
     public void modify(boolean memberAnswer, boolean getScore) {
