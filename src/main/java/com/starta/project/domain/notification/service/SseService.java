@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Slf4j
@@ -89,30 +90,36 @@ public class SseService {
     private Notification createNotification(String receiver, String content, String type, String url) {
         if(type.equals(NotificationType.COMMENT.getAlias())) { //댓글
             return Notification.builder()
+                    .notificationId(receiver + "_" + System.currentTimeMillis())
                     .receiver(receiver)
                     .content(content)
                     .notificationType(NotificationType.COMMENT.getAlias())
                     .url(url)
                     .readYn('N')
                     .deletedYn('N')
+                    .created_at(LocalDateTime.now())
                     .build();
         } else if(type.equals(NotificationType.LIKEQUIZ.getAlias())) { //좋아요
             return Notification.builder()
+                    .notificationId(receiver + "_" + System.currentTimeMillis())
                     .receiver(receiver)
                     .content(content)
                     .notificationType(NotificationType.LIKEQUIZ.getAlias())
                     .url(url)
                     .readYn('N')
                     .deletedYn('N')
+                    .created_at(LocalDateTime.now())
                     .build();
         } else if(type.equals(NotificationType.NOTICE.getAlias())) { //공지
             return Notification.builder()
+                    .notificationId(receiver + "_" + System.currentTimeMillis())
                     .receiver(receiver)
                     .content(content)
                     .notificationType(NotificationType.NOTICE.getAlias())
                     .url(url)
                     .readYn('N')
                     .deletedYn('N')
+                    .created_at(LocalDateTime.now())
                     .build();
         } else {
             return null;
