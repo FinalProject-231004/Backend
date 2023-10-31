@@ -95,12 +95,12 @@ public class AnswerService {
                 () -> new NullPointerException("해당 퀴즈는 없는 퀴즈입니다. ")
         );
         Long quizId = quiz.getId();
-        List<Comment> List = commentRepository.findAllByQuizId(quizId);
+//        List<Comment> List = commentRepository.findAllByQuizIdOrderByCreatedAtDesc(quizId);
 
         int totalQuiz = quizQuestionRepository.countByQuiz(quiz);
         int correctQuiz = memberAnswerRepository.countByQuizIdAndCorrectIsTrueAndMemberId(quizId,member.getId());
         ResultResponseDto resultResponseDto = new ResultResponseDto();
-        resultResponseDto.set(quiz, List);
+        resultResponseDto.set(quiz);
 
         return ResponseEntity.ok(new MsgDataResponse
                 ( quiz.getTitle()+" 문제에서 " + totalQuiz+ "개의 문제 중 " + correctQuiz +"개 정답! ", resultResponseDto ));
