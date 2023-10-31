@@ -101,6 +101,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                                 .antMatchers("/v3/api-docs/**").permitAll()
                                 .antMatchers("/swagger-ui/**").permitAll()
                                 .antMatchers("/api/quiz/**").permitAll()
+                                .antMatchers("/api/mileageshop/**").permitAll()
                                 .anyRequest().authenticated() // 그 외 모든 요청 인증처리
         );
 
