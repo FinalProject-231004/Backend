@@ -10,7 +10,7 @@ import com.starta.project.domain.member.entity.UserRoleEnum;
 import com.starta.project.domain.member.repository.MemberDetailRepository;
 import com.starta.project.domain.member.repository.MemberRepository;
 import com.starta.project.global.jwt.JwtUtil;
-import com.starta.project.global.messageDto.MsgDataResponse;
+import com.starta.project.global.messageDto.MsgResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,7 +48,7 @@ public class KakaoService {
     @Value("${kakao.redirect-uri}")
     private String redirect_uri;
 
-    public MsgDataResponse kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
+    public MsgResponse kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
         // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
@@ -65,7 +65,7 @@ public class KakaoService {
 
         jwtUtil.addJwtToHeader(jwtAccessToken, jwtRefreshToken, response);
 
-        return new MsgDataResponse(message,kakaoMember);
+        return new MsgResponse(message);
 
 
     }
@@ -189,9 +189,9 @@ public class KakaoService {
 //            memberDetail.setMember(savedMember);
 //            memberDetailRepository.save(memberDetail);
 
-            message = "신규 회원입니다.";
+            message = "신규유저입니다.";
         } else {
-            message = "기존 회원입니다.";
+            message = "기존유저입니다.";
         }
 
 //            return savedMember;
