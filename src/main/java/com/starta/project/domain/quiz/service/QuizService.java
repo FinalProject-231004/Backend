@@ -52,7 +52,7 @@ public class QuizService {
     @Transactional
     public ResponseEntity<MsgDataResponse> createQuiz(MultipartFile multipartFile, CreateQuizRequestDto quizRequestDto,
                                                       Member member) {
-        LocalDate localDate = LocalDate.now();
+        LocalDateTime localDate = LocalDateTime.now();
         System.out.println(localDate);
 
         Optional<MileageGetHistory> getHistory = getHistoryRepository.findByDateAndMemberDetailAndType(

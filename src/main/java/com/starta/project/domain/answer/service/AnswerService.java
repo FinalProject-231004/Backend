@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +50,7 @@ public class AnswerService {
         //필요 변수
         Long quizId = quizChoices.getQuizQuestion().getQuiz().getId();
         Integer quizQuestionNum = quizChoices.getQuizQuestion().getQuestionNum();
-        LocalDate localDate = LocalDate.now();
+        LocalDateTime localDate = LocalDateTime.now();
         MemberDetail memberDetail = member.getMemberDetail();
 
         //필요한 조건 찾아오기 -> 응답이 있는 지 없는지, 하루의 푼 문제의 숫자
