@@ -15,4 +15,6 @@ public interface QuizQuestionRepository extends JpaRepository<QuizQuestion,Long>
     QuizQuestion findByQuizAndQuestionNum(Quiz quiz, Integer questionNum);
 
     List<QuizQuestion> findAllByQuiz(Quiz quiz);
+
+    int countByQuiz(Quiz quiz);
 }

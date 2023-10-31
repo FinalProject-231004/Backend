@@ -7,6 +7,7 @@ import com.starta.project.global.messageDto.MsgDataResponse;
 import com.starta.project.global.messageDto.MsgResponse;
 import com.starta.project.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,15 +24,17 @@ public class QuizController {
 
     @Operation(summary = "퀴즈 생성")
     @PostMapping("/quiz")
-    public ResponseEntity<MsgDataResponse> createQuiz (@RequestPart("requestDto") CreateQuizRequestDto quizRequestDto,
-                                                       @RequestPart("image") MultipartFile multipartFile,
-                                                       @AuthenticationPrincipal UserDetailsImpl userDetails)  {
+    public ResponseEntity<MsgDataResponse> createQuiz (@RequestPart("image") MultipartFile multipartFile,
+                                                       @RequestPart("requestDto") CreateQuizRequestDto quizRequestDto,
+                                                       @Parameter(hidden = true)
+                                                           @AuthenticationPrincipal UserDetailsImpl userDetails)  {
         return quizService.createQuiz(multipartFile ,quizRequestDto, userDetails.getMember() );
     }
 
     @Operation(summary = "퀴즈 개별 조회")
     @GetMapping("/quiz/{id}")
     public ResponseEntity<ShowQuizResponseDto> showQuiz (@PathVariable Long id,
+                                                         @Parameter(hidden = true)
                                                          @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return quizService.showQuiz(id, userDetails.getMember());
     }
@@ -39,6 +42,7 @@ public class QuizController {
     @Operation(summary = "퀴즈 삭제")
     @DeleteMapping("/quiz/{id}")
     public ResponseEntity<MsgResponse> deleteQuiz(@PathVariable Long id,
+                                                  @Parameter(hidden = true)
                                                   @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return quizService.deleteQuiz(id,userDetails.getMember());
     }
@@ -46,6 +50,7 @@ public class QuizController {
     @Operation(summary = "좋아요 | 좋아요 취소 ")
     @PostMapping("/quiz/{id}/quizLikes")
     public ResponseEntity<MsgResponse> pushLikes (@PathVariable Long id,
+                                                  @Parameter(hidden = true)
                                                   @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(quizService.pushLikes(id, userDetails.getMember()));
     }
@@ -53,6 +58,7 @@ public class QuizController {
     @Operation(summary = "게시 ")
     @PutMapping("/quiz/display/{id}")
     public ResponseEntity<MsgResponse> display (@PathVariable Long id,
+                                                @Parameter(hidden = true)
                                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return quizService.display(id, userDetails.getMember().getId());
     }

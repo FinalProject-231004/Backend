@@ -9,16 +9,15 @@ import java.util.List;
 @Getter
 public class ShowQuestionResponseDto {
 
-    private Long id;
+    private Long quizId;
     private String title;
-    private String content;
     private String image;
-    private List<QuizChoices> quizChoices;
+    private List<ChoicesList> quizChoices;
 
-    public void set(QuizQuestion quizQuestion, List<QuizChoices> list) {
-        this.id = quizQuestion.getId();
+
+    public void set(QuizQuestion quizQuestion, List<ChoicesList> list) {
+        this.quizId = quizQuestion.getId();
         this.title = quizQuestion.getQuizTitle();
-        this.content = quizQuestion.getQuizContent();
         this.image = quizQuestion.getImage();;
         this.quizChoices = list;
     }

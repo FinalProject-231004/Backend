@@ -1,19 +1,20 @@
 package com.starta.project.domain.quiz.controller;
 
 import com.starta.project.domain.quiz.dto.CreateQuestionRequestDto;
+import com.starta.project.domain.quiz.dto.QuestionListRequestDto;
 import com.starta.project.domain.quiz.dto.ShowQuestionResponseDto;
-import com.starta.project.domain.quiz.entity.QuizQuestion;
 import com.starta.project.domain.quiz.service.QuizQuestionService;
 import com.starta.project.global.messageDto.MsgResponse;
 import com.starta.project.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
-import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -25,11 +26,13 @@ public class QuizQuestionController {
 
     @Operation(summary = "문제 생성 ")
     @PostMapping("/quiz/{id}/quizQuestion")
-    public ResponseEntity<MsgResponse> createQuizQuestion (@PathVariable Long id,
-                                                           @RequestPart("requestDto") CreateQuestionRequestDto createQuestionRequestDto,
-                                                           @RequestPart("image") Optional<MultipartFile> multipartFile,
-                                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return quizQuestionService.createQuizQuestion(id,multipartFile, createQuestionRequestDto, userDetails.getMember());
+    public ResponseEntity<MsgResponse> createQuizQuestion(
+            @PathVariable Long id,
+            @RequestPart("image") List<MultipartFile> images, // 이미지 리스트로 변경
+            @RequestPart("requestDto") List<CreateQuestionRequestDto> requestDto,
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        return quizQuestionService.createQuizQuestion(id, images, requestDto, userDetails.getMember());
     }
 
     @Operation(summary = "문제 개별 조회 -> 문제 번호에 따라 ")
@@ -43,13 +46,15 @@ public class QuizQuestionController {
     @DeleteMapping("/quiz/{id}/quizQuestion/{questionNum}")
     public ResponseEntity<MsgResponse> deleteQuizQuestion (@PathVariable Long id,
                                                            @PathVariable Integer questionNum,
-                                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                                           @Parameter(hidden = true)
+                                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return quizQuestionService.deleteQuizQuestion(id,questionNum, userDetails.getMember());
     }
 
     @Operation(summary = "선택지 삭제 ")
     @DeleteMapping("/quiz/quizQuestion/quizChoices/{id}")
     public ResponseEntity<MsgResponse> deleteQuizChoices (@PathVariable Long id,
+                                                          @Parameter(hidden = true)
                                                           @AuthenticationPrincipal UserDetailsImpl userDetails){
         return quizQuestionService.deleteChoices(id, userDetails.getMember());
     }

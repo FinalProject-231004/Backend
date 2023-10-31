@@ -37,7 +37,7 @@ public class MemberDetail {
     private Member member;
 
     @JsonIgnore
-    @OneToMany(fetch = FetchType.EAGER ,mappedBy = "memberDetail",cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "memberDetail",cascade = CascadeType.ALL)
     private List<MemberAnswer> memberAnswer = new ArrayList<>();
 
     public MemberDetail(String nickname) {
@@ -85,8 +85,7 @@ public class MemberDetail {
     public void changeAnswer(MemberAnswer memberAnswer) {
         for (MemberAnswer answer : this.memberAnswer) {
             if (memberAnswer.getId().equals(answer.getId())) {
-                if (answer.isCorrect() == true) break;
-                answer.modify(memberAnswer.isCorrect());
+                answer.modify(memberAnswer.isCorrect(),memberAnswer.isGetScore());
                 break;
             }
         }

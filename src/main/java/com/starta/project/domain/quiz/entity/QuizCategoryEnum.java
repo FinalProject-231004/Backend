@@ -1,23 +1,15 @@
 package com.starta.project.domain.quiz.entity;
 
 public enum QuizCategoryEnum {
-    SCIENCE,
-    HISTORY,
-    LITERATURE,
     MOVIE_TV,
-    MUSIC,
+    CARTOON,
+    GAME,
+    IQ_TEST,
+    PERSON,
+    COMMON_SENSE,
+    FOOD,
     SPORT,
-    GEOGRAPHY,
-    MATH,
-    TECHNOLOGY_IT,
-    LIFESTYLE_FASHION,
-    HOBBY_LEISURE,
-    PEOPLE,
-    HUMOR,
-    TREND,
-    LANGUAGE,
-    HORROR,
-    KNOWLEDGE,
+    ANIMAL,
     ETC
 }
 
