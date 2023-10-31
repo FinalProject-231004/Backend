@@ -95,7 +95,6 @@ public class AnswerService {
                 () -> new NullPointerException("해당 퀴즈는 없는 퀴즈입니다. ")
         );
         Long quizId = quiz.getId();
-//        List<Comment> List = commentRepository.findAllByQuizIdOrderByCreatedAtDesc(quizId);
 
         int totalQuiz = quizQuestionRepository.countByQuiz(quiz);
         int correctQuiz = memberAnswerRepository.countByQuizIdAndCorrectIsTrueAndMemberId(quizId,member.getId());
