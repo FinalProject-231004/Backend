@@ -33,12 +33,12 @@ public class MileageShopService {
 
     // 마일리지샵 구매
     @Transactional
-    public MsgResponse orderItem(Member member, Long id, OrderItemRequestDto orderItemRequestDto) {
+    public MsgResponse orderItem(Member member, OrderItemRequestDto orderItemRequestDto) {
         // 유저 정보 검색
         Member findMember = findMember(member.getId());
 
         // 마일리지샵 상품 검색
-        MileageShopItem findItem = findItem(id);
+        MileageShopItem findItem = findItem(orderItemRequestDto.getItemId());
 
         // 유저의 마일리지 포인트
         Integer memberMileagePoint = findMember.getMemberDetail().getMileagePoint();
