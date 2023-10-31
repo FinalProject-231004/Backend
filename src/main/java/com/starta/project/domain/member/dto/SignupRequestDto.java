@@ -26,6 +26,8 @@ public class SignupRequestDto {
     )
     private String password;
 
+    private String checkPassword;
+
     private boolean admin = false; // 기본값은 "USER"로 설정
 
 }
