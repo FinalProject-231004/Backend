@@ -5,7 +5,6 @@ package com.starta.project.global.exception.Custom;
  * JWT에 설정한 유효 기간(Expiration Time)이 만료했으나 사용하려고 할 때 발생합니다.
   */
 
-
 public class CustomExpiredJwtException extends RuntimeException {
     public CustomExpiredJwtException(String message) {
         super(message);

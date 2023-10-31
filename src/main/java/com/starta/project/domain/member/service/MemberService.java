@@ -7,6 +7,7 @@ import com.starta.project.domain.member.entity.MemberDetail;
 import com.starta.project.domain.member.entity.UserRoleEnum;
 import com.starta.project.domain.member.repository.MemberDetailRepository;
 import com.starta.project.domain.member.repository.MemberRepository;
+import com.starta.project.domain.member.util.ValidationUtil;
 import com.starta.project.domain.mileageshop.entity.MileageShopItem;
 import com.starta.project.domain.mypage.repository.AttendanceCheckRepository;
 import com.starta.project.domain.mypage.repository.MileageGetHistoryRepository;
@@ -35,23 +36,17 @@ public class MemberService {
     private final AttendanceCheckRepository attendanceCheckRepository;
     private final PasswordEncoder passwordEncoder;
     private final AmazonS3Service amazonS3Service;
+    private final ValidationUtil validationUtil;
 
     public MsgResponse signup(SignupRequestDto requestDto) {
         String username = requestDto.getUsername();
         String nickname = requestDto.getNickname();
         String password = passwordEncoder.encode(requestDto.getPassword());
 
-        // username 중복 확인
-        Optional<Member> checkUsername = memberRepository.findByUsername(username);
-        if(checkUsername.isPresent()){
-            throw new IllegalArgumentException("중복된 username 입니다.");
-        }
-
-        // nickname 중복 확인
-        Optional<MemberDetail> checkNickname = memberDetailRepository.findByNickname(nickname);
-        if(checkNickname.isPresent()){
-            throw new IllegalArgumentException("중복된 nickname 입니다.");
-        }
+        // 회원가입 정보 검증
+        validationUtil.checkDuplicatedUsername(username);
+        validationUtil.checkDuplicatedNick(nickname);
+        validationUtil.checkPassword(requestDto.getPassword(), requestDto.getCheckPassword());
 
         // 사용자 ROLE 확인 (기본값: USER)
         UserRoleEnum role = UserRoleEnum.USER;
@@ -102,11 +97,10 @@ public class MemberService {
 
     @Transactional
     public MsgResponse updateNickname(UpdateNicknameRequestDto requestDto, Long id) {
-        Member member = findMember(id);
+        Member member = validationUtil.findMember(id);
         MemberDetail memberDetail = member.getMemberDetail();
-        if (memberDetailRepository.findByNickname(requestDto.getNewNickname()).isPresent()) {
-            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
-        }
+
+        validationUtil.checkDuplicatedNick(requestDto.getNewNickname());
 
         memberDetail.updateNickname(requestDto.getNewNickname());
         return new MsgResponse("닉네임 변경완료.");
@@ -115,9 +109,8 @@ public class MemberService {
     }
     @Transactional
     public MsgResponse updatePassword(UpdatePasswordRequestDto requestDto, Long id) {
-
-        Member member = findMember(id);
-        MemberDetail memberDetail = member.getMemberDetail();
+        Member member = validationUtil.findMember(id);
+        validationUtil.checkPassword(requestDto.getNewPassword(), requestDto.getNewCheckPassword());
         String encodedPassword = passwordEncoder.encode(requestDto.getNewPassword());
         member.updatePassword(encodedPassword);
         return new MsgResponse("비밀번호 변경완료");
@@ -158,15 +151,4 @@ public class MemberService {
 
         return new MsgResponse("탈퇴완료.");
     }
-
-
-    // 현재 유저 정보 찾기
-    private Member findMember(Long id) {
-        return memberRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("회원을 찾을 수 없습니다.")
-        );
-    }
-
-
-
 }
