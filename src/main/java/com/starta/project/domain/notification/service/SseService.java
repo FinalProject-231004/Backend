@@ -140,7 +140,6 @@ public class SseService {
     private void emitEventToClient(SseEmitter sseEmitter, String emitterId, Object data) {
         try {
             send(sseEmitter, emitterId, data);
-            sseRepository.deleteEmitterById(emitterId);
         } catch (Exception e) {
             sseRepository.deleteEmitterById(emitterId);
             throw new RuntimeException("Connection Failed.");
