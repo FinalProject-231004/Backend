@@ -64,7 +64,7 @@ public class MileageShopService {
 
     // 마일리지샵 등록
     @Transactional
-    public MsgResponse createItem(Member member, CreateMileageItemRequestDto requestDto, MultipartFile image) throws IOException {
+    public MsgDataResponse createItem(Member member, CreateMileageItemRequestDto requestDto, MultipartFile image) throws IOException {
 
         // 관리자만 등록 가능
         if (!(member.getRole() == UserRoleEnum.ADMIN)) throw new IllegalArgumentException("잘못된 접근입니다.");
@@ -78,7 +78,7 @@ public class MileageShopService {
         MileageShopItem mileageShopItem = new MileageShopItem(requestDto, imageUrl, requestDto.getCategory());
         mileageShopItemRepository.save(mileageShopItem);
 
-        return new MsgResponse("마일리지샵 등록에 성공했습니다.");
+        return new MsgDataResponse("마일리지샵 등록에 성공했습니다.", new MileageItemResponseDto(mileageShopItem));
     }
 
     // 마일리지샵 전체조회

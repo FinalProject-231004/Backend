@@ -34,7 +34,7 @@ public class MileageShopController {
 
     @Operation(summary = "마일리지샵 등록")
     @PostMapping("/mileageshop/newItem")
-    public ResponseEntity<MsgResponse> createItem(
+    public ResponseEntity<MsgDataResponse> createItem(
             @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestPart(value = "image", required = false) MultipartFile image,
             @RequestPart(value = "requestDto", required = false) CreateMileageItemRequestDto requestDto) throws IOException {
