@@ -123,9 +123,9 @@ public class MemberService {
 
     @Transactional  // 일관성 유지를 위해 사용
     public MsgResponse deleteMember(String password, Member member) {
-        if (!passwordEncoder.matches(password, member.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-        }
+//        if (!passwordEncoder.matches(password, member.getPassword())) {
+//            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+//        }
         memberRepository.delete(member);
         return new MsgResponse("탈퇴완료.");
     }
