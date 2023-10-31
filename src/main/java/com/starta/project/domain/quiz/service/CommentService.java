@@ -65,11 +65,11 @@ public class CommentService {
                             + "]";
                 } else {
                     content = "["
-                            + title.substring(0, 3) + "..."
+                            + title
                             + "]"
                             + "게시글에 댓글이 달렸습니다: "
                             + "["
-                            + comment.getComment()
+                            + comment.getComment().substring(0, 3) + "..."
                             + "]";
                 }
             } else {
@@ -79,7 +79,7 @@ public class CommentService {
                             + "]"
                             + "게시글에 댓글이 달렸습니다: "
                             + "["
-                            + comment.getComment().substring(0, 3) + "..."
+                            + comment.getComment()
                             + "]";
                 } else {
                     content = "["
@@ -87,7 +87,7 @@ public class CommentService {
                             + "]"
                             + "게시글에 댓글이 달렸습니다: "
                             + "["
-                            + comment.getComment()
+                            + comment.getComment().substring(0, 3) + "..."
                             + "]";
                 }
             }
