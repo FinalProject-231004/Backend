@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @RestController
@@ -32,7 +33,7 @@ public class AnswerController {
                         @AuthenticationPrincipal UserDetailsImpl userDetails,
                         HttpServletRequest httpServletRequest) {
         if(userDetails == null ) answerService.noMemberChoice(choiceRequestDto, httpServletRequest);
-        else answerService.choice(choiceRequestDto, userDetails.getMember());
+        else  answerService.choice(choiceRequestDto, userDetails.getMember());
     }
 
     @Operation(summary = "결과 보기")

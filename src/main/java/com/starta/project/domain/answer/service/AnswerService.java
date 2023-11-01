@@ -18,12 +18,15 @@ import com.starta.project.domain.quiz.repository.QuizQuestionRepository;
 import com.starta.project.domain.quiz.repository.QuizRepository;
 import com.starta.project.global.messageDto.MsgDataResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.connector.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -107,9 +110,20 @@ public class AnswerService {
 
         memberAnswer.noMemberAnswer(quizId,quizQuestionNum);
 
-        if(memberAnswer.isCorrect()) memberAnswers.add(memberAnswer);
+        if(!memberAnswers.isEmpty()) {
+            for (MemberAnswer answer : memberAnswers) {
+                if (memberAnswer.getQuizId().equals(answer.getQuizId()) &&
+                        memberAnswer.getQuizQuestionNum().equals(answer.getQuizQuestionNum())) {
+                    memberAnswers.remove(answer);
+                }
+            }
+        }
+        memberAnswers.add(memberAnswer);
 
+        httpSession.setMaxInactiveInterval(5 * 60);
         httpSession.setAttribute("No_Member_Answer", memberAnswers);
+
+
     }
 
 
@@ -139,17 +153,20 @@ public class AnswerService {
 
         List<MemberAnswer> memberAnswers = (List<MemberAnswer>) httpSession.getAttribute("No_Member_Answer");
 
+        if(memberAnswers == null) System.out.println("비비비");
+
         int correctQuiz = 0;
 
-        for (MemberAnswer memberAnswer : memberAnswers) {
-            if (quiz.getId().equals(memberAnswer.getQuizId())) correctQuiz++;
+        if(!(memberAnswers == null)) {
+            for (MemberAnswer memberAnswer : memberAnswers) {
+                if (quiz.getId().equals(memberAnswer.getQuizId())) correctQuiz++;
+            }
         }
 
         int totalQuiz = quizQuestionRepository.countByQuiz(quiz);
         ResultResponseDto resultResponseDto = new ResultResponseDto();
         resultResponseDto.set(quiz);
 
-        httpSession.removeAttribute("No_Member_Answer");
 
         return ResponseEntity.ok(new MsgDataResponse
                 ( quiz.getTitle()+" 문제에서 " + totalQuiz+ "개의 문제 중 " + correctQuiz +"개 정답! ", resultResponseDto ));
