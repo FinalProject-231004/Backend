@@ -16,7 +16,7 @@ public interface MileageGetHistoryRepository extends JpaRepository<MileageGetHis
 
     void deleteAllByMemberDetail(MemberDetail memberDetail);
 
-    Optional<MileageGetHistory> findByDateAndMemberDetailAndType(LocalDateTime localDate, MemberDetail memberDetail, TypeEnum typeEnum);
-
     int countByDateAndMemberDetailAndType(LocalDateTime localDate, MemberDetail memberDetail, TypeEnum typeEnum);
+
+    Optional<MileageGetHistory> findFirstByMemberDetailAndTypeOrderByDateDesc(MemberDetail memberDetail, TypeEnum typeEnum);
 }
