@@ -2,6 +2,8 @@ package com.starta.project.domain.notification.controller;
 
 import com.starta.project.domain.notification.service.SseService;
 import com.starta.project.global.security.UserDetailsImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -21,8 +23,9 @@ public class SseController {
     /**
      * 로그인 시 SSE 구독(연결)
      */
+    @Operation(summary = "sse세션연결")
     @GetMapping(value = "/api/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public ResponseEntity<SseEmitter> subscribe(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<SseEmitter> subscribe(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails,
                                                 @RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId) {
         return ResponseEntity.ok(sseService.subscribe(userDetails.getMember(), lastEventId));
     }

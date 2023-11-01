@@ -115,4 +115,13 @@ public class MileageShopService {
         findItem.changeImage(imageUrl);
         return new MsgResponse("이미지 수정에 성공했습니다.");
     }
+
+    public MsgResponse createImages(MultipartFile image) throws IOException {
+        // 이미지가 없을 경우
+        if (image == null) throw new IllegalArgumentException("이미지가 없습니다.");
+
+        // 이미지 업로드
+        String imageUrl = amazonS3Service.upload(image);
+        return new MsgResponse("이미지가 업로드되었습니다..");
+    }
 }

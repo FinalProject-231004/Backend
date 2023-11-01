@@ -10,20 +10,20 @@ import java.time.LocalDateTime;
 public class SimpleQuizDto {
 
     private Long id;
-    private Integer viewNum;
-    private Integer likes;
+    private Integer viewCount;
+//    private Integer likes;
     private QuizCategoryEnum category;
     private String title;
     private String image;
-    private String username;
+    private String nickname;
 
     public void set(Quiz quiz) {
         this.id = quiz.getId();
         this.image = quiz.getImage();
         this.title = quiz.getTitle();
         this.category = quiz.getCategory();
-        this.viewNum = quiz.getViewCount();
-        this.likes = quiz.getViewCount();
-        this.username = quiz.getMember().getUsername();
+        this.viewCount = quiz.getViewCount();
+//        this.likes = quiz.getLikes();
+        this.nickname = quiz.getNickname();
     }
 }

@@ -2,8 +2,9 @@ package com.starta.project.domain.quiz.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.starta.project.domain.member.entity.Member;
-import com.starta.project.domain.quiz.dto.CreateCommentRequestDto;
+import com.starta.project.domain.quiz.dto.CommentCreateRequestDto;
 import lombok.Getter;
+import java.time.LocalDateTime;
 
 import javax.persistence.*;
 
@@ -26,15 +27,26 @@ public class Comment {
     @JoinColumn(name = "quiz_id",nullable = false)
     private Quiz quiz;
 
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @Column
+    private Long memberId;
 
-    public void set(Quiz quiz, CreateCommentRequestDto createCommentRequestDto, Member member) {
-        this.comment = createCommentRequestDto.getContent();
+    @Column
+    private String nickname;
+
+    @Column
+    private String profileImage;
+
+    @Column
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+
+
+    public void set(Quiz quiz, CommentCreateRequestDto requestDto, Member member) {
+        this.comment = requestDto.getContent();
         this.quiz = quiz;
-        this.member = member;
+        this.memberId = member.getId();
+        this.nickname = member.getMemberDetail().getNickname();
+        this.profileImage = member.getMemberDetail().getImage();
     }
 
     public void update(String content) {

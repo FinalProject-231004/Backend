@@ -5,6 +5,7 @@ package com.starta.project.global.security;
  */
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.entity.UserRoleEnum;
 import org.springframework.security.core.GrantedAuthority;

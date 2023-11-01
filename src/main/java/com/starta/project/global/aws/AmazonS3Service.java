@@ -79,6 +79,13 @@ public class AmazonS3Service {
     }
     // 파일 이름 생성
     private String generateFileName(MultipartFile file) {
-        return UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
+        String originalFileName = file.getOriginalFilename();
+        String extension = "";
+        int lastDotIndex = originalFileName.lastIndexOf(".");
+        if (lastDotIndex > 0 && lastDotIndex < originalFileName.length() - 1) {
+            extension = originalFileName.substring(lastDotIndex);
+        }
+
+        return UUID.randomUUID().toString() + extension;
     }
 }

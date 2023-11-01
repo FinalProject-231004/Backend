@@ -1,5 +1,6 @@
 package com.starta.project.domain.answer.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.starta.project.domain.member.entity.MemberDetail;
 import lombok.Getter;
 
@@ -23,8 +24,12 @@ public class MemberAnswer {
     @Column
     private Long memberId;
 
+    @Column
+    private boolean getScore = false;
+
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "member_detail_id")
+    @JoinColumn( name = "member_detail_id")
     private MemberDetail memberDetail;
 
     public void set(boolean b) {
@@ -41,8 +46,13 @@ public class MemberAnswer {
         this.memberDetail = memberDetail;
     }
 
-    public void modify(boolean memberAnswer) {
+    public void modify(boolean memberAnswer, boolean getScore) {
         this.correct = memberAnswer;
+        this.getScore = getScore;
+    }
+
+    public void gainScore(boolean b) {
+        this.getScore = b;
     }
     // getters, setters, etc.
 }

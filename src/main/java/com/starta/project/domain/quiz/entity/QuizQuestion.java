@@ -1,6 +1,7 @@
 package com.starta.project.domain.quiz.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.starta.project.domain.quiz.dto.UpdateQuizQuestionDto;
 import lombok.Getter;
@@ -23,24 +24,20 @@ public class QuizQuestion {
     @Column
     private String image;
 
-    @Column(nullable = false)
-    private String quizContent;
-
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "quiz_id", nullable = false)
     private Quiz quiz;
 
-    public void set(Quiz quiz, Integer questionNum, String title, String content, String dtoImage) {
+    public void set(Quiz quiz, Integer questionNum, String title, String image) {
         this.quiz = quiz;
         this.quizTitle = title;
-        this.quizContent = content;
-        this.image = dtoImage;
+        this.image = image;
         this.questionNum = questionNum;
     }
 
     public void update(UpdateQuizQuestionDto updateQuizQuestionDto) {
         this.quizTitle = updateQuizQuestionDto.getTitle();
         this.image = updateQuizQuestionDto.getImage();
-        this.quizContent = updateQuizQuestionDto.getContent();
     }
 }

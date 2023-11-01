@@ -12,17 +12,16 @@ public class Likes {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id",nullable = false)
-    private Member member;
+    @Column
+    private Long memberId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "quiz_id",nullable = false)
     private Quiz quiz;
 
     public void set(Quiz quiz, Member member) {
         this.quiz = quiz;
-        this.member =member;
+        this.memberId = member.getId();
     }
     // getters, setters, etc.
 }

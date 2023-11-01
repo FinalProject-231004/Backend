@@ -8,6 +8,7 @@ import com.starta.project.global.messageDto.MsgDataResponse;
 import com.starta.project.global.messageDto.MsgResponse;
 import com.starta.project.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,14 +29,14 @@ public class MileageShopController {
     @PostMapping("/mileageshop/{mileageItemId}")
     public ResponseEntity<MsgResponse> orderItem(@PathVariable Long mileageItemId,
                                                  @RequestBody OrderItemRequestDto orderItemRequestDto,
-                                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                                 @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.status(HttpStatus.OK).body(mileageShopService.orderItem(userDetails.getMember(), mileageItemId, orderItemRequestDto));
     }
 
     @Operation(summary = "마일리지샵 등록")
     @PostMapping("/mileageshop")
     public ResponseEntity<MsgResponse> createItem(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestPart(value = "image", required = false) MultipartFile image,
             @RequestPart(value = "requestDto", required = false) CreateMileageItemRequestDto requestDto) throws IOException {
         return ResponseEntity.status(HttpStatus.CREATED).body(mileageShopService.createItem(userDetails.getMember(), requestDto, image));
@@ -57,6 +58,13 @@ public class MileageShopController {
     @PutMapping("/mileageshop/{id}/image")
     public ResponseEntity<MsgResponse> updateItemImage(@PathVariable Long id, @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
         return ResponseEntity.status(HttpStatus.OK).body(mileageShopService.updateItemImage(id, image));
+    }
+
+    @Operation(summary = "리액트 이미지파일 TEST")
+    @PostMapping("/quiz/imageTest")
+    public ResponseEntity<MsgResponse> createImages(
+            @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(mileageShopService.createImages(image));
     }
 
 }
