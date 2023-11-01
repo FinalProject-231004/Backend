@@ -10,10 +10,8 @@ import com.starta.project.domain.member.repository.MemberDetailRepository;
 import com.starta.project.domain.mypage.entity.MileageGetHistory;
 import com.starta.project.domain.mypage.entity.TypeEnum;
 import com.starta.project.domain.mypage.repository.MileageGetHistoryRepository;
-import com.starta.project.domain.quiz.entity.Comment;
 import com.starta.project.domain.quiz.entity.Quiz;
 import com.starta.project.domain.quiz.entity.QuizChoices;
-import com.starta.project.domain.quiz.entity.QuizQuestion;
 import com.starta.project.domain.quiz.repository.CommentRepository;
 import com.starta.project.domain.quiz.repository.QuizChoicesRepository;
 import com.starta.project.domain.quiz.repository.QuizQuestionRepository;
@@ -24,8 +22,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,6 +87,30 @@ public class AnswerService {
         memberDetailRepository.save(memberDetail);
     }
 
+    public void noMemberChoice(ChoiceRequestDto choiceRequestDto, HttpSession httpSession) {
+        //선택지 찾아오기
+        QuizChoices quizChoices = quizChoicesRepository.findById(choiceRequestDto.getChoiceId()).orElseThrow(
+                () -> new NullPointerException("해당 선택지는 잘못된 선택지입니다. ㅋ "));
+        //필요 변수
+        Long quizId = quizChoices.getQuizQuestion().getQuiz().getId();
+        Integer quizQuestionNum = quizChoices.getQuizQuestion().getQuestionNum();
+
+        //우선 객체 형성
+        MemberAnswer memberAnswer = new MemberAnswer();
+
+        List<MemberAnswer> memberAnswers = (List<MemberAnswer>) httpSession.getAttribute("No_Member_Answer");
+        if(memberAnswers == null) memberAnswers = new ArrayList<>();
+        //정답 체크
+        memberAnswer.set(quizChoices.isChecks());
+
+        memberAnswer.noMemberAnswer(quizId,quizQuestionNum);
+
+        if(memberAnswer.isCorrect()) memberAnswers.add(memberAnswer);
+
+        httpSession.setAttribute("No_Member_Answer", memberAnswers);
+    }
+
+
     //결과창 보기
     public ResponseEntity<MsgDataResponse> result(Long id, Member member) {
 
@@ -105,4 +128,22 @@ public class AnswerService {
                 ( quiz.getTitle()+" 문제에서 " + totalQuiz+ "개의 문제 중 " + correctQuiz +"개 정답! ", resultResponseDto ));
     }
 
+
+    public ResponseEntity<MsgDataResponse> noMemberResult(Long id, HttpSession httpSession) {
+        Quiz quiz = quizRepository.findById(id).orElseThrow(
+                () -> new NullPointerException("해당 퀴즈는 없는 퀴즈입니다. ")
+        );
+
+        List<MemberAnswer> memberAnswers = (List<MemberAnswer>) httpSession.getAttribute("No_Member_Answer");
+
+        int totalQuiz = quizQuestionRepository.countByQuiz(quiz);
+        int correctQuiz = memberAnswers.size();
+        ResultResponseDto resultResponseDto = new ResultResponseDto();
+        resultResponseDto.set(quiz);
+
+        httpSession.removeAttribute("No_Member_Answer");
+
+        return ResponseEntity.ok(new MsgDataResponse
+                ( quiz.getTitle()+" 문제에서 " + totalQuiz+ "개의 문제 중 " + correctQuiz +"개 정답! ", resultResponseDto ));
+    }
 }

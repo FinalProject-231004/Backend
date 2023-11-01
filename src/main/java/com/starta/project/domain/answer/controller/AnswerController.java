@@ -1,5 +1,6 @@
 package com.starta.project.domain.answer.controller;
 
+import com.amazonaws.services.s3.model.Bucket;
 import com.starta.project.domain.answer.dto.ChoiceRequestDto;
 import com.starta.project.domain.answer.service.AnswerService;
 import com.starta.project.domain.quiz.repository.QuizChoicesRepository;
@@ -14,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -25,15 +28,20 @@ public class AnswerController {
     @PostMapping("/quiz/choice")
     public void choice (@RequestBody ChoiceRequestDto choiceRequestDto,
                         @Parameter(hidden = true)
-                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        answerService.choice(choiceRequestDto, userDetails.getMember());
+                        @AuthenticationPrincipal UserDetailsImpl userDetails,
+                        HttpSession httpSession) {
+        if(userDetails == null ) answerService.noMemberChoice(choiceRequestDto, httpSession);
+        else answerService.choice(choiceRequestDto, userDetails.getMember());
     }
 
     @Operation(summary = "결과 보기")
     @GetMapping("/quiz/result/{id}")
     public ResponseEntity<MsgDataResponse> result(@PathVariable Long id,
                                                   @Parameter(hidden = true)
-                                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                                  @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                  HttpSession httpSession) {
+        if(userDetails == null) return answerService.noMemberResult(id, httpSession);
         return answerService.result(id, userDetails.getMember());
+
     }
 }

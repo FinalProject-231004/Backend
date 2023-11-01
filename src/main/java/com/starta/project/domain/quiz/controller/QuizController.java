@@ -39,10 +39,8 @@ public class QuizController {
 
     @Operation(summary = "퀴즈 개별 조회")
     @GetMapping("/quiz/{id}")
-    public ResponseEntity<ShowQuizResponseDto> showQuiz (@PathVariable Long id,
-                                                         @Parameter(hidden = true)
-                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return quizService.showQuiz(id, userDetails.getMember());
+    public ResponseEntity<ShowQuizResponseDto> showQuiz (@PathVariable Long id) {
+        return quizService.showQuiz(id);
     }
 
     @Operation(summary = "퀴즈 삭제")
