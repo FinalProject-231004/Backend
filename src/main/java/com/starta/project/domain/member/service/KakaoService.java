@@ -3,7 +3,10 @@ package com.starta.project.domain.member.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.starta.project.domain.member.dto.KaKaoFirstLoginDto;
 import com.starta.project.domain.member.dto.KakaoUserInfoDto;
+import com.starta.project.domain.member.dto.UpdateNicknameRequestDto;
+import com.starta.project.domain.member.dto.UpdatePasswordRequestDto;
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.entity.MemberDetail;
 import com.starta.project.domain.member.entity.UserRoleEnum;
@@ -11,20 +14,27 @@ import com.starta.project.domain.member.repository.MemberDetailRepository;
 import com.starta.project.domain.member.repository.MemberRepository;
 import com.starta.project.global.jwt.JwtUtil;
 import com.starta.project.global.messageDto.MsgResponse;
+import com.starta.project.global.security.UserDetailsImpl;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -184,17 +194,10 @@ public class KakaoService {
             memberDetail.setMember(kakaoMember);
             memberDetailRepository.save(memberDetail);
 
-//            Member savedMember = memberRepository.save(new Member(kakaoUsername, kakaoPassword, UserRoleEnum.USER, kakaoId));
-//            MemberDetail memberDetail = new MemberDetail(randomNickname, kakaoUserInfo.getProfilImg());
-//            memberDetail.setMember(savedMember);
-//            memberDetailRepository.save(memberDetail);
-
             message = "신규유저입니다.";
         } else {
             message = "기존유저입니다.";
         }
-
-//            return savedMember;
 
         Map<String, Object> result = new HashMap<>();
         result.put("member", kakaoMember);
@@ -221,4 +224,5 @@ public class KakaoService {
         log.info("generateCustomNickname 끝");
         return nickname.toString();
     }
+
 }
