@@ -14,11 +14,8 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class ValidationUtil {
-
-
     private final MemberRepository memberRepository;
     private final MemberDetailRepository memberDetailRepository;
-
 
     public void checkDuplicatedUsername(String username){
         Optional<Member> checkUsername = memberRepository.findByUsername(username);

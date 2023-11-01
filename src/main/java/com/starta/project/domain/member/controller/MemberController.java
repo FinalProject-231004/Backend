@@ -1,10 +1,7 @@
 package com.starta.project.domain.member.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.starta.project.domain.member.dto.PasswordValidationRequestDto;
-import com.starta.project.domain.member.dto.SignupRequestDto;
-import com.starta.project.domain.member.dto.UpdateNicknameRequestDto;
-import com.starta.project.domain.member.dto.UpdatePasswordRequestDto;
+import com.starta.project.domain.member.dto.*;
 import com.starta.project.domain.member.service.KakaoService;
 import com.starta.project.domain.member.service.MemberService;
 import com.starta.project.global.messageDto.MsgDataResponse;
@@ -14,9 +11,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,12 +42,25 @@ public class MemberController {
         return ResponseEntity.ok(memberService.signup(requestDto));
     }
 
+
     @Operation(summary = "카카오 로그인")
     @GetMapping("/kakao/callback")
     public ResponseEntity<MsgResponse> kakaoLogin(@RequestParam String code,
                                                   HttpServletResponse response) throws JsonProcessingException {
         return ResponseEntity.ok(kakaoService.kakaoLogin(code, response));
 
+    }
+
+    @Operation(summary = "카카오 신규회원 비밀번호 변경")
+    @PostMapping("/kakao/first-login")
+    public ResponseEntity<MsgResponse> kakaoFirstLogin(@Valid @RequestBody KaKaoFirstLoginDto requestDto,
+                                                       BindingResult bindingResult,
+                                                       @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        // Validation 예외처리
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(new MsgResponse("비밀번호 형식 미충족"));
+        }
+        return ResponseEntity.ok(memberService.kakaoFirstLogin(requestDto, userDetails.getMember().getId()));
     }
 
     @Operation(summary = "마이페이지 내 정보 불러오기(프로필, 닉네임, 비밀번호)")
