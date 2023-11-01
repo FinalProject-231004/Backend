@@ -93,22 +93,22 @@ public class QuizService {
     }
 
     // 문제 상세 보기
-    public ResponseEntity<ShowQuizResponseDto> showQuiz(Long id, Member member) {
-        ShowQuizResponseDto showQuizResponseDto = new ShowQuizResponseDto();
-        Quiz quiz = findQuiz(id);
-        if(quiz.getDisplay()== false && !quiz.getMemberId().equals(member.getId()))  {
-            throw new IllegalArgumentException("게시된 퀴즈가 아닙니다. ");
-        }
-        //조회수 => api 검색 = 조회하는 횟수 -> 이거 조회 api 안해도 될꺼 같은데..?
-        // 만약 할꺼면 여기다 동시성 제어를 걸어야 할거 같습니다!
-        Integer viewCount = quiz.getViewCount();
-        viewCount++;
-        quiz.view(viewCount);
-        quizRepository.save(quiz);
-        //반환하는 데이터
-        showQuizResponseDto.set(quiz,viewCount);
+    public ResponseEntity<ShowQuizResponseDto> showQuiz(Long id) {
+            ShowQuizResponseDto showQuizResponseDto = new ShowQuizResponseDto();
+            Quiz quiz = findQuiz(id);
+            if(quiz.getDisplay()== false )  {
+                throw new IllegalArgumentException("게시된 퀴즈가 아닙니다. ");
+            }
+            //조회수 => api 검색 = 조회하는 횟수 -> 이거 조회 api 안해도 될꺼 같은데..?
+            // 만약 할꺼면 여기다 동시성 제어를 걸어야 할거 같습니다!
+            Integer viewCount = quiz.getViewCount();
+            viewCount++;
+            quiz.view(viewCount);
+            quizRepository.save(quiz);
+            //반환하는 데이터
+            showQuizResponseDto.set(quiz,viewCount);
 
-        return ResponseEntity.status(200).body(showQuizResponseDto);
+            return ResponseEntity.status(200).body(showQuizResponseDto);
     }
 
     @Transactional //퀴즈 삭제
