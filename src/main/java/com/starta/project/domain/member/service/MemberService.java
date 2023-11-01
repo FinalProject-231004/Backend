@@ -144,9 +144,9 @@ public class MemberService {
 
     @Transactional
     public MsgResponse deleteMember(String password, Member member) {
-        if (!passwordEncoder.matches(password, member.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-        }
+//        if (!passwordEncoder.matches(password, member.getPassword())) {
+//            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+//        }
 
         // MemberDetail과 연관된 엔터티들을 삭제
         MemberDetail memberDetail = member.getMemberDetail();

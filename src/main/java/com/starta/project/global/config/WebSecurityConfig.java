@@ -49,9 +49,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         "https://yulmoo.world",
                         "https://api.quizpop.net",
                         "https://www.quizpop.net",
-                        "https://quizpop.net",
-                        "https://fe-test-tau.vercel.app",    // 테스트용 프론트
-                        "https://www.fe-test-tau.vercel.app") // 테스트용 프론트
+                        "https://quizpop.net")
                 .allowedMethods(ALLOWED_METHOD_NAMES.split(","))
                 .allowedHeaders("*")
                 .exposedHeaders(JwtUtil.AUTHORIZATION_HEADER, JwtUtil.REFRESH_HEADER) // JWT 헤더를 노출
