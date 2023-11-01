@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -87,7 +88,7 @@ public class AnswerService {
         memberDetailRepository.save(memberDetail);
     }
 
-    public void noMemberChoice(ChoiceRequestDto choiceRequestDto, HttpSession httpSession) {
+    public void noMemberChoice(ChoiceRequestDto choiceRequestDto, HttpServletRequest httpServletRequest) {
         //선택지 찾아오기
         QuizChoices quizChoices = quizChoicesRepository.findById(choiceRequestDto.getChoiceId()).orElseThrow(
                 () -> new NullPointerException("해당 선택지는 잘못된 선택지입니다. ㅋ "));
@@ -97,6 +98,7 @@ public class AnswerService {
 
         //우선 객체 형성
         MemberAnswer memberAnswer = new MemberAnswer();
+        HttpSession httpSession = httpServletRequest.getSession();
 
         List<MemberAnswer> memberAnswers = (List<MemberAnswer>) httpSession.getAttribute("No_Member_Answer");
         if(memberAnswers == null) memberAnswers = new ArrayList<>();
@@ -129,15 +131,21 @@ public class AnswerService {
     }
 
 
-    public ResponseEntity<MsgDataResponse> noMemberResult(Long id, HttpSession httpSession) {
+    public ResponseEntity<MsgDataResponse> noMemberResult(Long id, HttpServletRequest httpServletRequest) {
         Quiz quiz = quizRepository.findById(id).orElseThrow(
                 () -> new NullPointerException("해당 퀴즈는 없는 퀴즈입니다. ")
         );
+        HttpSession httpSession = httpServletRequest.getSession();
 
         List<MemberAnswer> memberAnswers = (List<MemberAnswer>) httpSession.getAttribute("No_Member_Answer");
 
+        int correctQuiz = 0;
+
+        for (MemberAnswer memberAnswer : memberAnswers) {
+            if (quiz.getId().equals(memberAnswer.getQuizId())) correctQuiz++;
+        }
+
         int totalQuiz = quizQuestionRepository.countByQuiz(quiz);
-        int correctQuiz = memberAnswers.size();
         ResultResponseDto resultResponseDto = new ResultResponseDto();
         resultResponseDto.set(quiz);
 
