@@ -2,6 +2,7 @@ package com.starta.project.global.jwt;
 
 
 import com.starta.project.global.exception.Custom.CustomExpiredJwtException;
+import com.starta.project.global.exception.Custom.CustomInvalidJwtException;
 import com.starta.project.global.exception.Custom.CustomMalformedJwtException;
 import com.starta.project.global.exception.Custom.CustomUnsupportedJwtException;
 import com.starta.project.global.security.UserDetailsServiceImpl;
@@ -88,14 +89,21 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     res.getWriter().write("{\"msg\":\"Malformed JWT Token. 형식이 잘못된 JWT 토큰입니다.\"}");
                     return; // 필터 체인 종료
+                }catch (CustomInvalidJwtException e) {
+                    res.setContentType("application/json");
+                    res.setCharacterEncoding("utf-8");
+                    res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    res.getWriter().write("{\"msg\":\"Invalid JWT signature, 유효하지 않은 JWT 토큰 입니다.\"}");
+                    return; // 필터 체인 종료
                 } catch (Exception e) {
                     res.setContentType("application/json");
                     res.setCharacterEncoding("utf-8");
                     res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    res.getWriter().write("{\"msg\":\"서버 내부 오류가 발생했습니다.\"}");
+                    res.getWriter().write("{\"msg\":\"토큰을 다시 발급해주세요.\"}");
                     return; // 필터 체인 종료
                 }
             }
+
         }
         log.info("doFilter");
         filterChain.doFilter(req, res);
