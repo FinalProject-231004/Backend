@@ -38,7 +38,7 @@ public class MileageShopService {
         Member findMember = findMember(member.getId());
 
         // 유저 이메일 패턴 인증
-        if (orderItemRequestDto.getEmail() == null || !orderItemRequestDto.getEmail().matches("^[a-zA-Z0-9]+@[a-zA-Z0-9]+$")) throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
+        if (orderItemRequestDto.getEmail() == null || !orderItemRequestDto.getEmail().matches("^[a-zA-Z0-9]+@[a-zA-Z0-9\\.]+$")) throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
 
         // 마일리지샵 상품 검색
         MileageShopItem findItem = findItem(orderItemRequestDto.getItemId());
