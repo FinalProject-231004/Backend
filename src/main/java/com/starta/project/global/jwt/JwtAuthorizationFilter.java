@@ -2,13 +2,12 @@ package com.starta.project.global.jwt;
 
 
 import com.starta.project.global.exception.Custom.CustomExpiredJwtException;
+import com.starta.project.global.exception.Custom.CustomInvalidJwtException;
 import com.starta.project.global.exception.Custom.CustomMalformedJwtException;
 import com.starta.project.global.exception.Custom.CustomUnsupportedJwtException;
 import com.starta.project.global.security.UserDetailsServiceImpl;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,18 +38,18 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String refreshTokenValue = jwtUtil.getRefreshTokenFromHeader(req);
         String requestURI = req.getRequestURI();
 
-        // 엑세스토큰 만료시 리프레시토큰 검증 및 엑세스토큰 재발급요청 로직
+        // 리프레시 토큰 재발급 API
         if ("/api/token/reissue".equals(requestURI) && refreshTokenValue != null) {
             try {
-                jwtUtil.checkUsingRefreshToken(accessTokenValue, refreshTokenValue, res); // 리프레시 토큰 검증 및 새로운 액세스 토큰 발급
-                return; // 필터 체인 종료
+                jwtUtil.checkUsingRefreshToken(accessTokenValue, refreshTokenValue, res);
+                return;
             } catch (JwtException jwtEx) {
                 log.error("Refresh token expired or invalid.", jwtEx);
                 res.setContentType("application/json");
                 res.setCharacterEncoding("utf-8");
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 res.getWriter().write("{\"message\":\"Expired Refresh Token. 토큰이 만료되었습니다.\"}");
-                return; // 필터 체인 종료
+                return;
             }
         }
 
@@ -58,7 +57,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         // 로그인 또는 재발급 요청이 아닌 경우
         if (!(requestURI.equals("/") || requestURI.equals("/api/member/login") || requestURI.equals("/api/member/signup"))) {
             if (StringUtils.hasText(accessTokenValue)) {
-                // JWT 토큰 substring
                 accessTokenValue = jwtUtil.substringToken(accessTokenValue);
                 log.info("validateToken 시작");
 
@@ -70,7 +68,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                         setAuthentication(info.getSubject());
                         log.info("setAuthentication");
                     }
-                } catch (CustomExpiredJwtException e) {  // 액세스 토큰 만료 발생 시
+                } catch (CustomExpiredJwtException e) {
                     res.setContentType("application/json");
                     res.setCharacterEncoding("utf-8");
                     res.setStatus(401);
@@ -88,14 +86,21 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     res.getWriter().write("{\"msg\":\"Malformed JWT Token. 형식이 잘못된 JWT 토큰입니다.\"}");
                     return; // 필터 체인 종료
+                }catch (CustomInvalidJwtException e) {
+                    res.setContentType("application/json");
+                    res.setCharacterEncoding("utf-8");
+                    res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    res.getWriter().write("{\"msg\":\"Invalid JWT signature, 유효하지 않은 JWT 토큰 입니다.\"}");
+                    return; // 필터 체인 종료
                 } catch (Exception e) {
                     res.setContentType("application/json");
                     res.setCharacterEncoding("utf-8");
                     res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    res.getWriter().write("{\"msg\":\"서버 내부 오류가 발생했습니다.\"}");
+                    res.getWriter().write("{\"msg\":\"토큰을 다시 발급해주세요.\"}");
                     return; // 필터 체인 종료
                 }
             }
+
         }
         log.info("doFilter");
         filterChain.doFilter(req, res);

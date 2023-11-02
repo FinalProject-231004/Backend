@@ -110,7 +110,7 @@ public class JwtUtil {
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
             throw new CustomUnsupportedJwtException("Unsupported JWT, 지원되지 않는 JWT 입니다.");
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             log.info("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
             throw new CustomMalformedJwtException("JWT claims is empty, 잘못된 JWT 입니다.");
         }
@@ -150,7 +150,7 @@ public class JwtUtil {
         }
     }
 
-    // 토큰에서 사용자 정보 가져오기
+    // token에서 사용자 정보 가져오기
     public Claims getUserInfoFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }

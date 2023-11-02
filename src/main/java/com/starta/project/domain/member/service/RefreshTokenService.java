@@ -25,15 +25,7 @@ public class RefreshTokenService {
 
     public static final String REFRESH_PREFIX = "refresh:";
 
-    private final long REFRESH_TOKEN_TIME = 21 * 24 * 60 * 60L;  // 서버용 3주, 세컨드단위
-//    private final long REFRESH_TOKEN_TIME = 10 * 60L;  // TEST용 10분, 세컨드단위
-
-    /**
-     * refresh 토큰 저장 및 ID 반환 메소드
-     * @param userName 발급할 userName
-     * @param role 발급할 userRole
-     * @return refreshtoken key 값
-     */
+    private final long REFRESH_TOKEN_TIME = 21 * 24 * 60 * 60L;  // 서버용 2주
     public String createRefreshToken(String userName, UserRoleEnum role) {
 
         UUID uuid = UUID.randomUUID();
@@ -48,7 +40,6 @@ public class RefreshTokenService {
             return uuid.toString();
 
         } catch (JsonProcessingException e) {
-            log.error("refresh 토큰 String 변환 실패");
             throw new RuntimeException(e);
         }
     }
@@ -72,7 +63,6 @@ public class RefreshTokenService {
             return uuid.toString();
 
         } catch (JsonProcessingException e) {
-            log.error("refresh 토큰 String 변환 실패");
             throw new RuntimeException(e);
         }
     }

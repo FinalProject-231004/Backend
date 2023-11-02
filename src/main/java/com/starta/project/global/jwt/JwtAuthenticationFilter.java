@@ -8,6 +8,8 @@ import com.starta.project.domain.member.service.RefreshTokenService;
 import com.starta.project.global.messageDto.MsgResponse;
 import com.starta.project.global.security.UserDetailsImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -36,13 +38,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         log.info("로그인 시도");
         try {
-            // 요청 본문이 비어 있는지 확인
-            if (request.getContentLength() == 0) {
-                throw new RuntimeException("요청 본문이 비어 있습니다.");
+            if (request.getContentLength() <= 0) {
+                throw new BadCredentialsException("요청 본문이 비어 있습니다.");
             }
-
-            LoginRequestDto requestDto = new ObjectMapper().readValue(request.getInputStream(), LoginRequestDto.class);
-
+            LoginRequestDto requestDto = mapper.readValue(request.getInputStream(), LoginRequestDto.class);
             return getAuthenticationManager().authenticate(
                     new UsernamePasswordAuthenticationToken(
                             requestDto.getUsername(),
@@ -52,10 +51,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             );
         } catch (IOException e) {
             log.error("예외 발생: ", e);
-            throw new RuntimeException("요청 처리 중 오류가 발생했습니다.");
+            throw new AuthenticationServiceException("요청 처리 중 오류가 발생했습니다.", e);
         }
     }
-
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         log.info("로그인 성공 및 JWT 생성");
@@ -70,15 +68,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         log.info("로그인 실패");
-        response.setStatus(400);
-        String msg = "회원을 찾을 수 없습니다.";
-
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        response.setContentType("application/json;charset=UTF-8");
+        String msg = "로그인 실패";
         try(PrintWriter writer = response.getWriter()) {
             String jsonDto = mapper.writeValueAsString(new MsgResponse(msg));
             writer.print(jsonDto);
         } catch (IOException e) {
             log.error("예외 발생: ", e);
-            throw new RuntimeException("요청 처리 중 오류가 발생했습니다.");
+            throw new RuntimeException("응답 처리 중 오류가 발생했습니다.");
         }
     }
 }

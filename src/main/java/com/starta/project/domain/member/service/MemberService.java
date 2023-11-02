@@ -53,10 +53,8 @@ public class MemberService {
         if(requestDto.isAdmin()){
             role = UserRoleEnum.ADMIN;
         }
-        // 회원 정보 저장
         Member savedMember = memberRepository.save(new Member(username, password, role));
 
-        // 회원 상세 정보 저장 및 연관 관계 설정
         MemberDetail memberDetail = new MemberDetail(nickname);
         memberDetail.setMember(savedMember);
         memberDetailRepository.save(memberDetail);
@@ -78,15 +76,13 @@ public class MemberService {
         String oldImageUrl = memberDetail.getImage();
         System.out.println("S3 oldImage: " + oldImageUrl);
         try {
-            // 기존 이미지가 없는 경우
             if (oldImageUrl == null) {
-                String imageUrl = amazonS3Service.upload(newImage); // S3에 새 이미지 업로드
-                memberDetail.updateImage(imageUrl); // 이미지 URL을 업데이트
+                String imageUrl = amazonS3Service.upload(newImage);
+                memberDetail.updateImage(imageUrl);
             } else {
-                // 기존 이미지가 있는 경우
-                amazonS3Service.deleteFile(oldImageUrl.split("/")[3]); // S3 기존 이미지 삭제
-                String imageUrl = amazonS3Service.upload(newImage); // S3에 새 이미지 업로드
-                memberDetail.updateImage(imageUrl); // 이미지 URL을 업데이트
+                amazonS3Service.deleteFile(oldImageUrl.split("/")[3]);
+                String imageUrl = amazonS3Service.upload(newImage);
+                memberDetail.updateImage(imageUrl);
             }
         } catch (IOException e) {
             return new MsgResponse("이미지 업로드 또는 삭제 중에 오류가 발생했습니다.");
@@ -104,17 +100,15 @@ public class MemberService {
 
         memberDetail.updateNickname(requestDto.getNewNickname());
         return new MsgResponse("닉네임 변경완료.");
-
-
     }
     @Transactional
     public MsgResponse kakaoFirstLogin(KaKaoFirstLoginDto requestDto, Long id) {
         Member member = validationUtil.findMember(id);
         String newPassword = requestDto.getNewPassword();
-        validationUtil.checkPassword(newPassword, requestDto.getNewCheckPassword());
         if (!passwordEncoder.matches(requestDto.getPassword(), member.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
+        validationUtil.checkPassword(newPassword, requestDto.getNewCheckPassword());
         String encodedPassword = passwordEncoder.encode(newPassword);
         member.updatePassword(encodedPassword);
         return new MsgResponse("카카오 신규유저 비밀번호 변경완료");
@@ -148,7 +142,6 @@ public class MemberService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        // MemberDetail과 연관된 엔터티들을 삭제
         MemberDetail memberDetail = member.getMemberDetail();
         if (memberDetail != null) {
             mileageGetHistoryRepository.deleteAllByMemberDetail(memberDetail);
@@ -156,10 +149,7 @@ public class MemberService {
             memberAnswerRepository.deleteAllByMemberDetail(memberDetail);
         }
 
-        // AttendanceCheck와의 연관관계 끊기
         attendanceCheckRepository.deleteAllByMember(member);
-
-        // Member 엔터티 삭제
         memberRepository.delete(member);
 
         return new MsgResponse("탈퇴완료.");
