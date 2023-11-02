@@ -102,7 +102,7 @@ public class ReadService {
 
     //퀴즈 리스트
     private List<Quiz> findQuizLists (String keyword) {
-        return quizRepository.findAllByDisplayIsTrueAndTitleContainingOrderById(keyword);
+        return quizRepository.findAllByDisplayIsTrueAndTitleContainingOrderByIdDesc(keyword);
     }
 
     //리스트 만들기
