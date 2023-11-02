@@ -56,10 +56,9 @@ public class AnswerService {
         MemberDetail memberDetail = member.getMemberDetail();
 
         //필요한 조건 찾아오기 -> 응답이 있는 지 없는지, 하루의 푼 문제의 숫자
+        int daySolve = mileageGetHistoryRepository.countByDateAndMemberDetailAndType(localDate ,memberDetail, TypeEnum.QUIZ_SOLVE);
         Optional<MemberAnswer> answer = memberAnswerRepository.findTopByMemberIdAndQuizQuestionNumAndQuizId(
                 member.getId(),quizQuestionNum,quizId);
-        int daySolve = mileageGetHistoryRepository.countByDateAndMemberDetailAndType(localDate,memberDetail, TypeEnum.QUIZ_SOLVE);
-
         //우선 객체 형성
         MemberAnswer memberAnswer = new MemberAnswer();
         //옵션의 결과에 따라 있으면 기존의 응답 변경 | 없다면 푼 문제의 갯수에 따라 10개 보다 작으면 문제를 제작함
