@@ -24,14 +24,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/**
- * Spring Security의 기본 설정을 하는 클래스
- * 특히 JWT 인증에 필요한 필터 설정 및 URL에 따른 접근 권한 설정 .
- */
-
 @Configuration
-@EnableWebSecurity // Spring Security 지원을 가능하게 함
-//@EnableGlobalMethodSecurity(securedEnabled = true) // @Secured 활성화
+@EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig implements WebMvcConfigurer {
     private final JwtUtil jwtUtil;
@@ -52,7 +46,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         "https://quizpop.net")
                 .allowedMethods(ALLOWED_METHOD_NAMES.split(","))
                 .allowedHeaders("*")
-                .exposedHeaders(JwtUtil.AUTHORIZATION_HEADER, JwtUtil.REFRESH_HEADER) // JWT 헤더를 노출
+                .exposedHeaders(JwtUtil.AUTHORIZATION_HEADER, JwtUtil.REFRESH_HEADER)
                 .allowCredentials(true);
     }
 
@@ -83,7 +77,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         // CSRF 설정
         http.csrf((csrf) -> csrf.disable());
 
-        // 기본 설정인 Session 방식은 사용하지 않고 JWT 방식을 사용하기 위한 설정
         http.sessionManagement((sessionManagement) ->
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
@@ -99,12 +92,12 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                                 .antMatchers("/v3/api-docs/**").permitAll()
                                 .antMatchers("/swagger-ui/**").permitAll()
                                 .antMatchers("/api/quiz/**").permitAll()
-                                .anyRequest().authenticated() // 그 외 모든 요청 인증처리
+                                .anyRequest().authenticated()
         );
 
         http.cors();
 
-        http.formLogin(AbstractHttpConfigurer::disable); // 폼 로그인 비활성화
+        http.formLogin(AbstractHttpConfigurer::disable);
 
         // 필터 관리
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);

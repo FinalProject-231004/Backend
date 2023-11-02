@@ -1,11 +1,5 @@
 package com.starta.project.global.security;
 
-/**
- * Spring Security에서 사용자 정보를 불러오기 위한 클래스
- */
-
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.entity.UserRoleEnum;
 import org.springframework.security.core.GrantedAuthority;

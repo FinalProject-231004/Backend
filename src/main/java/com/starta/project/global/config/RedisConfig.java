@@ -9,12 +9,6 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-
-/**
- *  Redis 설정과 관련된 클래스
- * Redis는 Key-Value 형태의 데이터베이스로 여기서는 Refresh Token을 저장하는데 사용
- */
-
 @Configuration
 public class RedisConfig {
 
@@ -32,7 +26,6 @@ public class RedisConfig {
         RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
         configuration.setHostName(host);
         configuration.setPassword(password);
-        // password 설정을 추가합니다.
         configuration.setPort(port);
         return new LettuceConnectionFactory(configuration);
     }

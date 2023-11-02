@@ -54,7 +54,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             throw new AuthenticationServiceException("요청 처리 중 오류가 발생했습니다.", e);
         }
     }
-
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         log.info("로그인 성공 및 JWT 생성");
@@ -71,7 +70,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         log.info("로그인 실패");
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         response.setContentType("application/json;charset=UTF-8");
-        String msg = "회원을 찾을 수 없습니다.";
+        String msg = "로그인 실패";
         try(PrintWriter writer = response.getWriter()) {
             String jsonDto = mapper.writeValueAsString(new MsgResponse(msg));
             writer.print(jsonDto);
