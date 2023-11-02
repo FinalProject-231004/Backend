@@ -61,8 +61,8 @@ public class NotificationService {
     @Transactional
     public void sendNotifications(List<Notification> notificationList) {
         notificationList.forEach(notification -> {
-            notificationRepository.save(notification); //DB 저장
-            sseService.send(notification.getReceiver(), notification.getContent(), notification.getNotificationType(), notification.getUrl());
+            Notification notificationResult = notificationRepository.save(notification); //DB 저장
+            sseService.send(notificationResult);
         });
     }
 
@@ -71,7 +71,7 @@ public class NotificationService {
      */
     @Transactional
     public void sendNotification(Notification notification) {
-        notificationRepository.save(notification); //DB 저장
-        sseService.send(notification.getReceiver(), notification.getContent(), notification.getNotificationType(), notification.getUrl());
+        Notification notificationResult = notificationRepository.save(notification); //DB 저장
+        sseService.send(notificationResult);
     }
 }

@@ -55,10 +55,10 @@ public class SseService {
     /**
      * [SSE 통신]specific user에게 알림 전송
      */
-    public void send(String receiver, String content, String type, String url) {
-        Notification notification = createNotification(receiver, content, type, url);
+    public void send(Notification notificationResult) {
+        Notification notification = createNotification(notificationResult);
         /* 로그인한 client의 sseEmitter 전체 호출 */
-        Map<String, SseEmitter> sseEmitters = sseRepository.findAllEmitterStartsWithUsername(receiver);
+        Map<String, SseEmitter> sseEmitters = sseRepository.findAllEmitterStartsWithUsername(notificationResult.getReceiver());
         sseEmitters.forEach(
                 (key, sseEmitter) -> {
                     log.info("key, notification : {}, {}", key, notification);
@@ -87,36 +87,39 @@ public class SseService {
     /**
      * [SSE 통신]notification type별 data 생성
      */
-    private Notification createNotification(String receiver, String content, String type, String url) {
-        if(type.equals(NotificationType.COMMENT.getAlias())) { //댓글
+    private Notification createNotification(Notification notificationResult) {
+        if(notificationResult.getNotificationType().equals(NotificationType.COMMENT.getAlias())) { //댓글
             return Notification.builder()
-                    .notificationId(receiver + "_" + System.currentTimeMillis())
-                    .receiver(receiver)
-                    .content(content)
+                    .id(notificationResult.getId())
+                    .notificationId(notificationResult.getNotificationId())
+                    .receiver(notificationResult.getReceiver())
+                    .content(notificationResult.getContent())
                     .notificationType(NotificationType.COMMENT.getAlias())
-                    .url(url)
+                    .url(notificationResult.getUrl())
                     .readYn('N')
                     .deletedYn('N')
                     .created_at(LocalDateTime.now())
                     .build();
-        } else if(type.equals(NotificationType.LIKEQUIZ.getAlias())) { //좋아요
+        } else if(notificationResult.getNotificationType().equals(NotificationType.LIKEQUIZ.getAlias())) { //좋아요
             return Notification.builder()
-                    .notificationId(receiver + "_" + System.currentTimeMillis())
-                    .receiver(receiver)
-                    .content(content)
+                    .id(notificationResult.getId())
+                    .notificationId(notificationResult.getNotificationId())
+                    .receiver(notificationResult.getReceiver())
+                    .content(notificationResult.getContent())
                     .notificationType(NotificationType.LIKEQUIZ.getAlias())
-                    .url(url)
+                    .url(notificationResult.getUrl())
                     .readYn('N')
                     .deletedYn('N')
                     .created_at(LocalDateTime.now())
                     .build();
-        } else if(type.equals(NotificationType.NOTICE.getAlias())) { //공지
+        } else if(notificationResult.getNotificationType().equals(NotificationType.NOTICE.getAlias())) { //공지
             return Notification.builder()
-                    .notificationId(receiver + "_" + System.currentTimeMillis())
-                    .receiver(receiver)
-                    .content(content)
+                    .id(notificationResult.getId())
+                    .notificationId(notificationResult.getNotificationId())
+                    .receiver(notificationResult.getReceiver())
+                    .content(notificationResult.getContent())
                     .notificationType(NotificationType.NOTICE.getAlias())
-                    .url(url)
+                    .url(notificationResult.getUrl())
                     .readYn('N')
                     .deletedYn('N')
                     .created_at(LocalDateTime.now())
