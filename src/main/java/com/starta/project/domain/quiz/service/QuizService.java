@@ -53,12 +53,11 @@ public class QuizService {
     public ResponseEntity<MsgDataResponse> createQuiz(MultipartFile multipartFile, CreateQuizRequestDto quizRequestDto,
                                                       Member member) {
         LocalDateTime localDate = LocalDateTime.now();
-        System.out.println(localDate);
 
-        Optional<MileageGetHistory> getHistory = getHistoryRepository.findByDateAndMemberDetailAndType(
-                localDate, member.getMemberDetail(), TypeEnum.QUIZ_CREATE);
+        Optional<MileageGetHistory> getHistory = getHistoryRepository.findFirstByMemberDetailAndTypeOrderByDateDesc(
+                 member.getMemberDetail(), TypeEnum.QUIZ_CREATE);
 
-        if(getHistory.isEmpty()){
+        if(getHistory.isEmpty() || getHistory.get().getDate().isEqual(localDate)){
             MemberDetail memberDetail = member.getMemberDetail();
             Integer i = 50;
             memberDetail.gainMileagePoint(i);
@@ -68,6 +67,7 @@ public class QuizService {
             mileageGetHistory.getFromQuiz(memberDetail,i,des);
             getHistoryRepository.save(mileageGetHistory);
         }
+
         Quiz quiz = new Quiz();
         String image;
         //이미지

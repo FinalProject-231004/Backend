@@ -12,12 +12,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.security.NoSuchAlgorithmException;
 
 @RestController
 @RequestMapping("/api")
@@ -28,11 +30,11 @@ public class AnswerController {
 
     @Operation(summary = "문제풀이")
     @PostMapping("/quiz/choice")
-    public void choice (@RequestBody ChoiceRequestDto choiceRequestDto,
+    public void choice  (@RequestBody ChoiceRequestDto choiceRequestDto,
                         @Parameter(hidden = true)
                         @AuthenticationPrincipal UserDetailsImpl userDetails,
-                        HttpServletRequest httpServletRequest) {
-        if(userDetails == null ) answerService.noMemberChoice(choiceRequestDto, httpServletRequest);
+                         HttpServletRequest httpServletRequest) throws NoSuchAlgorithmException {
+        if(userDetails == null ) answerService.noMemberChoice(choiceRequestDto,httpServletRequest);
         else  answerService.choice(choiceRequestDto, userDetails.getMember());
     }
 
@@ -41,9 +43,8 @@ public class AnswerController {
     public ResponseEntity<MsgDataResponse> result(@PathVariable Long id,
                                                   @Parameter(hidden = true)
                                                   @AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                  HttpServletRequest httpServletRequest) {
-        if(userDetails == null) return answerService.noMemberResult(id, httpServletRequest);
+                                                  HttpServletRequest httpServletRequest) throws NoSuchAlgorithmException{
+        if(userDetails == null) return answerService.noMemberResult(id,httpServletRequest);
         return answerService.result(id, userDetails.getMember());
-
     }
 }

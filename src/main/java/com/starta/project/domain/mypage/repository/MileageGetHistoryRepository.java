@@ -4,10 +4,8 @@ import com.starta.project.domain.member.entity.MemberDetail;
 import com.starta.project.domain.mypage.entity.MileageGetHistory;
 import com.starta.project.domain.mypage.entity.TypeEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.time.LocalDate;
+import org.springframework.data.jpa.repository.Query;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +14,11 @@ public interface MileageGetHistoryRepository extends JpaRepository<MileageGetHis
 
     void deleteAllByMemberDetail(MemberDetail memberDetail);
 
-    Optional<MileageGetHistory> findByDateAndMemberDetailAndType(LocalDateTime localDate, MemberDetail memberDetail, TypeEnum typeEnum);
-
+    @Query("SELECT COUNT(m) FROM MileageGetHistory m " +
+            "WHERE DATE_FORMAT(m.date, '%Y-%m-%d') = DATE_FORMAT(:localDate, '%Y-%m-%d')" +
+            "AND m.memberDetail = :memberDetail " +
+            "AND m.type = :typeEnum " )
     int countByDateAndMemberDetailAndType(LocalDateTime localDate, MemberDetail memberDetail, TypeEnum typeEnum);
+
+    Optional<MileageGetHistory> findFirstByMemberDetailAndTypeOrderByDateDesc(MemberDetail memberDetail, TypeEnum typeEnum);
 }
