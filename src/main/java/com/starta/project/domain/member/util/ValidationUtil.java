@@ -35,7 +35,7 @@ public class ValidationUtil {
     }
     public void checkPassword(String password, String checkPassword){
         if(!Objects.equals(password, checkPassword)){
-            throw new IllegalArgumentException("패스워드가 일치하지 않습니다.");
+            throw new IllegalArgumentException("패스워드 변경이 일치하지 않습니다.");
         }
     }
 }

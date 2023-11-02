@@ -105,10 +105,10 @@ public class MemberService {
     public MsgResponse kakaoFirstLogin(KaKaoFirstLoginDto requestDto, Long id) {
         Member member = validationUtil.findMember(id);
         String newPassword = requestDto.getNewPassword();
-        validationUtil.checkPassword(newPassword, requestDto.getNewCheckPassword());
         if (!passwordEncoder.matches(requestDto.getPassword(), member.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
+        validationUtil.checkPassword(newPassword, requestDto.getNewCheckPassword());
         String encodedPassword = passwordEncoder.encode(newPassword);
         member.updatePassword(encodedPassword);
         return new MsgResponse("카카오 신규유저 비밀번호 변경완료");
