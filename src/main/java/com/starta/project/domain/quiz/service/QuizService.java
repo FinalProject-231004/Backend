@@ -179,10 +179,19 @@ public class QuizService {
             String receiver = memberOptional.get().getUsername();
             String notificationId = receiver + "_" + System.currentTimeMillis();
             String title = quiz.getTitle();
-            String content = "["
-                    + title
-                    + "]"
-                    + "게시글 좋아요가 추가되었습니다. ";
+            String content = "";
+            if(title.length() < 4) {
+                content = "["
+                        + title
+                        + "]"
+                        + "게시글 좋아요가 추가되었습니다. ";
+            } else {
+                content = "["
+                        + title.substring(0, 3) + "..."
+                        + "]"
+                        + "게시글 좋아요가 추가되었습니다. ";
+            }
+
             String type = NotificationType.LIKEQUIZ.getAlias();
 
             Notification notification = Notification.builder()
