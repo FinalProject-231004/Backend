@@ -1,9 +1,11 @@
 package com.starta.project.domain.quiz.controller;
 
+import com.google.common.util.concurrent.RateLimiter;
 import com.starta.project.domain.quiz.dto.CommentCreateRequestDto;
 import com.starta.project.domain.quiz.dto.CommentDeleteRequestDto;
 import com.starta.project.domain.quiz.dto.CommentUpdateRequestDto;
 import com.starta.project.domain.quiz.service.CommentService;
+import com.starta.project.global.exception.Custom.CustomRateLimiterException;
 import com.starta.project.global.messageDto.MsgDataResponse;
 import com.starta.project.global.messageDto.MsgResponse;
 import com.starta.project.global.security.UserDetailsImpl;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
 
     private final CommentService commentService;
+    private static final RateLimiter rateLimiter = RateLimiter.create(0.5);
+
 
     @Operation(summary = "댓글 조회 ")
     @GetMapping("/quiz/{quizId}/comments")
@@ -33,6 +37,7 @@ public class CommentController {
     public ResponseEntity<MsgDataResponse> createComments (@RequestBody CommentCreateRequestDto requestDto,
                                                        @Parameter(hidden = true)
                                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        if(!rateLimiter.tryAcquire()) throw new CustomRateLimiterException("잠시만 기다려 주시면 감사하겠습니다. ");
         return ResponseEntity.status(HttpStatus.OK).body(commentService.createComment(requestDto, userDetails.getMember()));
     }
 

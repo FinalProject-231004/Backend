@@ -20,13 +20,11 @@ public class ShowQuizResponseDto {
     private LocalDateTime createdTime;
     private QuizCategoryEnum category;
     private String content;
-    private List<Comment> comments;
 
-    public void set(Quiz quiz, Integer viewcount, List<Comment> comments) {
+    public void set(Quiz quiz, Integer viewcount) {
         this.id = quiz.getId();
         this.title = quiz.getTitle();
         this.category = quiz.getCategory();
-        this.comments = comments;
         this.username = quiz.getNickname();
         this.createdTime = quiz.getCreatedAt();
         this.image = quiz.getImage();
