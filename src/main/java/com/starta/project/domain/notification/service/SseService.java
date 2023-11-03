@@ -30,8 +30,8 @@ public class SseService {
         String emitterId = member.getUsername() + "_" + System.currentTimeMillis();
 
         SseEmitter sseEmitter = sseRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
-        log.info("new emitter added : {}", sseEmitter);
-        log.info("lastEventId : {}", lastEventId);
+//        log.info("new emitter added : {}", sseEmitter);
+//        log.info("lastEventId : {}", lastEventId);
 
         /* 상황별 emitter 삭제 처리 */
         sseEmitter.onCompletion(() -> sseRepository.deleteEmitterById(emitterId)); //완료 시, 타임아웃 시, 에러 발생 시
@@ -61,7 +61,7 @@ public class SseService {
         Map<String, SseEmitter> sseEmitters = sseRepository.findAllEmitterStartsWithUsername(notificationResult.getReceiver());
         sseEmitters.forEach(
                 (key, sseEmitter) -> {
-                    log.info("key, notification : {}, {}", key, notification);
+                    //log.info("key, notification : {}, {}", key, notification);
                     sseRepository.saveEventCache(key, notification); //저장
                     emitEventToClient(sseEmitter, key, notification); //전송
                 }

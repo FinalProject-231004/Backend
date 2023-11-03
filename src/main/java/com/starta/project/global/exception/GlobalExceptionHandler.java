@@ -2,14 +2,17 @@ package com.starta.project.global.exception;
 
 import com.starta.project.global.exception.Custom.*;
 import com.starta.project.global.messageDto.MsgResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 
-
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -72,6 +75,11 @@ public class GlobalExceptionHandler {
                 restApiException,
                 HttpStatus.TOO_MANY_REQUESTS
         );
+    }
+
+    @ExceptionHandler(AsyncRequestTimeoutException.class)
+    public final void handleAsyncRequestTimeoutException(AsyncRequestTimeoutException ex, WebRequest request) {
+       log.info("Async request timed out Resolved [org.springframework.web.context.request.async.AsyncRequestTimeoutException]");
     }
 
 //    @ExceptionHandler(MethodArgumentNotValidException.class)
