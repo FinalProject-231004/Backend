@@ -154,7 +154,10 @@ public class AnswerService {
         MemberDetail memberDetail = member.getMemberDetail();
 
         if(memberDetail.getMileagePoint() < 50) throw new IllegalArgumentException("마일리지가 부족합니다. ");
-        else memberDetail.changeMileagePoint(50);
+        else {
+            memberDetail.changeMileagePoint(50);
+            memberDetailRepository.save(memberDetail);
+        }
         List<WhatWrongResponseDto> list = new ArrayList<>();
         List<QuizQuestion> quizQuestionList = quizQuestionRepository.findAllByQuiz(quiz);
         for (QuizQuestion quizQuestion : quizQuestionList) {
@@ -162,6 +165,7 @@ public class AnswerService {
             WhatWrongResponseDto whatWrongResponseDto = new WhatWrongResponseDto(quizQuestion,quizChoices);
             list.add(whatWrongResponseDto);
         }
+
         return new MsgDataResponse(quiz.getTitle()+ " 퀴즈의 정답입니다. 다시 풀어주세요! ", list);
     }
 
