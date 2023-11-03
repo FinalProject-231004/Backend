@@ -105,12 +105,9 @@ public class MemberService {
     public MsgResponse kakaoFirstLogin(KaKaoFirstLoginDto requestDto, Long id) {
         Member member = validationUtil.findMember(id);
         String newPassword = requestDto.getNewPassword();
-        // 기존 비밀번호 확인
-        validationUtil.verifyPassword(requestDto.getPassword(),member.getPassword());
-//        if (!passwordEncoder.matches(requestDto.getPassword(), member.getPassword())) {
-//            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-//        }
-        // 변경비밀번호 일치 확인
+        if (!passwordEncoder.matches(requestDto.getPassword(), member.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
         validationUtil.checkPassword(newPassword, requestDto.getNewCheckPassword());
         String encodedPassword = passwordEncoder.encode(newPassword);
         member.updatePassword(encodedPassword);
@@ -141,10 +138,9 @@ public class MemberService {
 
     @Transactional
     public MsgResponse deleteMember(String password, Member member) {
-        validationUtil.verifyPassword(password,member.getPassword());
-//        if (!passwordEncoder.matches(password, member.getPassword())) {
-//            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-//        }
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
 
         MemberDetail memberDetail = member.getMemberDetail();
         if (memberDetail != null) {
