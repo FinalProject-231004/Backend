@@ -2,6 +2,7 @@ package com.starta.project.domain.quiz.service;
 
 import com.starta.project.domain.quiz.dto.*;
 import com.starta.project.domain.quiz.entity.Quiz;
+import com.starta.project.domain.quiz.entity.QuizCategoryEnum;
 import com.starta.project.domain.quiz.entity.QuizChoices;
 import com.starta.project.domain.quiz.entity.QuizQuestion;
 import com.starta.project.domain.quiz.repository.QuizChoicesRepository;
@@ -24,9 +25,9 @@ public class ReadService {
     private final QuizChoicesRepository quizChoicesRepository;
     // 카테고리 별 정렬
     @Transactional(readOnly = true)
-    public List<SimpleQuizDto> readByCategory(CategoryDto categoryDto) {
+    public List<SimpleQuizDto> readByCategory(QuizCategoryEnum categoryName) {
         List<SimpleQuizDto> list = new ArrayList<>();
-        List<Quiz> quizList = quizRepository.findAllByCategoryAndDisplayTrueOrderByCreatedAtDesc(categoryDto.getCategory());
+        List<Quiz> quizList = quizRepository.findAllByCategoryAndDisplayTrueOrderByCreatedAtDesc(categoryName);
         list = makeList(quizList,list);
 
         return list;

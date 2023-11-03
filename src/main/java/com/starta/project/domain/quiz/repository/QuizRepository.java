@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface QuizRepository extends JpaRepository<Quiz, Long> {
-    List<Quiz> findAllByCategoryAndDisplayTrueOrderByCreatedAtDesc(QuizCategoryEnum category);
+    List<Quiz> findAllByCategoryAndDisplayTrueOrderByCreatedAtDesc(QuizCategoryEnum categoryName);
 
     List<Quiz> findAllByDisplayIsTrue(Sort id);
 
