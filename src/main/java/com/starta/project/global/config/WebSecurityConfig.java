@@ -8,7 +8,6 @@ import com.starta.project.global.jwt.JwtUtil;
 import com.starta.project.global.security.UserDetailsServiceImpl;
 import com.starta.project.global.security.handler.MemberLoginFailHandler;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,7 +37,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     public static final String ALLOWED_METHOD_NAMES = "GET,HEAD,POST,PUT,DELETE,TRACE,OPTIONS,PATCH";
 
-
     public void addCorsMappings(final CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:3000",
@@ -66,7 +64,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil,refreshTokenService, memberLoginFailHandler,userDetailsService);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil,refreshTokenService, memberLoginFailHandler, userDetailsService);
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return filter;
     }
@@ -86,18 +84,18 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         );
 
         http.authorizeHttpRequests((authorizeHttpRequests) ->
-                        authorizeHttpRequests
-                                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                                .antMatchers("/").permitAll()
-                                .antMatchers(HttpMethod.GET, "/**").permitAll()
-                                .antMatchers("/api/member/login").permitAll()
-                                .antMatchers("/api/member/signup").permitAll()
-                                .antMatchers("/api/member/kakao/callback").permitAll()
-                                .antMatchers("/v3/api-docs/**").permitAll()
-                                .antMatchers("/swagger-ui/**").permitAll()
-                                .antMatchers("/api/quiz/**").permitAll()
-                                .antMatchers("/api/mileageshop/**").permitAll()
-                                .anyRequest().authenticated() // 그 외 모든 요청 인증처리
+                authorizeHttpRequests
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                        .antMatchers("/").permitAll()
+                        .antMatchers(HttpMethod.GET, "/**").permitAll()
+                        .antMatchers("/api/member/login").permitAll()
+                        .antMatchers("/api/member/signup").permitAll()
+                        .antMatchers("/api/member/kakao/callback").permitAll()
+                        .antMatchers("/v3/api-docs/**").permitAll()
+                        .antMatchers("/swagger-ui/**").permitAll()
+                        .antMatchers("/api/quiz/**").permitAll()
+                        .antMatchers("/api/mileageshop/**").permitAll()
+                        .anyRequest().authenticated() // 그 외 모든 요청 인증처리
 
         );
 

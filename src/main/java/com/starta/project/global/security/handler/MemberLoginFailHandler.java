@@ -22,30 +22,29 @@ public class MemberLoginFailHandler implements AuthenticationFailureHandler {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
+
+    private void setErrorResponse(HttpServletResponse res, int statusCode, String msg) throws IOException {
+        res.setStatus(statusCode);
+        res.setContentType("application/json;charset=UTF-8");
+        Map<String, String> errorDetails = new HashMap<>();
+        errorDetails.put("msg", msg);
+        res.getWriter().write(mapper.writeValueAsString(errorDetails));
+    }
+
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-                                        AuthenticationException exception) throws IOException, ServletException {
+                                        AuthenticationException exception) throws IOException {
 
-
-        String msg;
         if (exception instanceof UsernameNotFoundException) {
-            msg = "계정이 존재하지 않습니다.";
+            setErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "계정이 존재하지 않습니다.");
         } else if (exception instanceof BadCredentialsException) {
-            msg = "아이디 또는 비밀번호가 맞지 않습니다.";
+            setErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "아이디 또는 비밀번호가 맞지 않습니다.");
         } else if (exception instanceof InternalAuthenticationServiceException) {
-            msg = "내부적으로 발생한 시스템 문제로 인해 요청을 처리할 수 없습니다. 관리자에게 문의하세요.";
+            setErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "내부적으로 발생한 시스템 문제로 인해 요청을 처리할 수 없습니다. 관리자에게 문의하세요.");
         } else if (exception instanceof AuthenticationCredentialsNotFoundException) {
-            msg = "인증 요청이 거부되었습니다. 관리자에게 문의하세요.";
+            setErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, "인증 요청이 거부되었습니다. 관리자에게 문의하세요.");
         } else {
-            msg = "알 수 없는 이유로 로그인에 실패하였습니다. 관리자에게 문의하세요.";
-        }
-
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType("application/json;charset=UTF-8");
-        try (PrintWriter writer = response.getWriter()) {
-            Map<String, String> errorDetails = new HashMap<>();
-            errorDetails.put("msg", msg);
-            writer.print(mapper.writeValueAsString(errorDetails));
+            setErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "알 수 없는 이유로 로그인에 실패하였습니다. 관리자에게 문의하세요.");
         }
     }
 }
