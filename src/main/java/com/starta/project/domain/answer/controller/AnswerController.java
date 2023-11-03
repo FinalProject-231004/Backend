@@ -11,6 +11,7 @@ import com.starta.project.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -44,7 +45,15 @@ public class AnswerController {
                                                   @Parameter(hidden = true)
                                                   @AuthenticationPrincipal UserDetailsImpl userDetails,
                                                   HttpServletRequest httpServletRequest) throws NoSuchAlgorithmException{
-        if(userDetails == null) return answerService.noMemberResult(id,httpServletRequest);
-        return answerService.result(id, userDetails.getMember());
+        if(userDetails == null) return ResponseEntity.ok(answerService.noMemberResult(id,httpServletRequest));
+        return ResponseEntity.ok(answerService.result(id, userDetails.getMember()));
+    }
+
+    @Operation(summary = "문제 정답 보기")
+    @GetMapping("/quiz/result-true/{quizId}")
+    public ResponseEntity<MsgDataResponse> wrongQuestion (@PathVariable Long quizId,
+                                                          @Parameter(hidden = true)
+                                                          @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return ResponseEntity.ok(answerService.whatWrong(quizId, userDetails.getMember()));
     }
 }
