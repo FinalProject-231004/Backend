@@ -6,7 +6,9 @@ import com.starta.project.global.jwt.JwtAuthenticationFilter;
 import com.starta.project.global.jwt.JwtAuthorizationFilter;
 import com.starta.project.global.jwt.JwtUtil;
 import com.starta.project.global.security.UserDetailsServiceImpl;
+import com.starta.project.global.security.handler.MemberLoginFailHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,8 +34,10 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     private final RefreshTokenService refreshTokenService;
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final MemberLoginFailHandler memberLoginFailHandler;
 
     public static final String ALLOWED_METHOD_NAMES = "GET,HEAD,POST,PUT,DELETE,TRACE,OPTIONS,PATCH";
+
 
     public void addCorsMappings(final CorsRegistry registry) {
         registry.addMapping("/**")
@@ -62,7 +66,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil,refreshTokenService);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil,refreshTokenService, memberLoginFailHandler,userDetailsService);
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return filter;
     }

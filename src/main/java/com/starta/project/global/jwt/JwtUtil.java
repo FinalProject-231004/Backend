@@ -43,8 +43,8 @@ public class JwtUtil {
     // Token 식별자
     public static final String BEARER_PREFIX = "Bearer ";
     // 토큰 만료시간
-    private final long TOKEN_TIME = 14 * 24 * 60 * 60 * 1000L; // 테스트용 2주, 밀리세컨드
-//    private final long TOKEN_TIME = 5 * 60 * 1000L; // TEST용 5분, 밀리세컨드
+//    private final long TOKEN_TIME = 3 * 60 * 60 * 1000L; // 3시간, 밀리세컨드
+    private final long TOKEN_TIME = 5 * 60 * 1000L; // TEST용 5분, 밀리세컨드
 
     private final RedisRepository redisRepository;
 
@@ -121,8 +121,6 @@ public class JwtUtil {
     public String checkUsingRefreshToken(String accessToken, String refreshTokenValue, HttpServletResponse res) throws JwtException {
         String value = redisRepository.getValue(REFRESH_PREFIX + refreshTokenValue);
         if (value == null) { // refresh 만료
-            log.error(REFRESH_PREFIX + refreshTokenValue);
-            log.error("Expired Refresh Token, 만료된 Refresh Token 입니다.");
             throw new JwtException("만료된 Refresh Token 입니다.");
         }
         try {
