@@ -31,76 +31,62 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserDetailsServiceImpl userDetailsService;
 
+    private void setErrorResponse(HttpServletResponse res, int statusCode, String msg) throws IOException {
+        res.setContentType("application/json");
+        res.setCharacterEncoding("utf-8");
+        res.setStatus(statusCode);
+        res.getWriter().write("{\"msg\":\"" + msg + "\"}");
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
         log.info("JWT 필터 시작");
+        String requestURI = req.getRequestURI();
         String accessTokenValue = jwtUtil.getTokenFromHeader(req);
         String refreshTokenValue = jwtUtil.getRefreshTokenFromHeader(req);
-        String requestURI = req.getRequestURI();
+
 
         // 리프레시 토큰 재발급 API
         if ("/api/token/reissue".equals(requestURI) && refreshTokenValue != null) {
             try {
                 jwtUtil.checkUsingRefreshToken(accessTokenValue, refreshTokenValue, res);
                 return;
-            } catch (JwtException jwtEx) {
-                log.error("Refresh token expired or invalid.", jwtEx);
-                res.setContentType("application/json");
-                res.setCharacterEncoding("utf-8");
-                res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                res.getWriter().write("{\"message\":\"Expired Refresh Token. 토큰이 만료되었습니다.\"}");
+            }  catch (CustomInvalidJwtException e) {
+                setErrorResponse(res, HttpServletResponse.SC_BAD_REQUEST, "Expired Refresh Token. 유효하지 않은 JWT 토큰 입니다.");
+            }catch (JwtException jwtEx) {
+                setErrorResponse(res, HttpServletResponse.SC_UNAUTHORIZED, "Expired Refresh Token. 토큰이 만료되었습니다");
                 return;
             }
         }
 
-
         // 로그인 또는 재발급 요청이 아닌 경우
         if (!(requestURI.equals("/") || requestURI.equals("/api/member/login") || requestURI.equals("/api/member/signup"))) {
-            if (StringUtils.hasText(accessTokenValue)) {
-                accessTokenValue = jwtUtil.substringToken(accessTokenValue);
-                log.info("validateToken 시작");
-
-                //access 토큰이 유효하면 그대로 반환, 만료되어 refresh토큰 통해 반환되면 새로운 토큰 발급
-                try {
-                    if (jwtUtil.validateToken(accessTokenValue, refreshTokenValue, res)) {
-                        Claims info = jwtUtil.getUserInfoFromToken(accessTokenValue);
-                        log.info("Claims info" + info);
-                        setAuthentication(info.getSubject());
-                        log.info("setAuthentication");
-                    }
-                } catch (CustomExpiredJwtException e) {
-                    res.setContentType("application/json");
-                    res.setCharacterEncoding("utf-8");
-                    res.setStatus(401);
-                    res.getWriter().write("{\"msg\":\"Expired Access Token. 토큰이 만료되었습니다.\"}");
-                    return; // 필터 체인 종료
-                } catch (CustomUnsupportedJwtException e) {
-                    res.setContentType("application/json");
-                    res.setCharacterEncoding("utf-8");
-                    res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    res.getWriter().write("{\"msg\":\"Unsupported JWT Token. 지원하지 않는 JWT 토큰입니다.\"}");
-                    return; // 필터 체인 종료
-                } catch (CustomMalformedJwtException e) {
-                    res.setContentType("application/json");
-                    res.setCharacterEncoding("utf-8");
-                    res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    res.getWriter().write("{\"msg\":\"Malformed JWT Token. 형식이 잘못된 JWT 토큰입니다.\"}");
-                    return; // 필터 체인 종료
-                }catch (CustomInvalidJwtException e) {
-                    res.setContentType("application/json");
-                    res.setCharacterEncoding("utf-8");
-                    res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    res.getWriter().write("{\"msg\":\"Invalid JWT signature, 유효하지 않은 JWT 토큰 입니다.\"}");
-                    return; // 필터 체인 종료
-                } catch (Exception e) {
-                    res.setContentType("application/json");
-                    res.setCharacterEncoding("utf-8");
-                    res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    res.getWriter().write("{\"msg\":\"토큰을 다시 발급해주세요.\"}");
-                    return; // 필터 체인 종료
-                }
+            if (!StringUtils.hasText(accessTokenValue)) {
+                setErrorResponse(res, HttpServletResponse.SC_BAD_REQUEST, "Access Token이 없습니다.");
+                return; // 필터 체인 종료
             }
-
+            accessTokenValue = jwtUtil.substringToken(accessTokenValue);
+            log.info("validateToken 시작");
+            //access 토큰이 유효하면 그대로 반환, 만료되어 refresh토큰 통해 반환되면 새로운 토큰 발급
+            try {
+                if (jwtUtil.validateToken(accessTokenValue, refreshTokenValue, res)) {
+                    Claims info = jwtUtil.getUserInfoFromToken(accessTokenValue);
+                    log.info("Claims info" + info);
+                    setAuthentication(info.getSubject());
+                    log.info("setAuthentication");
+                }
+            } catch (CustomExpiredJwtException e) {
+                setErrorResponse(res, HttpServletResponse.SC_UNAUTHORIZED, "Expired Access Token. 토큰이 만료되었습니다.");
+            } catch (CustomUnsupportedJwtException e) {
+                setErrorResponse(res, HttpServletResponse.SC_BAD_REQUEST, "Unsupported JWT Token. 지원하지 않는 JWT 토큰입니다.");
+            } catch (CustomMalformedJwtException e) {
+                setErrorResponse(res, HttpServletResponse.SC_BAD_REQUEST, "Malformed JWT Token. 형식이 잘못된 JWT 토큰입니다.");
+            } catch (CustomInvalidJwtException e) {
+                setErrorResponse(res, HttpServletResponse.SC_BAD_REQUEST, "Invalid JWT signature, 유효하지 않은 JWT 토큰 입니다.");
+            } catch (Exception e) {
+                setErrorResponse(res, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "토큰을 다시 발급해주세요.");
+            }
+            return; // 필터 체인 종료
         }
         log.info("doFilter");
         filterChain.doFilter(req, res);
@@ -111,7 +97,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         Authentication authentication = createAuthentication(username);
         context.setAuthentication(authentication);
-
         SecurityContextHolder.setContext(context);
     }
 

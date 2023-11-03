@@ -17,10 +17,6 @@ spring:
     username: root
     url: ${DB_URL}
     password: ${DB_PASSWORD}
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    username: root
-#    url: jdbc:mysql://34.64.142.127:3306/quizpop
-#    password: heypop_DB
   jpa:
     properties:
       hibernate:

@@ -7,6 +7,7 @@ import com.starta.project.domain.member.entity.UserRoleEnum;
 import com.starta.project.domain.member.service.RefreshTokenService;
 import com.starta.project.global.messageDto.MsgResponse;
 import com.starta.project.global.security.UserDetailsImpl;
+import com.starta.project.global.security.handler.MemberLoginFailHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -28,9 +29,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private final RefreshTokenService refreshTokenService;
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, RefreshTokenService refreshTokenService) {
+    private final MemberLoginFailHandler memberLoginFailHandler;
+
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, RefreshTokenService refreshTokenService, MemberLoginFailHandler memberLoginFailHandler) {
         this.jwtUtil = jwtUtil;
         this.refreshTokenService = refreshTokenService;
+        this.memberLoginFailHandler = memberLoginFailHandler;
         setFilterProcessesUrl("/api/member/login");
     }
 
@@ -69,14 +73,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         log.info("로그인 실패");
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        response.setContentType("application/json;charset=UTF-8");
-        String msg = "로그인 실패";
-        try(PrintWriter writer = response.getWriter()) {
-            String jsonDto = mapper.writeValueAsString(new MsgResponse(msg));
-            writer.print(jsonDto);
-        } catch (IOException e) {
-            log.error("예외 발생: ", e);
-            throw new RuntimeException("응답 처리 중 오류가 발생했습니다.");
-        }
+        memberLoginFailHandler.onAuthenticationFailure(request, response, failed);
+
+//        try (PrintWriter writer = response.getWriter()) {
+//            String jsonDto = mapper.writeValueAsString(new MsgResponse(errorMessage)); // 여기서 errorMessage는 알맞은 메시지로 설정해야 합니다.
+//            writer.print(jsonDto);
+//        } catch (IOException e) {
+//            log.error("응답 작성 중 오류 발생", e);
+//        }
     }
 }
