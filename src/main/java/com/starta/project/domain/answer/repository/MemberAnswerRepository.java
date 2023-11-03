@@ -22,12 +22,15 @@ public interface MemberAnswerRepository extends JpaRepository<MemberAnswer,Long>
                                                                         @Param("quizQuestionNum") Integer quizQuestionNum,
                                                                         @Param("quizId") Long quizId);
 
-
     int countByQuizIdAndCorrectIsTrueAndMemberId(Long quizId, Long id);
 
-    List<MemberAnswer> findAllByMemberDetailAndQuizIdAndCorrectIsFalse(MemberDetail memberDetail, Long quizId);
-
-    MemberAnswer findByMemberDetailAndQuizIdAndQuizQuestionNum(MemberDetail memberDetail, Long quizId, Integer questionNum);
+    @Query ("SELECT m FROM MemberAnswer AS m " +
+    "WHERE m.memberDetail = :memberDetail " +
+    "AND m.quizId = :quizId " +
+    "AND m.quizQuestionNum = :questionNum")
+    MemberAnswer findByMemberDetailAndQuizIdAndQuizQuestionNum(@Param("memberDetail") MemberDetail memberDetail,
+                                                               @Param("quizId") Long quizId,
+                                                               @Param("questionNum") Integer questionNum);
 }
 
 
