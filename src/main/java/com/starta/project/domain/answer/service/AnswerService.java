@@ -161,8 +161,9 @@ public class AnswerService {
         List<WhatWrongResponseDto> list = new ArrayList<>();
         List<QuizQuestion> quizQuestionList = quizQuestionRepository.findAllByQuiz(quiz);
         for (QuizQuestion quizQuestion : quizQuestionList) {
+            MemberAnswer memberAnswer = memberAnswerRepository.findByMemberDetailAndQuizIdAndQuizQuestionNum(memberDetail,quizId,quizQuestion.getQuestionNum());
             QuizChoices quizChoices = quizChoicesRepository.findByQuizQuestionAndChecksIsTrue(quizQuestion);
-            WhatWrongResponseDto whatWrongResponseDto = new WhatWrongResponseDto(quizQuestion,quizChoices);
+            WhatWrongResponseDto whatWrongResponseDto = new WhatWrongResponseDto(quizQuestion,quizChoices,memberAnswer);
             list.add(whatWrongResponseDto);
         }
 

@@ -26,6 +26,8 @@ public interface MemberAnswerRepository extends JpaRepository<MemberAnswer,Long>
     int countByQuizIdAndCorrectIsTrueAndMemberId(Long quizId, Long id);
 
     List<MemberAnswer> findAllByMemberDetailAndQuizIdAndCorrectIsFalse(MemberDetail memberDetail, Long quizId);
+
+    MemberAnswer findByMemberDetailAndQuizIdAndQuizQuestionNum(MemberDetail memberDetail, Long quizId, Integer questionNum);
 }
 
 
