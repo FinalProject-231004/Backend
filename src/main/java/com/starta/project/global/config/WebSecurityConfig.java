@@ -35,6 +35,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final MemberLoginFailHandler memberLoginFailHandler;
+
     public static final String ALLOWED_METHOD_NAMES = "GET,HEAD,POST,PUT,DELETE,TRACE,OPTIONS,PATCH";
 
 
@@ -65,7 +66,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil,refreshTokenService, memberLoginFailHandler);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil,refreshTokenService, memberLoginFailHandler,userDetailsService);
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return filter;
     }

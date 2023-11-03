@@ -14,6 +14,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -28,13 +31,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
     private static final ObjectMapper mapper = new ObjectMapper();
-
     private final MemberLoginFailHandler memberLoginFailHandler;
-
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, RefreshTokenService refreshTokenService, MemberLoginFailHandler memberLoginFailHandler) {
+    private final UserDetailsService userDetailsService;
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, RefreshTokenService refreshTokenService, MemberLoginFailHandler memberLoginFailHandler, UserDetailsService userDetailsService) {
         this.jwtUtil = jwtUtil;
         this.refreshTokenService = refreshTokenService;
         this.memberLoginFailHandler = memberLoginFailHandler;
+        this.userDetailsService = userDetailsService;
         setFilterProcessesUrl("/api/member/login");
     }
 
@@ -46,18 +49,27 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 throw new BadCredentialsException("요청 본문이 비어 있습니다.");
             }
             LoginRequestDto requestDto = mapper.readValue(request.getInputStream(), LoginRequestDto.class);
+            // 사용자 이름을 체크하여 존재하지 않는 경우 UsernameNotFoundException 던지기
+            UserDetails userDetails = userDetailsService.loadUserByUsername(requestDto.getUsername());
+            if (userDetails == null) {
+                throw new UsernameNotFoundException("계정이 존재하지 않습니다. 회원가입 진행 후 로그인 해주세요.");
+            }
             return getAuthenticationManager().authenticate(
                     new UsernamePasswordAuthenticationToken(
                             requestDto.getUsername(),
                             requestDto.getPassword(),
-                            null
+                            userDetails.getAuthorities()
                     )
             );
+        } catch (UsernameNotFoundException e) {
+            log.info("계정이 존재하지 않음: ");
+            throw e;
         } catch (IOException e) {
-            log.error("예외 발생: ", e);
+            log.info("예외 발생: ", e);
             throw new AuthenticationServiceException("요청 처리 중 오류가 발생했습니다.", e);
         }
     }
+
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         log.info("로그인 성공 및 JWT 생성");
@@ -72,14 +84,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         log.info("로그인 실패");
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+//        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         memberLoginFailHandler.onAuthenticationFailure(request, response, failed);
 
-//        try (PrintWriter writer = response.getWriter()) {
-//            String jsonDto = mapper.writeValueAsString(new MsgResponse(errorMessage)); // 여기서 errorMessage는 알맞은 메시지로 설정해야 합니다.
-//            writer.print(jsonDto);
-//        } catch (IOException e) {
-//            log.error("응답 작성 중 오류 발생", e);
-//        }
     }
 }
