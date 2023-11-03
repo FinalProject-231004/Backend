@@ -144,7 +144,8 @@ public class AnswerService {
         int totalQuiz = quizQuestionRepository.countByQuiz(quiz);
         ResultResponseDto resultResponseDto = new ResultResponseDto();
         resultResponseDto.set(quiz);
-        redisTemplate.opsForList().leftPop(hashedIP + "_0" + quizId, correctQuiz);
+        redisTemplate.expire(hashedIP + "_0" + quizId,0,TimeUnit.SECONDS);
+
         return new MsgDataResponse (quiz.getTitle()+" 문제에서 " + totalQuiz+ "개의 문제 중 " + correctQuiz +"개 정답! ", resultResponseDto );
     }
 
