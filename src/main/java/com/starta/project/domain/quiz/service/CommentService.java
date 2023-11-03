@@ -51,14 +51,47 @@ public class CommentService {
             String receiver = memberOptional.get().getUsername();
             String notificationId = receiver + "_" + System.currentTimeMillis();
             String title = quiz.getTitle();
-            // 3글자 아닐때 문제가 발생해서 그거 예외처리 해야함`
-            String content = "["
-                    + title
-                    + "]"
-                    + "게시글에 댓글이 달렸습니다: "
-                    + "["
-                    + comment.getComment()
-                    + "]";
+            String content = "";
+
+            // 3글자 아닐때 문제가 발생해서 그거 예외처리 해야함
+            if(title.length() < 4){
+                if(comment.getComment().length() < 4) {
+                    content = "["
+                            + title
+                            + "]"
+                            + "게시글에 댓글이 달렸습니다: "
+                            + "["
+                            + comment.getComment()
+                            + "]";
+                } else {
+                    content = "["
+                            + title
+                            + "]"
+                            + "게시글에 댓글이 달렸습니다: "
+                            + "["
+                            + comment.getComment().substring(0, 3) + "..."
+                            + "]";
+                }
+            } else {
+                if(comment.getComment().length() < 4) {
+                    content = "["
+                            + title.substring(0, 3) + "..."
+                            + "]"
+                            + "게시글에 댓글이 달렸습니다: "
+                            + "["
+                            + comment.getComment()
+                            + "]";
+                } else {
+                    content = "["
+                            + title.substring(0, 3) + "..."
+                            + "]"
+                            + "게시글에 댓글이 달렸습니다: "
+                            + "["
+                            + comment.getComment().substring(0, 3) + "..."
+                            + "]";
+                }
+            }
+
             String type = NotificationType.COMMENT.getAlias();
 
             Notification notification = Notification.builder()

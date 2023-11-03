@@ -54,6 +54,11 @@ public class MemberAnswer {
     public void gainScore(boolean b) {
         this.getScore = b;
     }
+
+    public void noMemberAnswer(Long quizId, Integer quizQuestionNum) {
+        this.quizId = quizId;
+        this.quizQuestionNum = quizQuestionNum;
+    }
     // getters, setters, etc.
 }
 

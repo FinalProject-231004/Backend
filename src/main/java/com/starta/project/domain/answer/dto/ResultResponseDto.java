@@ -14,15 +14,13 @@ public class ResultResponseDto {
     private String image;
     private Integer likes;
     private Integer viewCount;
-    private List<Comment> comments;
 
-    public void set(Quiz quiz, List<Comment> list) {
+    public void set(Quiz quiz) {
         this.id = quiz.getId();
         this.title = quiz.getTitle();
         this.content = quiz.getContent();
         this.image = quiz.getImage();
         this.viewCount = quiz.getViewCount();
         this.likes = quiz.getLikes();
-        this.comments = list;
     }
 }

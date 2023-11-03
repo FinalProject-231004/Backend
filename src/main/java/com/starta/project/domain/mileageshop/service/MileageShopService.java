@@ -33,12 +33,15 @@ public class MileageShopService {
 
     // 마일리지샵 구매
     @Transactional
-    public MsgResponse orderItem(Member member, Long id, OrderItemRequestDto orderItemRequestDto) {
+    public MsgResponse orderItem(Member member, OrderItemRequestDto orderItemRequestDto) {
         // 유저 정보 검색
         Member findMember = findMember(member.getId());
 
+        // 유저 이메일 패턴 인증
+        if (orderItemRequestDto.getEmail() == null || !orderItemRequestDto.getEmail().matches("^[a-zA-Z0-9]+@[a-zA-Z0-9\\.]+$")) throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
+
         // 마일리지샵 상품 검색
-        MileageShopItem findItem = findItem(id);
+        MileageShopItem findItem = findItem(orderItemRequestDto.getItemId());
 
         // 유저의 마일리지 포인트
         Integer memberMileagePoint = findMember.getMemberDetail().getMileagePoint();
@@ -64,7 +67,7 @@ public class MileageShopService {
 
     // 마일리지샵 등록
     @Transactional
-    public MsgResponse createItem(Member member, CreateMileageItemRequestDto requestDto, MultipartFile image) throws IOException {
+    public MsgDataResponse createItem(Member member, CreateMileageItemRequestDto requestDto, MultipartFile image) throws IOException {
 
         // 관리자만 등록 가능
         if (!(member.getRole() == UserRoleEnum.ADMIN)) throw new IllegalArgumentException("잘못된 접근입니다.");
@@ -78,7 +81,7 @@ public class MileageShopService {
         MileageShopItem mileageShopItem = new MileageShopItem(requestDto, imageUrl, requestDto.getCategory());
         mileageShopItemRepository.save(mileageShopItem);
 
-        return new MsgResponse("마일리지샵 등록에 성공했습니다.");
+        return new MsgDataResponse("마일리지샵 등록에 성공했습니다.", new MileageItemResponseDto(mileageShopItem));
     }
 
     // 마일리지샵 전체조회

@@ -52,13 +52,12 @@ public class QuizService {
     @Transactional
     public ResponseEntity<MsgDataResponse> createQuiz(MultipartFile multipartFile, CreateQuizRequestDto quizRequestDto,
                                                       Member member) {
-        LocalDate localDate = LocalDate.now();
-        System.out.println(localDate);
+        LocalDateTime localDate = LocalDateTime.now();
 
-        Optional<MileageGetHistory> getHistory = getHistoryRepository.findByDateAndMemberDetailAndType(
-                localDate, member.getMemberDetail(), TypeEnum.QUIZ_CREATE);
+        Optional<MileageGetHistory> getHistory = getHistoryRepository.findFirstByMemberDetailAndTypeOrderByDateDesc(
+                 member.getMemberDetail(), TypeEnum.QUIZ_CREATE);
 
-        if(getHistory.isEmpty()){
+        if(getHistory.isEmpty() || getHistory.get().getDate().isEqual(localDate)){
             MemberDetail memberDetail = member.getMemberDetail();
             Integer i = 50;
             memberDetail.gainMileagePoint(i);
@@ -68,6 +67,7 @@ public class QuizService {
             mileageGetHistory.getFromQuiz(memberDetail,i,des);
             getHistoryRepository.save(mileageGetHistory);
         }
+
         Quiz quiz = new Quiz();
         String image;
         //이미지
@@ -93,24 +93,22 @@ public class QuizService {
     }
 
     // 문제 상세 보기
-    public ResponseEntity<ShowQuizResponseDto> showQuiz(Long id, Member member) {
-        ShowQuizResponseDto showQuizResponseDto = new ShowQuizResponseDto();
-        Quiz quiz = findQuiz(id);
-        if(quiz.getDisplay()== false && !quiz.getMemberId().equals(member.getId()))  {
-            throw new IllegalArgumentException("게시된 퀴즈가 아닙니다. ");
-        }
-        //댓글 가져오기
-        List<Comment> comments = getComment(quiz.getId());
-        //조회수 => api 검색 = 조회하는 횟수 -> 이거 조회 api 안해도 될꺼 같은데..?
-        // 만약 할꺼면 여기다 동시성 제어를 걸어야 할거 같습니다!
-        Integer viewCount = quiz.getViewCount();
-        viewCount++;
-        quiz.view(viewCount);
-        quizRepository.save(quiz);
-        //반환하는 데이터
-        showQuizResponseDto.set(quiz,viewCount,comments);
+    public ResponseEntity<ShowQuizResponseDto> showQuiz(Long id) {
+            ShowQuizResponseDto showQuizResponseDto = new ShowQuizResponseDto();
+            Quiz quiz = findQuiz(id);
+            if(quiz.getDisplay()== false )  {
+                throw new IllegalArgumentException("게시된 퀴즈가 아닙니다. ");
+            }
+            //조회수 => api 검색 = 조회하는 횟수 -> 이거 조회 api 안해도 될꺼 같은데..?
+            // 만약 할꺼면 여기다 동시성 제어를 걸어야 할거 같습니다!
+            Integer viewCount = quiz.getViewCount();
+            viewCount++;
+            quiz.view(viewCount);
+            quizRepository.save(quiz);
+            //반환하는 데이터
+            showQuizResponseDto.set(quiz,viewCount);
 
-        return ResponseEntity.status(200).body(showQuizResponseDto);
+            return ResponseEntity.status(200).body(showQuizResponseDto);
     }
 
     @Transactional //퀴즈 삭제
