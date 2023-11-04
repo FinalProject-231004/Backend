@@ -77,7 +77,7 @@ public class CommentService {
                     content = "["
                             + title.substring(0, 6) + "..."
                             + "]"
-                            + "게시글에 댓글이 달렸습니다: "
+                            + " 댓글이 달렸습니다: "
                             + "["
                             + comment.getComment()
                             + "]";
@@ -85,7 +85,7 @@ public class CommentService {
                     content = "["
                             + title.substring(0, 6) + "..."
                             + "]"
-                            + "게시글에 댓글이 달렸습니다: "
+                            + " 댓글이 달렸습니다: "
                             + "["
                             + comment.getComment().substring(0, 3) + "..."
                             + "]";
