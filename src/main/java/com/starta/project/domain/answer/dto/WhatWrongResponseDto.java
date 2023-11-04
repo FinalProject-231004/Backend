@@ -9,6 +9,7 @@ import lombok.Getter;
 public class WhatWrongResponseDto {
     private Integer quizQuestionNum;
     private String quizQuestionTitle;
+    private String myAnswer;
     private String quizChoiceAnswer;
     private boolean myAnswerIsCorrect;
 
@@ -17,5 +18,6 @@ public class WhatWrongResponseDto {
         this.quizQuestionTitle = question.getQuizTitle();
         this.quizChoiceAnswer = quizChoices.getAnswer();
         this.myAnswerIsCorrect = memberAnswer.isCorrect();
+        this.myAnswer = memberAnswer.getMyAnswer();
     }
 }

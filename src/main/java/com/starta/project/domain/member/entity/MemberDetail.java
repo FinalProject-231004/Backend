@@ -82,13 +82,14 @@ public class MemberDetail {
         this.totalScore += i;
     }
 
-    public void changeAnswer(MemberAnswer memberAnswer) {
+    public synchronized void changeAnswer(MemberAnswer memberAnswer) {
         for (MemberAnswer answer : this.memberAnswer) {
             if (memberAnswer.getId().equals(answer.getId())) {
-                answer.modify(memberAnswer.isCorrect(),memberAnswer.isGetScore());
+                answer.modify(memberAnswer.isCorrect(),memberAnswer.isGetScore(),memberAnswer.getMyAnswer());
                 break;
             }
         }
     }
+
 }
 
