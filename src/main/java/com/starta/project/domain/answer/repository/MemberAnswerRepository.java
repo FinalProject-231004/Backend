@@ -2,17 +2,16 @@ package com.starta.project.domain.answer.repository;
 
 import com.starta.project.domain.answer.entity.MemberAnswer;
 import com.starta.project.domain.member.entity.MemberDetail;
-import io.lettuce.core.dynamic.annotation.Param;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface MemberAnswerRepository extends JpaRepository<MemberAnswer,Long> {
 
     void deleteAllByMemberDetail(MemberDetail memberDetail);
-
 
     @Query ("SELECT a FROM MemberAnswer AS a "+
     "WHERE a.memberId = :id " +

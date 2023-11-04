@@ -43,31 +43,13 @@ public class QuizService {
     private final QuizChoicesRepository quizChoicesRepository;
     private final LikesRepository likesRepository;
     private final AmazonS3Service amazonS3Service;
-    private final MemberDetailRepository memberDetailRepository;
     private final NotificationService notificationService;
     private final MemberRepository memberRepository;
-    private final MileageGetHistoryRepository getHistoryRepository;
 
     //퀴즈 만들기
     @Transactional
     public ResponseEntity<MsgDataResponse> createQuiz(MultipartFile multipartFile, CreateQuizRequestDto quizRequestDto,
                                                       Member member) {
-        LocalDateTime localDate = LocalDateTime.now();
-
-        Optional<MileageGetHistory> getHistory = getHistoryRepository.findFirstByMemberDetailAndTypeOrderByDateDesc(
-                 member.getMemberDetail(), TypeEnum.QUIZ_CREATE);
-
-        if(getHistory.isEmpty() || getHistory.get().getDate().isEqual(localDate)){
-            MemberDetail memberDetail = member.getMemberDetail();
-            Integer i = 50;
-            memberDetail.gainMileagePoint(i);
-            memberDetailRepository.save(memberDetail);
-            MileageGetHistory mileageGetHistory = new MileageGetHistory();
-            String des = "오늘의 퀴즈 생성";
-            mileageGetHistory.getFromQuiz(memberDetail,i,des);
-            getHistoryRepository.save(mileageGetHistory);
-        }
-
         Quiz quiz = new Quiz();
         String image;
         //이미지

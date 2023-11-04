@@ -80,7 +80,7 @@ public class AnswerService {
         }
         memberAnswer.set(quizChoices.isChecks());
         //응답 저장
-        memberAnswer.answer(quizId,member.getId(),quizQuestionNum);
+        memberAnswer.answer(quizId,member.getId(),quizQuestionNum, quizChoices);
         // cascade를 위해 응답이 있는 조건과 없는 조건를 두고 상황에 따라 구별하여 저장함
         if (answer.isEmpty()) memberDetail.answer(memberAnswer);
         else {
@@ -113,6 +113,7 @@ public class AnswerService {
 
 
     //결과창 보기
+    @Transactional
     public MsgDataResponse result(Long id, Member member) {
 
         Quiz quiz = findQuiz(id);
@@ -128,6 +129,7 @@ public class AnswerService {
     }
 
 
+    @Transactional
     public MsgDataResponse noMemberResult(Long id, HttpServletRequest httpServletRequest) throws NoSuchAlgorithmException {
 
         Quiz quiz = findQuiz(id);

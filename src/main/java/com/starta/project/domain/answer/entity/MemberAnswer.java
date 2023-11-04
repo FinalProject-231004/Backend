@@ -2,6 +2,7 @@ package com.starta.project.domain.answer.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.starta.project.domain.member.entity.MemberDetail;
+import com.starta.project.domain.quiz.entity.QuizChoices;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -27,6 +28,9 @@ public class MemberAnswer {
     @Column
     private boolean getScore = false;
 
+    @Column
+    private String myAnswer;
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn( name = "member_detail_id")
@@ -36,19 +40,21 @@ public class MemberAnswer {
         this.correct = b;
     }
 
-    public void answer(Long quizId, Long id, Integer questionNum) {
+    public void answer(Long quizId, Long id, Integer questionNum, QuizChoices quizChoices) {
         this.quizId = quizId;
         this.memberId = id;
         this.quizQuestionNum = questionNum;
+        this.myAnswer = quizChoices.getAnswer();
     }
 
     public void got(MemberDetail memberDetail) {
         this.memberDetail = memberDetail;
     }
 
-    public void modify(boolean memberAnswer, boolean getScore) {
+    public void modify(boolean memberAnswer, boolean getScore, String myAnswer) {
         this.correct = memberAnswer;
         this.getScore = getScore;
+        this.myAnswer = myAnswer;
     }
 
     public void gainScore(boolean b) {
