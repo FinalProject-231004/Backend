@@ -55,7 +55,7 @@ public class CommentService {
 
             // 3글자 아닐때 문제가 발생해서 그거 예외처리 해야함
             if(title.length() < 6){
-                if(comment.getComment().length() < 6) {
+                if(comment.getComment().length() < 4) {
                     content = "["
                             + title
                             + "]"
@@ -69,11 +69,11 @@ public class CommentService {
                             + "]"
                             + " 댓글이 달렸습니다: "
                             + "["
-                            + comment.getComment().substring(0, 6) + "..."
+                            + comment.getComment().substring(0, 3) + "..."
                             + "]";
                 }
             } else {
-                if(comment.getComment().length() < 6) {
+                if(comment.getComment().length() < 4) {
                     content = "["
                             + title.substring(0, 6) + "..."
                             + "]"
@@ -87,7 +87,7 @@ public class CommentService {
                             + "]"
                             + "게시글에 댓글이 달렸습니다: "
                             + "["
-                            + comment.getComment().substring(0, 6) + "..."
+                            + comment.getComment().substring(0, 3) + "..."
                             + "]";
                 }
             }
