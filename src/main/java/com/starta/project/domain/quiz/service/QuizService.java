@@ -180,14 +180,14 @@ public class QuizService {
             String notificationId = receiver + "_" + System.currentTimeMillis();
             String title = quiz.getTitle();
             String content = "";
-            if(title.length() < 4) {
+            if(title.length() < 6) {
                 content = "["
                         + title
                         + "]"
                         + "게시글 좋아요가 추가되었습니다. ";
             } else {
                 content = "["
-                        + title.substring(0, 3) + "..."
+                        + title.substring(0, 6) + "..."
                         + "]"
                         + "게시글 좋아요가 추가되었습니다. ";
             }

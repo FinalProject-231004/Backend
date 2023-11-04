@@ -54,12 +54,12 @@ public class CommentService {
             String content = "";
 
             // 3글자 아닐때 문제가 발생해서 그거 예외처리 해야함
-            if(title.length() < 4){
-                if(comment.getComment().length() < 4) {
+            if(title.length() < 6){
+                if(comment.getComment().length() < 6) {
                     content = "["
                             + title
                             + "]"
-                            + "게시글에 댓글이 달렸습니다: "
+                            + " 댓글이 달렸습니다: "
                             + "["
                             + comment.getComment()
                             + "]";
@@ -67,15 +67,15 @@ public class CommentService {
                     content = "["
                             + title
                             + "]"
-                            + "게시글에 댓글이 달렸습니다: "
+                            + " 댓글이 달렸습니다: "
                             + "["
-                            + comment.getComment().substring(0, 3) + "..."
+                            + comment.getComment().substring(0, 6) + "..."
                             + "]";
                 }
             } else {
-                if(comment.getComment().length() < 4) {
+                if(comment.getComment().length() < 6) {
                     content = "["
-                            + title.substring(0, 3) + "..."
+                            + title.substring(0, 6) + "..."
                             + "]"
                             + "게시글에 댓글이 달렸습니다: "
                             + "["
@@ -83,11 +83,11 @@ public class CommentService {
                             + "]";
                 } else {
                     content = "["
-                            + title.substring(0, 3) + "..."
+                            + title.substring(0, 6) + "..."
                             + "]"
                             + "게시글에 댓글이 달렸습니다: "
                             + "["
-                            + comment.getComment().substring(0, 3) + "..."
+                            + comment.getComment().substring(0, 6) + "..."
                             + "]";
                 }
             }
