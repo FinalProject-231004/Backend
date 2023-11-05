@@ -5,7 +5,7 @@ import com.starta.project.domain.quiz.dto.CommentCreateRequestDto;
 import com.starta.project.domain.quiz.dto.CommentDeleteRequestDto;
 import com.starta.project.domain.quiz.dto.CommentUpdateRequestDto;
 import com.starta.project.domain.quiz.service.CommentService;
-import com.starta.project.global.exception.Custom.CustomRateLimiterException;
+import com.starta.project.global.exception.custom.CustomRateLimiterException;
 import com.starta.project.global.messageDto.MsgDataResponse;
 import com.starta.project.global.messageDto.MsgResponse;
 import com.starta.project.global.security.UserDetailsImpl;

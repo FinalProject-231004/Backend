@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.starta.project.domain.member.dto.*;
 import com.starta.project.domain.member.service.KakaoService;
 import com.starta.project.domain.member.service.MemberService;
+import com.starta.project.domain.member.util.ValidationUtil;
 import com.starta.project.global.messageDto.MsgDataResponse;
 import com.starta.project.global.messageDto.MsgResponse;
 import com.starta.project.global.security.UserDetailsImpl;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.Objects;
 
 @Slf4j(topic = "Member Controller")
 @RestController
@@ -30,16 +32,14 @@ public class MemberController {
 
     private final MemberService memberService;
     private final KakaoService kakaoService;
+    private final ValidationUtil validationUtil;
 
     @Operation(summary = "회원가입")
     @PostMapping("/signup")
-    public ResponseEntity<MsgResponse> signup(@Valid @RequestBody SignupRequestDto requestDto,
-                                              BindingResult bindingResult) {
-        // Validation 예외처리
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(new MsgResponse("회원가입 실패"));
-        }
-        return ResponseEntity.ok(memberService.signup(requestDto));
+    public ResponseEntity<?> signup(@Valid @RequestBody SignupRequestDto requestDto,
+                                    BindingResult bindingResult) {
+        return validationUtil.checkSignupValid(requestDto, bindingResult)
+                .orElseGet(() -> ResponseEntity.ok(memberService.signup(requestDto)));
     }
 
 
