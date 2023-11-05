@@ -62,10 +62,12 @@ public class QuizQuestionService {
             String img = "";
             if (imageIndex < images.size()) {
                 MultipartFile imageFile = images.get(imageIndex);
-                try {
-                    img = amazonS3Service.upload(imageFile);
-                } catch (java.io.IOException e) {
-                    throw new RuntimeException("이미지 업로드에 문제가 있습니다!  "); // 또는 적절한 예외 클래스를 사용하세요.
+                if (!imageFile.getOriginalFilename().equals("noimage01.jpg")) {
+                    try {
+                        img = amazonS3Service.upload(imageFile);
+                    } catch (java.io.IOException e) {
+                        throw new RuntimeException("이미지 업로드에 문제가 있습니다!  "); // 또는 적절한 예외 클래스를 사용하세요.
+                    }
                 }
             }
 
