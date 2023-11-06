@@ -156,10 +156,15 @@ public class AnswerService {
         Quiz quiz = findQuiz(quizId);
         MemberDetail memberDetail = member.getMemberDetail();
 
+
         if(memberDetail.getMileagePoint() < 50) throw new IllegalArgumentException("마일리지가 부족합니다. ");
         else {
             memberDetail.changeMileagePoint(50);
             memberDetailRepository.save(memberDetail);
+            MileageGetHistory mileageGetHistory = new MileageGetHistory();
+            String des = quiz.getTitle() + "퀴즈 정답 보기";
+            mileageGetHistory.spendMileage(des,50,memberDetail);
+            mileageGetHistoryRepository.save(mileageGetHistory);
         }
         List<WhatWrongResponseDto> list = new ArrayList<>();
         List<QuizQuestion> quizQuestionList = quizQuestionRepository.findAllByQuiz(quiz);

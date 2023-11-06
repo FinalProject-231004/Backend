@@ -6,13 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(name = "mileageHistory")
 public class MileageGetHistory {
 
     @Id
@@ -42,6 +42,7 @@ public class MileageGetHistory {
         this.points = points;
         this.memberDetail = memberDetail;
     }
+
     public void getFromQuiz(MemberDetail memberDetail, Integer i, String des) {
         this.description = des;
         this.points = i;
@@ -54,5 +55,12 @@ public class MileageGetHistory {
         this.points = i;
         this.memberDetail = memberDetail;
         this.type = TypeEnum.QUIZ_SOLVE;
+    }
+
+    public void spendMileage(String des, int i, MemberDetail memberDetail) {
+        this.description = des;
+        this.points = -i;
+        this.memberDetail = memberDetail;
+        this.type = TypeEnum.SPEND;
     }
 }
