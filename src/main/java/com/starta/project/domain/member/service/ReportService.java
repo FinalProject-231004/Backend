@@ -41,7 +41,7 @@ public class ReportService {
         Member reportedMember = validationUtil.findMember(reportedQuiz.getMemberId());
 
         // 중복 신고 확인 및 신고 기록 저장
-        validateAndSaveReport(reporterId, reportedMember.getId(), quizId, ReportType.POST);
+        validateAndSaveReport(reporterId, reportedMember.getId(), quizId, ReportType.QUIZ);
 
         reportedQuiz.complain(); // 퀴즈의 신고 횟수 증가
         if(reportedQuiz.getComplainInt() >= MAX_COMPLAINTS) {
@@ -67,7 +67,6 @@ public class ReportService {
         if(reportedComment.getComplainInt() >= MAX_COMPLAINTS) {
             handleMemberComplaint(reportedMember.getMemberDetail()); // 회원의 신고 횟수 증가 및 처리
             commentRepository.delete(reportedComment);
-            handleMemberComplaint(reportedMember.getMemberDetail()); // 회원의 신고 횟수 증가 및 처리
         }
 
 
