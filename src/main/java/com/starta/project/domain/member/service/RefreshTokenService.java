@@ -66,6 +66,4 @@ public class RefreshTokenService {
             throw new RuntimeException(e);
         }
     }
-
-
 }

@@ -1,6 +1,7 @@
 package com.starta.project.domain.quiz.service;
 
 import com.starta.project.domain.member.entity.Member;
+import com.starta.project.domain.member.entity.UserRoleEnum;
 import com.starta.project.domain.member.repository.MemberRepository;
 import com.starta.project.domain.notification.entity.Notification;
 import com.starta.project.domain.notification.entity.NotificationType;
@@ -38,6 +39,12 @@ public class CommentService {
 
     //댓글 생성
     public MsgDataResponse createComment(CommentCreateRequestDto requestDto, Member member) {
+        // 권한체크
+        if (member.getRole() == UserRoleEnum.BLOCK) {
+            System.out.println("댓글 생성이 차단");
+            throw new IllegalArgumentException("댓글 작성이 차단되었습니다.");
+        }
+
         Quiz quiz = quizRepository.findById(requestDto.getQuizId()).orElseThrow( () -> new NullPointerException("해당 퀴즈가 없습니다. "));
         Comment comment = new Comment();
         comment.set(quiz, requestDto, member);
@@ -91,7 +98,6 @@ public class CommentService {
                             + "]";
                 }
             }
-
             String type = NotificationType.COMMENT.getAlias();
 
             Notification notification = Notification.builder()

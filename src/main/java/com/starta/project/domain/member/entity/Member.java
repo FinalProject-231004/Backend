@@ -21,12 +21,11 @@ public class Member {
     private String password;
 
     @Column(nullable = false)
-    @Enumerated(value = EnumType.STRING)
-    private UserRoleEnum role;
+    private boolean block;
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
-    private BlockStatus blockStatus;
+    private UserRoleEnum role;
 
     @Column
     private Long kakaoId;
@@ -37,23 +36,29 @@ public class Member {
     public Member(String username, String password, UserRoleEnum role) {
         this.username = username;
         this.password = password;
+        this.block = false;
         this.role = role;
-        this.blockStatus = BlockStatus.NOT_BLOCKED;
     }
 
     public Member(String username, String password, UserRoleEnum role, Long kakaoId) {
         this.username = username;
         this.password = password;
+        this.block = false;
         this.role = role;
-        this.blockStatus = BlockStatus.NOT_BLOCKED;
         this.kakaoId =kakaoId;
     }
 
     public void updatePassword(String newPassword) {
         this.password = newPassword;
     }
-    public void updateBlockStatus(BlockStatus newStatus) {
-        this.blockStatus = newStatus;
+
+    public void setBlock(boolean block) {
+        this.block = block;
     }
+
+    public void setRole(UserRoleEnum role) {
+        this.role = role;
+    }
+
 }
 

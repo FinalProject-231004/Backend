@@ -13,30 +13,23 @@ public class Report {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    private Member reporter; // 신고자
-
-    @ManyToOne
-    private Member reported; // 신고당한 사람
+    @Column
+    private Long reporterId; // 신고자
 
     @Column
-    private Long postedId; // 게시글 or 댓글 아이디
+    private Long reportedId; // 신고당한 사람
 
     @Column
-    private Long commentedId; // 게시글 or 댓글 아이디
+    private Long postedId; // 신고된 게시글 or 댓글 아이디
 
     @Column
     @Enumerated(EnumType.STRING)
     private ReportType reportType; // 신고 유형
 
-    public Report(Member reporter, Member reported, Long declaredId, ReportType reportType) {
-        this.reporter = reporter;
-        this.reported = reported;
+    public Report(Long reporterId, Long reportedId, Long declaredId, ReportType reportType) {
+        this.reporterId = reporterId;
+        this.reportedId = reportedId;
+        this.postedId = declaredId;
         this.reportType = reportType;
-        if(reportType == ReportType.POST) {
-            this.postedId = declaredId;
-        }else if (reportType == ReportType.COMMENT){
-            this.commentedId = declaredId;
-        }
     }
 }
