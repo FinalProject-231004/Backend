@@ -1,6 +1,6 @@
 package com.starta.project.domain.mypage.dto;
 
-import com.starta.project.domain.mypage.entity.PurchaseHistory;
+import com.starta.project.domain.mypage.entity.MileageGetHistory;
 import lombok.Getter;
 
 @Getter
@@ -12,12 +12,12 @@ public class PurchaseHistoryItemDto {
     private String email;
     private String orderedAt;
 
-    public PurchaseHistoryItemDto(PurchaseHistory purchaseHistory) {
+    public PurchaseHistoryItemDto(MileageGetHistory purchaseHistory) {
         this.id = purchaseHistory.getId();
-        this.totalPrice = purchaseHistory.getTotalPrice();
-        this.itemName = purchaseHistory.getMileageShopItem().getItemName();
+        this.totalPrice = purchaseHistory.getPoints();
+        this.itemName = purchaseHistory.getDescription();
         this.quantity = purchaseHistory.getQuantity();
         this.email = purchaseHistory.getEmail();
-        this.orderedAt = purchaseHistory.getOrderedAt().toString();
+        this.orderedAt = purchaseHistory.getDate().toString();
     }
 }

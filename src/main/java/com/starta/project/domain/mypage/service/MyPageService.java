@@ -11,7 +11,6 @@ import com.starta.project.domain.mypage.entity.MileageGetHistory;
 import com.starta.project.domain.mypage.entity.TypeEnum;
 import com.starta.project.domain.mypage.repository.AttendanceCheckRepository;
 import com.starta.project.domain.mypage.repository.MileageGetHistoryRepository;
-import com.starta.project.domain.mypage.repository.PurchaseHistoryRepository;
 import com.starta.project.domain.quiz.entity.Quiz;
 import com.starta.project.domain.quiz.repository.QuizRepository;
 import com.starta.project.global.messageDto.MsgDataResponse;
@@ -23,11 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class MyPageService {
-    private final PurchaseHistoryRepository purchaseHistoryRepository;
     private final QuizRepository quizRepository;
     private final AttendanceCheckRepository attendanceCheckRepository;
     private final MemberRepository memberRepository;
@@ -35,7 +34,11 @@ public class MyPageService {
 
     @Transactional(readOnly = true)
     public MsgDataResponse getPurchaseHistory(Member member) {
-        return new MsgDataResponse("조회에 성공하셨습니다.", purchaseHistoryRepository.findByMemberDetailIdOrderByOrderedAtDesc(member.getId()).stream().map(PurchaseHistoryItemDto::new));
+        return new MsgDataResponse("조회에 성공하셨습니다.",
+                mileageGetHistoryRepository.findByMemberDetailIdOrderByDateDesc(member.getId()).stream()
+                        .filter(historyItem -> historyItem.getPoints() < 0) // points 컬럼이 음수인 항목만 필터링
+                        .map(PurchaseHistoryItemDto::new)
+                        .collect(Collectors.toList()));
     }
 
     //미 게시 퀴즈 찾아옴
@@ -84,7 +87,11 @@ public class MyPageService {
     @Transactional(readOnly = true)
     public MsgDataResponse mileageGetHistory(Member member) {
         Member findMember = findMember(member.getId());
-        return new MsgDataResponse("조회에 성공하셨습니다.", mileageGetHistoryRepository.findByMemberDetailIdOrderByDateDesc(findMember.getMemberDetail().getId()).stream().map(MileageGetHistoryDto::new));
+        return new MsgDataResponse("조회에 성공하셨습니다.", mileageGetHistoryRepository.findByMemberDetailIdOrderByDateDesc(findMember.getMemberDetail().getId())
+                .stream()
+                .filter(mileage -> mileage.getPoints() > 0) // points 컬럼이 양수인 요소만 필터링
+                .map(MileageGetHistoryDto::new)
+                .collect(Collectors.toList()));
     }
 
     public MsgDataResponse spendHistory(Member member) {
