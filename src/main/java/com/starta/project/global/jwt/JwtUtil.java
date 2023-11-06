@@ -42,8 +42,8 @@ public class JwtUtil {
     // Token 식별자
     public static final String BEARER_PREFIX = "Bearer ";
     // 토큰 만료시간
-//    private final long TOKEN_TIME = 14 * 24 * 60 * 60 * 1000L; // 테스트용 2주, 밀리세컨드
-    private final long TOKEN_TIME = 5 * 60 * 1000L; // TEST용 5분, 밀리세컨드
+    private final long TOKEN_TIME = 14 * 24 * 60 * 60 * 1000L; // 테스트용 2주, 밀리세컨드
+//    private final long TOKEN_TIME = 5 * 60 * 1000L; // TEST용 5분, 밀리세컨드
 
     private final RedisRepository redisRepository;
 
