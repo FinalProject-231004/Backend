@@ -9,7 +9,7 @@ import javax.validation.constraints.Pattern;
 public class SignupRequestDto {
 
     @Pattern(
-            regexp = "^[a-z][a-z0-9]{4,15}+$",
+            regexp = "^[a-z0-9]{4,15}$",
             message = "아이디는 4글자 이상, 15글자 이하이며 알파벳 소문자(a~z), 숫자로 적어주세요."
     )
     private String username;
