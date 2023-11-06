@@ -99,7 +99,7 @@ public class CommentService {
                     .receiver(receiver)
                     .content(content)
                     .notificationType(type)
-                    .url("/api/quiz/" + quiz.getId())
+                    .url("/quiz/" + quiz.getId())
                     .readYn('N')
                     .deletedYn('N')
                     .created_at(LocalDateTime.now())
