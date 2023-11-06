@@ -58,7 +58,8 @@ public class MemberController {
                                                        @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         // Validation 예외처리
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(new MsgResponse("비밀번호 형식 미충족"));
+            String msg = bindingResult.getFieldErrors().get(0).getDefaultMessage();
+            return ResponseEntity.badRequest().body(new MsgResponse(msg));
         }
         return ResponseEntity.ok(memberService.kakaoFirstLogin(requestDto, userDetails.getMember().getId()));
     }
@@ -83,7 +84,8 @@ public class MemberController {
                                                       @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         // Validation 예외처리
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(new MsgResponse("닉네임 수정 실패"));
+            String msg = bindingResult.getFieldErrors().get(0).getDefaultMessage();
+            return ResponseEntity.badRequest().body(new MsgResponse(msg));
         }
         return ResponseEntity.ok(memberService.updateNickname(requestDto, userDetails.getMember().getId()));
     }
@@ -95,7 +97,8 @@ public class MemberController {
                                                       @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         // Validation 예외처리
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(new MsgResponse("비밀번호 수정 실패"));
+            String msg = bindingResult.getFieldErrors().get(0).getDefaultMessage();
+            return ResponseEntity.badRequest().body(new MsgResponse(msg));
         }
         return ResponseEntity.ok(memberService.updatePassword(requestDto, userDetails.getMember().getId()));
     }
@@ -112,7 +115,8 @@ public class MemberController {
                                                         BindingResult bindingResult) {
         // Validation 예외처리
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(new MsgResponse("닉네임은 5글자 이하의 한글, 숫자, 영소문자로만 적어주세요."));
+            String msg = bindingResult.getFieldErrors().get(0).getDefaultMessage();
+            return ResponseEntity.badRequest().body(new MsgResponse(msg));
         }
         return ResponseEntity.ok(memberService.validateNickname(requestDto));
     }
