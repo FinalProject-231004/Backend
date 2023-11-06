@@ -1,6 +1,7 @@
 package com.starta.project.domain.mypage.service;
 
 import com.starta.project.domain.member.entity.Member;
+import com.starta.project.domain.member.entity.MemberDetail;
 import com.starta.project.domain.member.repository.MemberRepository;
 import com.starta.project.domain.mypage.dto.MileageGetHistoryDto;
 import com.starta.project.domain.mypage.dto.MyPageMemberInfoDto;
@@ -84,6 +85,11 @@ public class MyPageService {
     public MsgDataResponse mileageGetHistory(Member member) {
         Member findMember = findMember(member.getId());
         return new MsgDataResponse("조회에 성공하셨습니다.", mileageGetHistoryRepository.findByMemberDetailIdOrderByDateDesc(findMember.getMemberDetail().getId()).stream().map(MileageGetHistoryDto::new));
+    }
+
+    public MsgDataResponse spendHistory(Member member) {
+        MemberDetail memberDetail = member.getMemberDetail();
+        return new MsgDataResponse("조회에 성공하셨습니다.", mileageGetHistoryRepository.findAllByMemberDetailAndTypeOrderByDateDesc(memberDetail, TypeEnum.SPEND));
     }
 
     // 유저 정보 검색

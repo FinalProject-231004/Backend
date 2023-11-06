@@ -30,4 +30,10 @@ public interface MileageGetHistoryRepository extends JpaRepository<MileageGetHis
             "AND m.memberDetail = :memberDetail " +
             "AND m.type = :typeEnum" )
     Optional<MileageGetHistory> findFirstByDateAndMemberDetailAndType(LocalDateTime localDate, MemberDetail memberDetail, TypeEnum typeEnum);
+
+    @Query ("SELECT m FROM MileageGetHistory m " +
+            "WHERE m.memberDetail = :memberDetail " +
+            "AND m.type = :spend " +
+            "ORDER BY m.date DESC ")
+    List<MileageGetHistory> findAllByMemberDetailAndTypeOrderByDateDesc(MemberDetail memberDetail, TypeEnum spend);
 }

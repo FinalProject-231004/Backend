@@ -54,4 +54,10 @@ public class MyPageController {
     public ResponseEntity<MsgDataResponse> mileageGetHistory(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.status(HttpStatus.OK).body(myPageService.mileageGetHistory(userDetails.getMember()));
     }
+
+    @Operation(summary = "마일리지 사용내역")
+    @GetMapping("/mypage/mileage-spendhistory")
+    public ResponseEntity<MsgDataResponse> mileageSpendHistory (@Parameter (hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.status(HttpStatus.OK).body(myPageService.spendHistory(userDetails.getMember()));
+    }
 }
