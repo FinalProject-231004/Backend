@@ -1,10 +1,9 @@
 package com.starta.project.global.jwt;
 
-
-import com.starta.project.global.exception.Custom.CustomExpiredJwtException;
-import com.starta.project.global.exception.Custom.CustomInvalidJwtException;
-import com.starta.project.global.exception.Custom.CustomMalformedJwtException;
-import com.starta.project.global.exception.Custom.CustomUnsupportedJwtException;
+import com.starta.project.global.exception.custom.CustomExpiredJwtException;
+import com.starta.project.global.exception.custom.CustomInvalidJwtException;
+import com.starta.project.global.exception.custom.CustomMalformedJwtException;
+import com.starta.project.global.exception.custom.CustomUnsupportedJwtException;
 import com.starta.project.global.security.UserDetailsServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -67,41 +66,26 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
                 //access 토큰이 유효하면 그대로 반환, 만료되어 refresh토큰 통해 반환되면 새로운 토큰 발급
                 try {
-                    if (jwtUtil.validateToken(accessTokenValue, refreshTokenValue, res)) {
+                    if (jwtUtil.validateToken(accessTokenValue, res)) {
                         Claims info = jwtUtil.getUserInfoFromToken(accessTokenValue);
                         log.info("Claims info" + info);
                         setAuthentication(info.getSubject());
                         log.info("setAuthentication");
                     }
                 } catch (CustomExpiredJwtException e) {
-                    res.setContentType("application/json");
-                    res.setCharacterEncoding("utf-8");
-                    res.setStatus(401);
-                    res.getWriter().write("{\"msg\":\"Expired Access Token. 토큰이 만료되었습니다.\"}");
+                    setErrorResponse(res, 401, "Expired Access Token. 토큰이 만료되었습니다");
                     return; // 필터 체인 종료
                 } catch (CustomUnsupportedJwtException e) {
-                    res.setContentType("application/json");
-                    res.setCharacterEncoding("utf-8");
-                    res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    res.getWriter().write("{\"msg\":\"Unsupported JWT Token. 지원하지 않는 JWT 토큰입니다.\"}");
+                    setErrorResponse(res, HttpServletResponse.SC_BAD_REQUEST, "Unsupported JWT Token. 지원하지 않는 JWT 토큰입니다.");
                     return; // 필터 체인 종료
                 } catch (CustomMalformedJwtException e) {
-                    res.setContentType("application/json");
-                    res.setCharacterEncoding("utf-8");
-                    res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    res.getWriter().write("{\"msg\":\"Malformed JWT Token. 형식이 잘못된 JWT 토큰입니다.\"}");
+                    setErrorResponse(res, HttpServletResponse.SC_BAD_REQUEST, "Malformed JWT Token. 형식이 잘못된 JWT 토큰입니다.");
                     return; // 필터 체인 종료
                 }catch (CustomInvalidJwtException e) {
-                    res.setContentType("application/json");
-                    res.setCharacterEncoding("utf-8");
-                    res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    res.getWriter().write("{\"msg\":\"Invalid JWT signature, 유효하지 않은 JWT 토큰 입니다.\"}");
+                    setErrorResponse(res, HttpServletResponse.SC_BAD_REQUEST, "Invalid JWT signature, 유효하지 않은 JWT 토큰 입니다.");
                     return; // 필터 체인 종료
                 } catch (Exception e) {
-                    res.setContentType("application/json");
-                    res.setCharacterEncoding("utf-8");
-                    res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    res.getWriter().write("{\"msg\":\"토큰을 다시 발급해주세요.\"}");
+                    setErrorResponse(res, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "토큰을 다시 발급해주세요.");
                     return; // 필터 체인 종료
                 }
             }

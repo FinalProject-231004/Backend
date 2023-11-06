@@ -2,10 +2,9 @@ package com.starta.project.domain.quiz.controller;
 
 import com.google.common.util.concurrent.RateLimiter;
 import com.starta.project.domain.quiz.dto.CreateQuestionRequestDto;
-import com.starta.project.domain.quiz.dto.QuestionListRequestDto;
 import com.starta.project.domain.quiz.dto.ShowQuestionResponseDto;
 import com.starta.project.domain.quiz.service.QuizQuestionService;
-import com.starta.project.global.exception.Custom.CustomRateLimiterException;
+import com.starta.project.global.exception.custom.CustomRateLimiterException;
 import com.starta.project.global.messageDto.MsgResponse;
 import com.starta.project.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")

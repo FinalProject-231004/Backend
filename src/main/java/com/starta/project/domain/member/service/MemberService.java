@@ -148,7 +148,6 @@ public class MemberService {
             purchaseHistoryRepository.deleteAllByMemberDetail(memberDetail);
             memberAnswerRepository.deleteAllByMemberDetail(memberDetail);
         }
-
         attendanceCheckRepository.deleteAllByMember(member);
         memberRepository.delete(member);
 

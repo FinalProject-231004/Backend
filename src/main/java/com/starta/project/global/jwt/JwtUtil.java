@@ -7,10 +7,10 @@ import com.starta.project.domain.member.entity.RefreshToken;
 import com.starta.project.domain.member.entity.UserRoleEnum;
 import com.starta.project.domain.member.repository.RedisRepository;
 import com.starta.project.domain.member.service.RefreshTokenService;
-import com.starta.project.global.exception.Custom.CustomExpiredJwtException;
-import com.starta.project.global.exception.Custom.CustomInvalidJwtException;
-import com.starta.project.global.exception.Custom.CustomMalformedJwtException;
-import com.starta.project.global.exception.Custom.CustomUnsupportedJwtException;
+import com.starta.project.global.exception.custom.CustomExpiredJwtException;
+import com.starta.project.global.exception.custom.CustomInvalidJwtException;
+import com.starta.project.global.exception.custom.CustomMalformedJwtException;
+import com.starta.project.global.exception.custom.CustomUnsupportedJwtException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,6 @@ import java.util.Date;
 public class JwtUtil {
 
     // JWT 데이터
-    // accessToken 값, Header name, 권환 이름 (user or admin)
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String REFRESH_HEADER = "Refresh";
     //redis 값 조회 헤더
@@ -43,8 +42,8 @@ public class JwtUtil {
     // Token 식별자
     public static final String BEARER_PREFIX = "Bearer ";
     // 토큰 만료시간
-    private final long TOKEN_TIME = 14 * 24 * 60 * 60 * 1000L; // 테스트용 2주, 밀리세컨드
-//    private final long TOKEN_TIME = 5 * 60 * 1000L; // TEST용 5분, 밀리세컨드
+//    private final long TOKEN_TIME = 14 * 24 * 60 * 60 * 1000L; // 테스트용 2주, 밀리세컨드
+    private final long TOKEN_TIME = 5 * 60 * 1000L; // TEST용 5분, 밀리세컨드
 
     private final RedisRepository redisRepository;
 
@@ -76,7 +75,7 @@ public class JwtUtil {
                         .compact();
     }
 
-    // 토큰을 반환할 때 Header에 accessToken과 refreshToken을 담아준다:
+    // JWT 헤더로 전달
     public void addJwtToHeader(String token, String refreshToken, HttpServletResponse res) {
         res.setHeader(AUTHORIZATION_HEADER, token);
         res.setHeader(REFRESH_HEADER, refreshToken);
@@ -94,11 +93,9 @@ public class JwtUtil {
 
 
     // 토큰 검증, JWT 위변조 확인
-    // parseBuilder() : 구성 성분을 분해하고 분석
-    public boolean validateToken(String accessToken, String refreshTokenValue, HttpServletResponse res) throws IOException {
+    public boolean validateToken(String accessToken, HttpServletResponse res) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken);
-//            return accessToken;
             log.info("validateToken 1번");
             return true;
         } catch (SecurityException | MalformedJwtException e) {
@@ -110,7 +107,7 @@ public class JwtUtil {
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
             throw new CustomUnsupportedJwtException("Unsupported JWT, 지원되지 않는 JWT 입니다.");
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             log.info("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
             throw new CustomMalformedJwtException("JWT claims is empty, 잘못된 JWT 입니다.");
         }
