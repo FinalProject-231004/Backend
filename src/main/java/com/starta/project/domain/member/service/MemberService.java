@@ -8,10 +8,8 @@ import com.starta.project.domain.member.entity.UserRoleEnum;
 import com.starta.project.domain.member.repository.MemberDetailRepository;
 import com.starta.project.domain.member.repository.MemberRepository;
 import com.starta.project.domain.member.util.ValidationUtil;
-import com.starta.project.domain.mileageshop.entity.MileageShopItem;
 import com.starta.project.domain.mypage.repository.AttendanceCheckRepository;
 import com.starta.project.domain.mypage.repository.MileageGetHistoryRepository;
-import com.starta.project.domain.mypage.repository.PurchaseHistoryRepository;
 import com.starta.project.global.aws.AmazonS3Service;
 import com.starta.project.global.messageDto.MsgDataResponse;
 import com.starta.project.global.messageDto.MsgResponse;
@@ -22,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +29,6 @@ public class MemberService {
     private final MemberDetailRepository memberDetailRepository;
     private final MileageGetHistoryRepository mileageGetHistoryRepository;
     private final MemberAnswerRepository memberAnswerRepository;
-    private final PurchaseHistoryRepository purchaseHistoryRepository;
     private final AttendanceCheckRepository attendanceCheckRepository;
     private final PasswordEncoder passwordEncoder;
     private final AmazonS3Service amazonS3Service;
@@ -145,7 +141,7 @@ public class MemberService {
         MemberDetail memberDetail = member.getMemberDetail();
         if (memberDetail != null) {
             mileageGetHistoryRepository.deleteAllByMemberDetail(memberDetail);
-            purchaseHistoryRepository.deleteAllByMemberDetail(memberDetail);
+//            purchaseHistoryRepository.deleteAllByMemberDetail(memberDetail);
             memberAnswerRepository.deleteAllByMemberDetail(memberDetail);
         }
         attendanceCheckRepository.deleteAllByMember(member);

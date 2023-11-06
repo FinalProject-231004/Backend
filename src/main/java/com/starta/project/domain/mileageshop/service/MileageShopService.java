@@ -9,8 +9,9 @@ import com.starta.project.domain.mileageshop.dto.OrderItemRequestDto;
 import com.starta.project.domain.mileageshop.entity.ItemCategoryEnum;
 import com.starta.project.domain.mileageshop.entity.MileageShopItem;
 import com.starta.project.domain.mileageshop.repository.MileageShopItemRepository;
-import com.starta.project.domain.mypage.entity.PurchaseHistory;
-import com.starta.project.domain.mypage.repository.PurchaseHistoryRepository;
+import com.starta.project.domain.mypage.entity.MileageGetHistory;
+import com.starta.project.domain.mypage.entity.TypeEnum;
+import com.starta.project.domain.mypage.repository.MileageGetHistoryRepository;
 import com.starta.project.global.aws.AmazonS3Service;
 import com.starta.project.global.messageDto.MsgDataResponse;
 import com.starta.project.global.messageDto.MsgResponse;
@@ -28,7 +29,7 @@ public class MileageShopService {
     private final MileageShopItemRepository mileageShopItemRepository;
     private final AmazonS3Service amazonS3Service;
     private final MemberRepository memberRepository;
-    private final PurchaseHistoryRepository purchaseHistoryRepository;
+    private final MileageGetHistoryRepository mileageGetHistoryRepository;
 
 
     // 마일리지샵 구매
@@ -57,8 +58,9 @@ public class MileageShopService {
         findMember.getMemberDetail().changeMileagePoint(totalPrice);
 
         // 구매 내역 저장
-        PurchaseHistory purchaseHistory = new PurchaseHistory(findItem, findMember.getMemberDetail(), orderItemRequestDto, totalPrice);
-        purchaseHistoryRepository.save(purchaseHistory);
+//        PurchaseHistory purchaseHistory = new PurchaseHistory(findItem, findMember.getMemberDetail(), orderItemRequestDto, totalPrice);
+        MileageGetHistory mileageGetHistory = new MileageGetHistory(findItem, findMember.getMemberDetail(),orderItemRequestDto, -totalPrice, TypeEnum.BUY_ITEM);
+        mileageGetHistoryRepository.save(mileageGetHistory);
 
         return new MsgResponse("구매에 성공 했습니다.");
     }
