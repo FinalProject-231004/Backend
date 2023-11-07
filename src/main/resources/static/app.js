@@ -1,6 +1,6 @@
 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 const host = window.location.host;
-const wsURL = `${protocol}//${host}/liveQuizChatRoom`;
+const wsURL = `${protocol}//${host}/api/ws`;
 
 const stompClient = new StompJs.Client({
     brokerURL: wsURL
@@ -10,7 +10,7 @@ const stompClient = new StompJs.Client({
 stompClient.onConnect = (frame) => {
     setConnected(true);
     console.log('Connected: ' + frame);
-    stompClient.subscribe('/api/liveQuizChatRoom', (liveChat) => {
+    stompClient.subscribe('/api/chat/liveChatRoom', (liveChat) => {
         showGreeting(JSON.parse(liveChat.body));
     });
 };
@@ -50,7 +50,7 @@ function disconnect() {
 
 function sendName() {
     stompClient.publish({
-        destination: "/api/liveQuizSendMassage",
+        destination: "/api/send/liveSendMassage",
         body: JSON.stringify({'message': $("#name").val() +' : ' + $("#msg").val()})  //$("#name").val()
     });
 }

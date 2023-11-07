@@ -15,8 +15,8 @@ public class LiveQuizController {
     private final LiveQuizService liveQuizService;
 
     // 클라이언트가 /api/sendMassage로 메시지를 보내면, 서버는 /topic/liveQuizChatRoom로 메시지를 보낸다.
-    @MessageMapping("/liveQuizSendMassage")
-    @SendTo("/api/liveQuizChatRoom")
+    @MessageMapping("/liveSendMassage")
+    @SendTo("/api/chat/liveChatRoom")
     public ChatMessageDto sendMessage(
 //            @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails,
             ChatMessageDto chatMessage) {
