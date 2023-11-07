@@ -40,6 +40,7 @@ public class NotificationService {
     /**
      * [DB 연동]단일 알림 삭제 상태 업데이트
      */
+    @Transactional
     public void updateNotificationDeleteStatusById(String notificationId) {
         notificationRepository.bulkDeletedUpdate(notificationId);
     }
