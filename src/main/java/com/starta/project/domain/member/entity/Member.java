@@ -1,6 +1,5 @@
 package com.starta.project.domain.member.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

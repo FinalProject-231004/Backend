@@ -1,5 +1,5 @@
 package com.starta.project.domain.member.service;
-//
+
 import com.starta.project.domain.member.entity.*;
 import com.starta.project.domain.member.repository.MemberDetailRepository;
 import com.starta.project.domain.member.repository.MemberRepository;

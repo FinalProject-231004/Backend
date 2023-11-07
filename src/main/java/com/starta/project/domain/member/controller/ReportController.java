@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/report")
 public class ReportController {
-    private final ReportService reportService;
 
+    private final ReportService reportService;
     @PostMapping("/quiz/{quizId}")
     public ResponseEntity<MsgResponse> reportPost(@PathVariable Long quizId,
                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {

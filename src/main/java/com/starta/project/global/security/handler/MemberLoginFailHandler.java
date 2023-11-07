@@ -44,7 +44,7 @@ public class MemberLoginFailHandler implements AuthenticationFailureHandler {
         } else if (exception instanceof AuthenticationCredentialsNotFoundException) {
             setErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, "인증 요청이 거부되었습니다. 관리자에게 문의하세요.");
         } else if (exception instanceof DisabledException) {
-            setErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, "여러 유저의 신고에 의해 차단된 계정입니다.");
+            setErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, "누적신고에 의해 차단된 계정입니다");
         }
         else{
             setErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "알 수 없는 이유로 로그인에 실패하였습니다. 관리자에게 문의하세요.");

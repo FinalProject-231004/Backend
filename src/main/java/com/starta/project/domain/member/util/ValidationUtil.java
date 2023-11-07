@@ -1,8 +1,5 @@
 package com.starta.project.domain.member.util;
 
-import com.starta.project.domain.member.dto.KaKaoFirstLoginDto;
-import com.starta.project.domain.member.dto.SignupRequestDto;
-import com.starta.project.domain.member.dto.UpdateNicknameRequestDto;
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.entity.MemberDetail;
 import com.starta.project.domain.member.repository.MemberDetailRepository;
@@ -13,14 +10,10 @@ import com.starta.project.domain.quiz.repository.CommentRepository;
 import com.starta.project.domain.quiz.repository.QuizRepository;
 import com.starta.project.global.messageDto.MsgResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.server.ResponseStatusException;
 
-import javax.validation.Valid;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -75,7 +68,7 @@ public class ValidationUtil {
     }
     public void checkPassword(String password, String checkPassword){
         if(!Objects.equals(password, checkPassword)){
-            throw new IllegalArgumentException("패스워드 변경이 일치하지 않습니다.");
+            throw new IllegalArgumentException("패스워드 확인이 일치하지 않습니다.");
         }
     }
     public Member findMember(Long id){

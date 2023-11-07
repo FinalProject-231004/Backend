@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-@Slf4j(topic = "Member Controller")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/member")
@@ -45,7 +44,6 @@ public class MemberController {
                                                   HttpServletResponse response) throws JsonProcessingException {
         return ResponseEntity.ok(kakaoService.kakaoLogin(code, response));
     }
-
     @Operation(summary = "카카오 신규회원 비밀번호 변경")
     @PostMapping("/kakao/first-login")
     public ResponseEntity<MsgResponse> kakaoFirstLogin(@Valid @RequestBody KaKaoFirstLoginDto requestDto,
@@ -54,20 +52,17 @@ public class MemberController {
         return validationUtil.checkKakaoValid(bindingResult)
                 .orElseGet(() -> ResponseEntity.ok(memberService.kakaoFirstLogin(requestDto, userDetails.getMember().getId())));
     }
-
     @Operation(summary = "마이페이지 내 정보 불러오기(프로필, 닉네임, 비밀번호)")
     @GetMapping("/update/view")
     public ResponseEntity<MsgDataResponse> getUserDetailView(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(memberService.getUserDetailView(userDetails.getMember()));
     }
-
     @Operation(summary = "profile 수정")
     @PutMapping("/update/profile")
     public ResponseEntity<MsgResponse> updateProfile(@RequestPart("newImage") MultipartFile newImage,
                                                      @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(memberService.updateProfile(newImage, userDetails.getMember().getId()));
     }
-
     @Operation(summary = "Nickname 수정")
     @PutMapping("/update/nickname")
     public ResponseEntity<MsgResponse> updateNickname(@Valid @RequestBody UpdateNicknameRequestDto requestDto,
@@ -76,7 +71,6 @@ public class MemberController {
         return validationUtil.checkNicknameValid(bindingResult)
                 .orElseGet(() -> ResponseEntity.ok(memberService.updateNickname(requestDto, userDetails.getMember().getId())));
     }
-
     @Operation(summary = "Password 수정")
     @PutMapping("/update/password")
     public ResponseEntity<MsgResponse> updatePassword(@Valid @RequestBody UpdatePasswordRequestDto requestDto,
@@ -91,7 +85,6 @@ public class MemberController {
     public ResponseEntity<MsgDataResponse> getUserId(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(new MsgDataResponse("내 정보 변경 화면로딩 성공!", userDetails.getMember().getUsername()));
     }
-
     @Operation(summary = "Nickname 수정 - 중복검증")
     @PostMapping("/validate/nickname")
     public ResponseEntity<MsgResponse> validateNickname(@Valid @RequestBody UpdateNicknameRequestDto requestDto,
@@ -99,19 +92,16 @@ public class MemberController {
         return validationUtil.checkNicknameValid(bindingResult)
                 .orElseGet(() -> ResponseEntity.ok(memberService.validateNickname(requestDto)));
     }
-
     @Operation(summary = "마이페이지 내 정보 변경 비밀번호 검증")
     @PostMapping("/validate/password")
     public ResponseEntity<MsgResponse> validatePassword(@Valid @RequestBody PasswordValidationRequestDto requestDto,
                                                         @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(memberService.validatePassword(requestDto, userDetails.getMember()));
     }
-
     @Operation(summary = "회원탈퇴")
     @DeleteMapping("/delete")
     public ResponseEntity<MsgResponse> deleteMember(@RequestBody PasswordValidationRequestDto requestDto,
                                                     @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(memberService.deleteMember(requestDto.getEnterPassword(), userDetails.getMember()));
     }
-
 }

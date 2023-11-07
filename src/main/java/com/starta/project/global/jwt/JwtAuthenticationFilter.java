@@ -51,17 +51,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 throw new BadCredentialsException("요청 본문이 비어 있습니다.");
             }
             LoginRequestDto requestDto = mapper.readValue(request.getInputStream(), LoginRequestDto.class);
-            // 사용자 이름을 체크하여 존재하지 않는 경우 UsernameNotFoundException 발생
             UserDetails userDetails = userDetailsService.loadUserByUsername(requestDto.getUsername());
 
             if (userDetails == null) {
                 throw new UsernameNotFoundException("계정이 존재하지 않습니다. 회원가입 진행 후 로그인 해주세요.");
             }
 
-            // 사용자 BLOCK상태 확인 후 접금유효성 검증
             if (userDetails.getAuthorities().contains(new SimpleGrantedAuthority(UserRoleEnum.BLOCK.getAuthority()))) {
-                log.info("필터 접근");
-                throw new DisabledException("여러 유저의 신고에 의해 차단된 계정입니다.");
+                throw new DisabledException("누적신고에 의해 차단된 계정입니다.");
             }
 
             return getAuthenticationManager().authenticate(

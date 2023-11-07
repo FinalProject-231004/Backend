@@ -86,19 +86,4 @@ public class GlobalExceptionHandler {
         MsgResponse errorResponse = new MsgResponse(ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
-
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity<RestApiException> handleValidationExceptions(MethodArgumentNotValidException ex) {
-//        StringBuilder errorMessage = new StringBuilder("Validation Failed: ");
-//
-//        for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
-//            errorMessage.append(fieldError.getField())
-//                    .append(" - ")
-//                    .append(fieldError.getDefaultMessage())
-//                    .append("; ");
-//        }
-//
-//        RestApiException restApiException = new RestApiException(errorMessage.toString(), HttpStatus.BAD_REQUEST.value());
-//        return new ResponseEntity<>(restApiException, HttpStatus.BAD_REQUEST);
-//    }
 }

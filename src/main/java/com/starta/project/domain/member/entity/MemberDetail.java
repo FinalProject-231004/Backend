@@ -23,7 +23,6 @@ public class MemberDetail {
     @Column(nullable = false, unique = true)
     private String nickname;
 
-    @Getter
     @Column(nullable = false)
     private Integer complaint;
 
@@ -47,7 +46,6 @@ public class MemberDetail {
         this.complaint = 0;
         this.totalScore = 0;
     }
-
     public MemberDetail(String nickname, String kakaoProfilImg) {
         this.nickname = nickname;
         this.image = kakaoProfilImg;
@@ -55,7 +53,6 @@ public class MemberDetail {
         this.complaint = 0;
         this.totalScore = 0;
     }
-
     public void setMember(Member member) {
         this.member = member;
     }
@@ -74,7 +71,6 @@ public class MemberDetail {
         this.memberAnswer.add(memberAnswer);
         memberAnswer.got(this);
     }
-
     public void gainMileagePoint(Integer i) {
         this.mileagePoint += i;
     }
@@ -91,9 +87,7 @@ public class MemberDetail {
             }
         }
     }
-
     public void addComplaint() {
         this.complaint += 1; }
-
 }
 
