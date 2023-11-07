@@ -35,8 +35,8 @@ public class NotificationController {
     }
 
     @Operation(summary = "알림삭제")
-    @PutMapping("/notification/{id}/delete")
-    public ResponseEntity<List<Notification>> updateNotificationDeleteStatusById(@PathVariable("id") String notificationId) {
+    @PutMapping("/notification/{notificationId}/delete")
+    public ResponseEntity<List<Notification>> updateNotificationDeleteStatusById(@PathVariable String notificationId) {
         notificationService.updateNotificationDeleteStatusById(notificationId);
         String username = notificationService.checkUsernameByNotificationId(notificationId);
         return ResponseEntity.ok().body(notificationService.getAllNotificationByUsername(username)); //수정 후 새롭게 전달
