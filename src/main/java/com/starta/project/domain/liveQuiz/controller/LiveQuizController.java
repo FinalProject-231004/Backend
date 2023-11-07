@@ -31,11 +31,5 @@ public class LiveQuizController {
 
     }
 
-    // 현재 시간을 반환하는 메소드
-    public String getCurrentTime() {
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        return now.format(formatter);
-    }
 
 }
