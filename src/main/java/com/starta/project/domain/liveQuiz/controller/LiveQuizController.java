@@ -22,7 +22,7 @@ public class LiveQuizController {
     public ChatMessageDto sendMessage(
             @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails,
             ChatMessageDto chatMessage) {
-        return liveQuizService.sendMessage(userDetails.getMember(), chatMessage);
+        return liveQuizService.sendMessage(userDetails.getMember(),chatMessage);
     }
 
 }

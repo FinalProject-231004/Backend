@@ -10,7 +10,7 @@ const stompClient = new StompJs.Client({
 stompClient.onConnect = (frame) => {
     setConnected(true);
     console.log('Connected: ' + frame);
-    stompClient.subscribe('/api/chat/liveChatRoom', (liveChat) => {
+    stompClient.subscribe('/topic/liveChatRoom', (liveChat) => {
         showGreeting(JSON.parse(liveChat.body));
     });
 };
@@ -50,12 +50,13 @@ function disconnect() {
 
 function sendName() {
     stompClient.publish({
-        destination: "/api/send/liveSendMassage",
+        destination: "/app/liveChatRoom",
         body: JSON.stringify({'message': $("#name").val() +' : ' + $("#msg").val()})  //$("#name").val()
     });
 }
 
 function showGreeting(data) {
+    const userId = data.userId;
     const name = data.username;
     const timestamp = data.timestamp;
     const message = data.message;
