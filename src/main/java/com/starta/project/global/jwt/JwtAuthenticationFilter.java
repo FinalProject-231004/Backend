@@ -11,9 +11,11 @@ import com.starta.project.global.security.handler.MemberLoginFailHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -49,11 +51,16 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 throw new BadCredentialsException("요청 본문이 비어 있습니다.");
             }
             LoginRequestDto requestDto = mapper.readValue(request.getInputStream(), LoginRequestDto.class);
-            // 사용자 이름을 체크하여 존재하지 않는 경우 UsernameNotFoundException 던지기
             UserDetails userDetails = userDetailsService.loadUserByUsername(requestDto.getUsername());
+
             if (userDetails == null) {
                 throw new UsernameNotFoundException("계정이 존재하지 않습니다. 회원가입 진행 후 로그인 해주세요.");
             }
+
+            if (userDetails.getAuthorities().contains(new SimpleGrantedAuthority(UserRoleEnum.BLOCK.getAuthority()))) {
+                throw new DisabledException("신고누적으로 계정이 차단되었습니다.");
+            }
+
             return getAuthenticationManager().authenticate(
                     new UsernamePasswordAuthenticationToken(
                             requestDto.getUsername(),

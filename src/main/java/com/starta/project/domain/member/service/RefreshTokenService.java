@@ -12,10 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-/**
- * Refresh 토큰을 생성하거나 rotation하는 로직
- */
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -66,6 +62,4 @@ public class RefreshTokenService {
             throw new RuntimeException(e);
         }
     }
-
-
 }

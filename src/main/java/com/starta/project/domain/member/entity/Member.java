@@ -1,6 +1,5 @@
 package com.starta.project.domain.member.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -45,11 +44,20 @@ public class Member {
         this.password = password;
         this.block = false;
         this.role = role;
-        this.kakaoId =kakaoId;
+        this.kakaoId = kakaoId;
     }
 
     public void updatePassword(String newPassword) {
         this.password = newPassword;
     }
+
+    public void setBlock(boolean block) {
+        this.block = block;
+    }
+
+    public void setRole(UserRoleEnum role) {
+        this.role = role;
+    }
+
 }
 

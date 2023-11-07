@@ -2,6 +2,7 @@ package com.starta.project.domain.quiz.service;
 
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.entity.MemberDetail;
+import com.starta.project.domain.member.entity.UserRoleEnum;
 import com.starta.project.domain.member.repository.MemberDetailRepository;
 import com.starta.project.domain.mypage.entity.MileageGetHistory;
 import com.starta.project.domain.mypage.entity.TypeEnum;
@@ -45,6 +46,11 @@ public class QuizQuestionService {
             List<MultipartFile> images,
             List<CreateQuestionRequestDto> questionListRequestDto,
             Member member) {
+
+        // 권한 체크
+        if (member.getRole() == UserRoleEnum.BLOCK) {
+            throw new IllegalArgumentException("신고 누적으로 퀴즈 생성이 권한이 차단되었습니다.");
+        }
 
         //퀴즈 찾기
         Quiz quiz = findQuiz(id);

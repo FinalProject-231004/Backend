@@ -2,6 +2,7 @@ package com.starta.project.global.exception;
 
 
 import com.starta.project.global.exception.custom.*;
+import com.starta.project.global.messageDto.MsgResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,18 +81,9 @@ public class GlobalExceptionHandler {
        log.info("Async request timed out Resolved [org.springframework.web.context.request.async.AsyncRequestTimeoutException]");
     }
 
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity<RestApiException> handleValidationExceptions(MethodArgumentNotValidException ex) {
-//        StringBuilder errorMessage = new StringBuilder("Validation Failed: ");
-//
-//        for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
-//            errorMessage.append(fieldError.getField())
-//                    .append(" - ")
-//                    .append(fieldError.getDefaultMessage())
-//                    .append("; ");
-//        }
-//
-//        RestApiException restApiException = new RestApiException(errorMessage.toString(), HttpStatus.BAD_REQUEST.value());
-//        return new ResponseEntity<>(restApiException, HttpStatus.BAD_REQUEST);
-//    }
+    @ExceptionHandler(CustomKakaoBlockException.class)
+    public ResponseEntity<MsgResponse> handleCustomException(CustomKakaoBlockException ex) {
+        MsgResponse errorResponse = new MsgResponse(ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
 }

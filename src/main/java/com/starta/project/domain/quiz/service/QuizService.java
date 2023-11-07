@@ -1,12 +1,8 @@
 package com.starta.project.domain.quiz.service;
 
 import com.starta.project.domain.member.entity.Member;
-import com.starta.project.domain.member.entity.MemberDetail;
-import com.starta.project.domain.member.repository.MemberDetailRepository;
+import com.starta.project.domain.member.entity.UserRoleEnum;
 import com.starta.project.domain.member.repository.MemberRepository;
-import com.starta.project.domain.mypage.entity.MileageGetHistory;
-import com.starta.project.domain.mypage.entity.TypeEnum;
-import com.starta.project.domain.mypage.repository.MileageGetHistoryRepository;
 import com.starta.project.domain.notification.entity.Notification;
 import com.starta.project.domain.notification.entity.NotificationType;
 import com.starta.project.domain.notification.service.NotificationService;
@@ -21,13 +17,13 @@ import com.starta.project.global.messageDto.MsgResponse;
 
 import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +46,11 @@ public class QuizService {
     @Transactional
     public ResponseEntity<MsgDataResponse> createQuiz(MultipartFile multipartFile, CreateQuizRequestDto quizRequestDto,
                                                       Member member) {
+        // 권한 체크
+        if (member.getRole() == UserRoleEnum.BLOCK) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new MsgDataResponse("신고 누적으로 퀴즈 생성 권한이 차단되었습니다.", null));
+        }
+
         Quiz quiz = new Quiz();
         String image;
         //이미지

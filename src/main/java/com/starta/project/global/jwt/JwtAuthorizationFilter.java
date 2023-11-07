@@ -57,14 +57,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             }
         }
 
-
         // 로그인 또는 재발급 요청이 아닌 경우
         if (!(requestURI.equals("/") || requestURI.equals("/api/member/login") || requestURI.equals("/api/member/signup"))) {
             if (StringUtils.hasText(accessTokenValue)) {
                 accessTokenValue = jwtUtil.substringToken(accessTokenValue);
                 log.info("validateToken 시작");
 
-                //access 토큰이 유효하면 그대로 반환, 만료되어 refresh토큰 통해 반환되면 새로운 토큰 발급
                 try {
                     if (jwtUtil.validateToken(accessTokenValue, res)) {
                         Claims info = jwtUtil.getUserInfoFromToken(accessTokenValue);
@@ -74,19 +72,19 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     }
                 } catch (CustomExpiredJwtException e) {
                     setErrorResponse(res, 401, "Expired Access Token. 토큰이 만료되었습니다");
-                    return; // 필터 체인 종료
+                    return;
                 } catch (CustomUnsupportedJwtException e) {
                     setErrorResponse(res, HttpServletResponse.SC_BAD_REQUEST, "Unsupported JWT Token. 지원하지 않는 JWT 토큰입니다.");
-                    return; // 필터 체인 종료
+                    return;
                 } catch (CustomMalformedJwtException e) {
                     setErrorResponse(res, HttpServletResponse.SC_BAD_REQUEST, "Malformed JWT Token. 형식이 잘못된 JWT 토큰입니다.");
-                    return; // 필터 체인 종료
+                    return;
                 }catch (CustomInvalidJwtException e) {
                     setErrorResponse(res, HttpServletResponse.SC_BAD_REQUEST, "Invalid JWT signature, 유효하지 않은 JWT 토큰 입니다.");
-                    return; // 필터 체인 종료
+                    return;
                 } catch (Exception e) {
                     setErrorResponse(res, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "토큰을 다시 발급해주세요.");
-                    return; // 필터 체인 종료
+                    return;
                 }
             }
 

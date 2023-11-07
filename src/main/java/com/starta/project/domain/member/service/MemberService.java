@@ -34,6 +34,7 @@ public class MemberService {
     private final AmazonS3Service amazonS3Service;
     private final ValidationUtil validationUtil;
 
+    @Transactional
     public MsgResponse signup(SignupRequestDto requestDto) {
         String username = requestDto.getUsername();
         String nickname = requestDto.getNickname();
