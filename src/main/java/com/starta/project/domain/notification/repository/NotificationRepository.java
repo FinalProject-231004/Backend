@@ -21,4 +21,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     void bulkDeletedUpdate(String notificationId);
 
     Notification findByNotificationId(String notificationId);
+
+    List<Notification> findAllByReceiverAndDeletedYn(String username, char n);
 }
