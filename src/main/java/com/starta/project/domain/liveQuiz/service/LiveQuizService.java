@@ -16,7 +16,7 @@ public class LiveQuizService {
     public ChatMessageDto sendMessage(ChatMessageDto chatMessage) {
         if (chatMessage != null && chatMessage.getMessage() != null) {
             String escapedMessage = HtmlUtils.htmlEscape(chatMessage.getMessage());
-            chatMessage = new ChatMessageDto("꺄뀻", escapedMessage, LocalDateTime.now());
+            chatMessage = new ChatMessageDto(1L, "꺄뀻", escapedMessage, LocalDateTime.now());
         }
         return chatMessage;
     }
