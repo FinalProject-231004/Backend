@@ -58,7 +58,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             }
 
             if (userDetails.getAuthorities().contains(new SimpleGrantedAuthority(UserRoleEnum.BLOCK.getAuthority()))) {
-                throw new DisabledException("누적신고에 의해 차단된 계정입니다.");
+                throw new DisabledException("신고누적으로 계정이 차단되었습니다.");
             }
 
             return getAuthenticationManager().authenticate(

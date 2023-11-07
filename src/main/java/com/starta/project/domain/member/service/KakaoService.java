@@ -157,7 +157,7 @@ public class KakaoService {
 
         // 기존 사용자가 BLOCK 상태인지 확인
         if (kakaoMember != null && kakaoMember.getRole() == UserRoleEnum.BLOCK) {
-            throw new CustomKakaoBlockException("누적 신고로 계정이 차단되었습니다."); // 적절한 예외를 던집니다.
+            throw new CustomKakaoBlockException("신고누적으로 계정이 차단되었습니다."); // 적절한 예외를 던집니다.
         } message = "기존유저입니다.";
 
         // 1. 카카오 신규로그인
