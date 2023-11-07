@@ -25,7 +25,7 @@ public class NotificationService {
      */
     @Transactional(readOnly = true)
     public List<Notification> getAllNotificationByUsername(String username) {
-        List<Notification> notificationList = notificationRepository.findAllByReceiver(username);
+        List<Notification> notificationList = notificationRepository.findAllByReceiverAndDeletedYn(username, 'N');
         return notificationList.stream().map(Notification::of).collect(Collectors.toList());
     }
 
