@@ -34,12 +34,12 @@ dependencies {
 	implementation 'mysql:mysql-connector-java:8.0.28'
 
 	//Redis
-//	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 	// AWS SDK for S3 추가
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+//	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -47,13 +47,16 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 	//swagger
-	implementation 'org.springdoc:springdoc-openapi-ui:1.6.11'
+	implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
 
-	//websocket
+	//sql_log용
+	implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
+
+	// time 락 용
+	implementation 'com.google.guava:guava:31.1-jre'
+
+	// websocket
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-
-	//webflux
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 tasks.named('test') {
