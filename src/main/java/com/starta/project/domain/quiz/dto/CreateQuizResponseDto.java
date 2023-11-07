@@ -1,9 +1,12 @@
 package com.starta.project.domain.quiz.dto;
 
+import lombok.Getter;
+
+@Getter
 public class CreateQuizResponseDto {
-    private Long Id;
+    private Long id;
 
     public void set(Long id) {
-        this.Id = id;
+        this.id = id;
     }
 }

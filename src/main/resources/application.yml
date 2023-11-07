@@ -1,7 +1,7 @@
 cloud:
   aws:
     s3:
-      bucket: quizpop
+      bucket: ${S3_Name}
     credentials:
       access-key: ${S3_AccessKey}
       secret-key: ${S3_SecretKey}
@@ -13,7 +13,7 @@ cloud:
 
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
     username: root
     url: ${DB_URL}
     password: ${DB_PASSWORD}
@@ -25,6 +25,29 @@ spring:
         show_sql: 'true'
     hibernate:
       ddl-auto: update
+  data:
+    redis:
+      port: ${REDIS_PORT}
+      host: ${REDIS_URL}
+      password: ${REIDS_PASSWORD}
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
 jwt:
   secret:
     key: ${JWT_SecretKey}
+logging:
+  level:
+    jdbc:
+      connection: 'off'
+      sqlonly: 'off'
+      resultset: 'off'
+      resultsettable: info
+      sqltiming: info
+      audit: 'off'
+
+# 카카오 로그인
+kakao:
+  client-id: ${KAKAO_CLIENT_ID}
+  redirect-uri: ${KAKAO_REDIRECT_URI}

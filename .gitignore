@@ -200,4 +200,7 @@ out/
 ### VS Code ###
 .vscode/
 
-
+.github/*
+docker/*
+scripts/*
+logs/*

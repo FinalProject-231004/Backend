@@ -1,7 +1,10 @@
 package com.starta.project.domain.quiz.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.starta.project.domain.member.entity.Member;
+import com.starta.project.domain.quiz.dto.CommentCreateRequestDto;
 import lombok.Getter;
+import java.time.LocalDateTime;
 
 import javax.persistence.*;
 
@@ -16,12 +19,44 @@ public class Comment {
     @Column(nullable = false)
     private String comment;
 
+    @Getter
+    @Column
+    private Integer complainInt = 0;
+
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "quiz_id",nullable = false)
     private Quiz quiz;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @Column
+    private Long memberId;
+
+    @Column
+    private String nickname;
+
+    @Column
+    private String profileImage;
+
+    @Column
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+
+
+    public void set(Quiz quiz, CommentCreateRequestDto requestDto, Member member) {
+        this.comment = requestDto.getContent();
+        this.quiz = quiz;
+        this.memberId = member.getId();
+        this.nickname = member.getMemberDetail().getNickname();
+        this.profileImage = member.getMemberDetail().getImage();
+    }
+
+    public void update(String content) {
+        this.comment = content;
+    }
+
+    public void complain() {
+        this.complainInt += 1; // 신고 횟수 증가
+    }
+
 }
 
