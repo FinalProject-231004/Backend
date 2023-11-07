@@ -1,6 +1,8 @@
 package com.starta.project.domain.member.util;
 
+import com.starta.project.domain.member.dto.KaKaoFirstLoginDto;
 import com.starta.project.domain.member.dto.SignupRequestDto;
+import com.starta.project.domain.member.dto.UpdateNicknameRequestDto;
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.entity.MemberDetail;
 import com.starta.project.domain.member.repository.MemberDetailRepository;
@@ -30,16 +32,34 @@ public class ValidationUtil {
     private final QuizRepository quizRepository;
     private final CommentRepository commentRepository;
 
-
-    public Optional<ResponseEntity<MsgResponse>> checkSignupValid(@Valid @RequestBody SignupRequestDto requestDto,
-                                                                  BindingResult bindingResult) {
+    public Optional<ResponseEntity<MsgResponse>> checkSignupValid(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String errorMessage = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
             return Optional.of(ResponseEntity.badRequest().body(new MsgResponse(errorMessage)));
         }
         return Optional.empty();
     }
-
+    public Optional<ResponseEntity<MsgResponse>> checkKakaoValid(BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            String errorMessage = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
+            return Optional.of(ResponseEntity.badRequest().body(new MsgResponse(errorMessage)));
+        }
+        return Optional.empty();
+    }
+    public Optional<ResponseEntity<MsgResponse>> checkNicknameValid(BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            String errorMessage = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
+            return Optional.of(ResponseEntity.badRequest().body(new MsgResponse(errorMessage)));
+        }
+        return Optional.empty();
+    }
+    public Optional<ResponseEntity<MsgResponse>> checkPasswordValid(BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            String errorMessage = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
+            return Optional.of(ResponseEntity.badRequest().body(new MsgResponse(errorMessage)));
+        }
+        return Optional.empty();
+    }
 
     public void checkDuplicatedUsername(String username){
         Optional<Member> checkUsername = memberRepository.findByUsername(username);
@@ -74,8 +94,4 @@ public class ValidationUtil {
         return commentRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("댓글을 찾을 수 없습니다."));
     }
-//    public Member findReportMember(Long id){
-//        return memberRepository.findById(id).orElseThrow(() ->
-//                new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 게시글의 작성자를 찾을 수 없습니다."));
-//    }
 }

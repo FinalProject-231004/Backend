@@ -58,7 +58,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 throw new UsernameNotFoundException("계정이 존재하지 않습니다. 회원가입 진행 후 로그인 해주세요.");
             }
 
-            // 사용자의 역할을 확인하고 BLOCKED 이면 DisabledException을 던집니다.
+            // 사용자 BLOCK상태 확인 후 접금유효성 검증
             if (userDetails.getAuthorities().contains(new SimpleGrantedAuthority(UserRoleEnum.BLOCK.getAuthority()))) {
                 log.info("필터 접근");
                 throw new DisabledException("여러 유저의 신고에 의해 차단된 계정입니다.");

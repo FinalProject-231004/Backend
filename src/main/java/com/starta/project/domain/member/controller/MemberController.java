@@ -12,17 +12,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.Objects;
 
 @Slf4j(topic = "Member Controller")
 @RestController
@@ -38,17 +35,15 @@ public class MemberController {
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody SignupRequestDto requestDto,
                                     BindingResult bindingResult) {
-        return validationUtil.checkSignupValid(requestDto, bindingResult)
+        return validationUtil.checkSignupValid(bindingResult)
                 .orElseGet(() -> ResponseEntity.ok(memberService.signup(requestDto)));
     }
-
 
     @Operation(summary = "카카오 로그인")
     @GetMapping("/kakao/callback")
     public ResponseEntity<MsgResponse> kakaoLogin(@RequestParam String code,
                                                   HttpServletResponse response) throws JsonProcessingException {
         return ResponseEntity.ok(kakaoService.kakaoLogin(code, response));
-
     }
 
     @Operation(summary = "카카오 신규회원 비밀번호 변경")
@@ -56,12 +51,8 @@ public class MemberController {
     public ResponseEntity<MsgResponse> kakaoFirstLogin(@Valid @RequestBody KaKaoFirstLoginDto requestDto,
                                                        BindingResult bindingResult,
                                                        @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        // Validation 예외처리
-        if (bindingResult.hasErrors()) {
-            String msg = bindingResult.getFieldErrors().get(0).getDefaultMessage();
-            return ResponseEntity.badRequest().body(new MsgResponse(msg));
-        }
-        return ResponseEntity.ok(memberService.kakaoFirstLogin(requestDto, userDetails.getMember().getId()));
+        return validationUtil.checkKakaoValid(bindingResult)
+                .orElseGet(() -> ResponseEntity.ok(memberService.kakaoFirstLogin(requestDto, userDetails.getMember().getId())));
     }
 
     @Operation(summary = "마이페이지 내 정보 불러오기(프로필, 닉네임, 비밀번호)")
@@ -82,12 +73,8 @@ public class MemberController {
     public ResponseEntity<MsgResponse> updateNickname(@Valid @RequestBody UpdateNicknameRequestDto requestDto,
                                                       BindingResult bindingResult,
                                                       @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        // Validation 예외처리
-        if (bindingResult.hasErrors()) {
-            String msg = bindingResult.getFieldErrors().get(0).getDefaultMessage();
-            return ResponseEntity.badRequest().body(new MsgResponse(msg));
-        }
-        return ResponseEntity.ok(memberService.updateNickname(requestDto, userDetails.getMember().getId()));
+        return validationUtil.checkNicknameValid(bindingResult)
+                .orElseGet(() -> ResponseEntity.ok(memberService.updateNickname(requestDto, userDetails.getMember().getId())));
     }
 
     @Operation(summary = "Password 수정")
@@ -95,12 +82,8 @@ public class MemberController {
     public ResponseEntity<MsgResponse> updatePassword(@Valid @RequestBody UpdatePasswordRequestDto requestDto,
                                                       BindingResult bindingResult,
                                                       @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        // Validation 예외처리
-        if (bindingResult.hasErrors()) {
-            String msg = bindingResult.getFieldErrors().get(0).getDefaultMessage();
-            return ResponseEntity.badRequest().body(new MsgResponse(msg));
-        }
-        return ResponseEntity.ok(memberService.updatePassword(requestDto, userDetails.getMember().getId()));
+        return validationUtil.checkPasswordValid(bindingResult)
+                .orElseGet(() -> ResponseEntity.ok(memberService.updatePassword(requestDto, userDetails.getMember().getId())));
     }
 
     @Operation(summary = "마이페이지 내 정보 변경 비밀번호 검증(Id값 로딩)")
@@ -113,12 +96,8 @@ public class MemberController {
     @PostMapping("/validate/nickname")
     public ResponseEntity<MsgResponse> validateNickname(@Valid @RequestBody UpdateNicknameRequestDto requestDto,
                                                         BindingResult bindingResult) {
-        // Validation 예외처리
-        if (bindingResult.hasErrors()) {
-            String msg = bindingResult.getFieldErrors().get(0).getDefaultMessage();
-            return ResponseEntity.badRequest().body(new MsgResponse(msg));
-        }
-        return ResponseEntity.ok(memberService.validateNickname(requestDto));
+        return validationUtil.checkNicknameValid(bindingResult)
+                .orElseGet(() -> ResponseEntity.ok(memberService.validateNickname(requestDto)));
     }
 
     @Operation(summary = "마이페이지 내 정보 변경 비밀번호 검증")
@@ -132,7 +111,7 @@ public class MemberController {
     @DeleteMapping("/delete")
     public ResponseEntity<MsgResponse> deleteMember(@RequestBody PasswordValidationRequestDto requestDto,
                                                     @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.status(200).body(memberService.deleteMember(requestDto.getEnterPassword(), userDetails.getMember()));
+        return ResponseEntity.ok(memberService.deleteMember(requestDto.getEnterPassword(), userDetails.getMember()));
     }
 
 }
