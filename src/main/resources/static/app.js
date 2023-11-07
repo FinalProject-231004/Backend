@@ -1,6 +1,6 @@
 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 const host = window.location.host;
-const wsURL = `${protocol}//${host}/liveQuiz-websocket`;
+const wsURL = `${protocol}//${host}/liveQuizChatRoom`;
 
 const stompClient = new StompJs.Client({
     brokerURL: wsURL
@@ -10,7 +10,7 @@ const stompClient = new StompJs.Client({
 stompClient.onConnect = (frame) => {
     setConnected(true);
     console.log('Connected: ' + frame);
-    stompClient.subscribe('/topic/liveQuizChatRoom', (liveChat) => {
+    stompClient.subscribe('/api/liveQuizChatRoom', (liveChat) => {
         showGreeting(JSON.parse(liveChat.body));
     });
 };
@@ -50,15 +50,16 @@ function disconnect() {
 
 function sendName() {
     stompClient.publish({
-        destination: "/app/liveQuizSendMassage",
+        destination: "/api/liveQuizSendMassage",
         body: JSON.stringify({'message': $("#name").val() +' : ' + $("#msg").val()})  //$("#name").val()
     });
 }
 
 function showGreeting(data) {
+    const name = data.username;
     const timestamp = data.timestamp;
     const message = data.message;
-    console.log(timestamp, message)
+    console.log(timestamp, message, name)
     $("#greetings").append("<tr><td>" +message + "시간 : " +timestamp +"</td></tr>");
 }
 
