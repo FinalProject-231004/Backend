@@ -64,7 +64,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 accessTokenValue = jwtUtil.substringToken(accessTokenValue);
                 log.info("validateToken 시작");
 
-                //access 토큰이 유효하면 그대로 반환, 만료되어 refresh토큰 통해 반환되면 새로운 토큰 발급
                 try {
                     if (jwtUtil.validateToken(accessTokenValue, res)) {
                         Claims info = jwtUtil.getUserInfoFromToken(accessTokenValue);

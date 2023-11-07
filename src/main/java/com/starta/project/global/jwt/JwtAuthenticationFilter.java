@@ -11,9 +11,11 @@ import com.starta.project.global.security.handler.MemberLoginFailHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -49,11 +51,19 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 throw new BadCredentialsException("요청 본문이 비어 있습니다.");
             }
             LoginRequestDto requestDto = mapper.readValue(request.getInputStream(), LoginRequestDto.class);
-            // 사용자 이름을 체크하여 존재하지 않는 경우 UsernameNotFoundException 던지기
+            // 사용자 이름을 체크하여 존재하지 않는 경우 UsernameNotFoundException 발생
             UserDetails userDetails = userDetailsService.loadUserByUsername(requestDto.getUsername());
+
             if (userDetails == null) {
                 throw new UsernameNotFoundException("계정이 존재하지 않습니다. 회원가입 진행 후 로그인 해주세요.");
             }
+
+            // 사용자의 역할을 확인하고 BLOCKED 이면 DisabledException을 던집니다.
+            if (userDetails.getAuthorities().contains(new SimpleGrantedAuthority(UserRoleEnum.BLOCK.getAuthority()))) {
+                log.info("필터 접근");
+                throw new DisabledException("여러 유저의 신고에 의해 차단된 계정입니다.");
+            }
+
             return getAuthenticationManager().authenticate(
                     new UsernamePasswordAuthenticationToken(
                             requestDto.getUsername(),

@@ -93,8 +93,7 @@ public class MemberDetail {
     }
 
     public void addComplaint() {
-        this.complaint += 1; // 신고 횟수 증가
-    }
+        this.complaint += 1; }
 
 }
 

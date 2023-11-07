@@ -20,13 +20,9 @@ import javax.transaction.Transactional;
 @Transactional
 public class ReportService {
 
-    private final MemberRepository memberRepository;
-    private final MemberDetailRepository memberDetailRepository;
-    private final QuizRepository quizRepository;
     private final CommentRepository commentRepository;
     private final ReportRepository reportRepository;
     private final ValidationUtil validationUtil;
-
 
     // 신고 횟수 MAX
     private final Integer MAX_COMPLAINTS = 3;
@@ -35,9 +31,9 @@ public class ReportService {
     @Transactional
     public MsgResponse reportPost(Long quizId, Long reporterId) {
 
-        // 신고자와 신고된 게시글, 게시 유저를 검증
+        // 신고자와 신고된 게시글, 게시 유저의 유효성 검증
+        validationUtil.findMember(reporterId);
         Quiz reportedQuiz = validationUtil.findQuiz(quizId);
-        Member reporter = validationUtil.findMember(reporterId);
         Member reportedMember = validationUtil.findMember(reportedQuiz.getMemberId());
 
         // 중복 신고 확인 및 신고 기록 저장
@@ -68,9 +64,6 @@ public class ReportService {
             handleMemberComplaint(reportedMember.getMemberDetail()); // 회원의 신고 횟수 증가 및 처리
             commentRepository.delete(reportedComment);
         }
-
-
-
         return new MsgResponse("댓글 신고 처리되었습니다.");
     }
 

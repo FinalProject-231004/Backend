@@ -49,8 +49,7 @@ public class QuizQuestionService {
 
         // 권한 체크
         if (member.getRole() == UserRoleEnum.BLOCK) {
-            System.out.println("퀴즈질문 생성이 차단");
-            throw new IllegalArgumentException("퀴즈 생성이 차단되었습니다.");
+            throw new IllegalArgumentException("신고 누적으로 퀴즈 생성이 권한이 차단되었습니다.");
         }
 
         //퀴즈 찾기

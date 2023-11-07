@@ -45,7 +45,7 @@ public class Member {
         this.password = password;
         this.block = false;
         this.role = role;
-        this.kakaoId =kakaoId;
+        this.kakaoId = kakaoId;
     }
 
     public void updatePassword(String newPassword) {

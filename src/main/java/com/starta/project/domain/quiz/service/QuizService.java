@@ -48,8 +48,7 @@ public class QuizService {
                                                       Member member) {
         // 권한 체크
         if (member.getRole() == UserRoleEnum.BLOCK) {
-            System.out.println("퀴즈 생성이 차단");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new MsgDataResponse("퀴즈 생성이 차단되었습니다.", null));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new MsgDataResponse("신고 누적으로 퀴즈 생성 권한이 차단되었습니다.", null));
         }
 
         Quiz quiz = new Quiz();

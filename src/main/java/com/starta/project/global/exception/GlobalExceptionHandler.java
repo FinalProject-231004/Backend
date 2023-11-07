@@ -2,6 +2,7 @@ package com.starta.project.global.exception;
 
 
 import com.starta.project.global.exception.custom.*;
+import com.starta.project.global.messageDto.MsgResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -78,6 +79,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AsyncRequestTimeoutException.class)
     public final void handleAsyncRequestTimeoutException(AsyncRequestTimeoutException ex, WebRequest request) {
        log.info("Async request timed out Resolved [org.springframework.web.context.request.async.AsyncRequestTimeoutException]");
+    }
+
+    @ExceptionHandler(CustomKakaoBlockException.class)
+    public ResponseEntity<MsgResponse> handleCustomException(CustomKakaoBlockException ex) {
+        MsgResponse errorResponse = new MsgResponse(ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 
 //    @ExceptionHandler(MethodArgumentNotValidException.class)
