@@ -10,6 +10,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
@@ -86,8 +87,26 @@ public class LiveQuizController {
     private void broadcastUserList() {
         // 현재 활성 사용자의 유니크한 이름 목록을 생성합니다.
         Set<String> uniqueUsernames = new HashSet<>(activeUsers.values());
-        System.out.println("uniqueUsernames = " + uniqueUsernames);
+//        System.out.println("uniqueUsernames = " + uniqueUsernames);
         // '/topic/users'를 구독하는 클라이언트에게 유니크한 사용자 목록을 브로드캐스트합니다.
         messagingTemplate.convertAndSend("/topic/users", uniqueUsernames);
+    }
+
+    @MessageMapping("/users.request")
+    public void handleUserListRequest(StompHeaderAccessor headerAccessor) {
+        // 요청한 사용자의 세션 ID를 가져옵니다.
+        String sessionId = headerAccessor.getSessionId();
+
+        // 현재 활성 사용자의 유니크한 nickName 목록을 생성합니다.
+        Set<String> uniqueNickNames = new HashSet<>(activeUsers.values());
+
+        // 요청한 클라이언트에게만 유니크한 사용자 목록을 전송합니다.
+        messagingTemplate.convertAndSendToUser(
+                sessionId,
+                "/queue/users",
+                uniqueNickNames
+        );
+
+        System.out.println("uniqueNickNames = " + uniqueNickNames);
     }
 }
