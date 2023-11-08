@@ -84,4 +84,19 @@ class ValidationUtilTest {
         assertDoesNotThrow(() -> validationUtil.checkDuplicatedUsername(username));
     }
 
+    @Test
+    @DisplayName("3. Username 중복체크 - 중복예외 발생")
+    void checkDuplicatedUsername_ThrowsException() {
+        // Given
+        String username = "testuser";
+        when(memberRepository.findByUsername(username))
+                .thenReturn(Optional.of(new Member()));
+
+        // When / Then
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> validationUtil.checkDuplicatedUsername(username)
+        );
+        assertEquals("중복된 username 입니다.", exception.getMessage());
+    }
 }
