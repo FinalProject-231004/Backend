@@ -99,4 +99,22 @@ class ValidationUtilTest {
         );
         assertEquals("중복된 username 입니다.", exception.getMessage());
     }
+
+
+    @Test
+    @DisplayName("4. 닉네임 중복 검사 - 중복된 닉네임 존재로 예외 발생")
+    void checkDuplicatedNick_ThrowsExceptionIfNicknameExists() {
+        // Given
+        String nickname = "nickname";
+        when(memberDetailRepository.findByNickname(nickname))
+                .thenReturn(Optional.of(new MemberDetail()));
+
+        // When / Then
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> validationUtil.checkDuplicatedNick(nickname)
+        );
+        assertEquals("중복된 nickname 입니다.", exception.getMessage());
+    }
+
 }
