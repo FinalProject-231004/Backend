@@ -45,7 +45,6 @@ public class JwtUtil {
 
 
     private final RedisRepository redisRepository;
-
     private final RefreshTokenService refreshTokenService;
 
     @Value("${jwt.secret.key}") // Base64 Encode 한 SecretKey
