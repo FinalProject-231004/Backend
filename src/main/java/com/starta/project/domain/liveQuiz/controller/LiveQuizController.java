@@ -6,6 +6,8 @@ import com.starta.project.global.jwt.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -14,6 +16,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
@@ -56,7 +59,7 @@ public class LiveQuizController {
                     Claims claims = jwtUtil.getUserInfoFromToken(token); // 토큰에서 사용자 정보를 추출하는 메소드
                     String username = claims.get("sub", String.class); // 'sub' 클레임에서 사용자 이름을 추출합니다.
                     String nickName = liveQuizService.findNickName(username);
-                    System.out.println( "니쿠네임 = "+nickName);
+                    System.out.println("니쿠네임 = " + nickName);
 
                     // 세션 ID를 가져옵니다.
                     String sessionId = headerAccessor.getSessionId();
@@ -108,5 +111,11 @@ public class LiveQuizController {
         );
 
         System.out.println("uniqueNickNames = " + uniqueNickNames);
+    }
+
+    @GetMapping("/api/quiz/liveQuizUsers")
+    public ResponseEntity<Set<String>> getCurrentActiveUsers() {
+        Set<String> uniqueNickNames = new HashSet<>(activeUsers.values());
+        return new ResponseEntity<>(uniqueNickNames, HttpStatus.OK);
     }
 }
