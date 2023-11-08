@@ -1,5 +1,6 @@
 package com.starta.project.domain.member.service;
 
+import com.starta.project.domain.member.dto.LoginRequestDto;
 import com.starta.project.domain.member.dto.SignupRequestDto;
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.entity.MemberDetail;
@@ -22,11 +23,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+
+/**
+ *  @vaild 를 통과하지 못한 경우 Controller에서 처리되기 때문에 ServiceTest에서는 정상값만 체크함.
+ */
+
 @ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
     @Mock
     MemberRepository memberRepository;
-
     @Mock
     MemberDetailRepository memberDetailRepository;
     @Mock
@@ -36,6 +41,7 @@ public class MemberServiceTest {
     @InjectMocks
     MemberService memberService;
 
+
     @Nested
     @DisplayName("SignUp")
     class SignUpUser {
@@ -44,26 +50,27 @@ public class MemberServiceTest {
         @Transactional
         @DisplayName("회원가입 성공")
         void signupUser_success() {
-            // Given
-            SignupRequestDto requestDto = new SignupRequestDto("test1",
+
+            SignupRequestDto signupRequestDto = new SignupRequestDto("test1",
                     "test1",
                     "test123!",
                     "test123!",
                     false);
 
-            String username = requestDto.getUsername();
-            String nickname = requestDto.getNickname();
-            String password = requestDto.getPassword();
-            String checkPassword = requestDto.getCheckPassword();
+            // Given
+            String username = signupRequestDto.getUsername();
+            String nickname = signupRequestDto.getNickname();
+            String password = signupRequestDto.getPassword();
+            String checkPassword = signupRequestDto.getCheckPassword();
             UserRoleEnum role = UserRoleEnum.USER;
-            if(requestDto.isAdmin()){
+            if(signupRequestDto.isAdmin()){
                 role = UserRoleEnum.ADMIN;
             }
                 ;
             Member member = new Member(username, password , role);
             MemberDetail memberDetail = new MemberDetail(nickname);
 
-            when(passwordEncoder.encode(requestDto.getPassword())).thenReturn("encodedPassword");
+            when(passwordEncoder.encode(signupRequestDto.getPassword())).thenReturn("encodedPassword");
             doNothing().when(validationUtil).checkDuplicatedUsername(username);
             doNothing().when(validationUtil).checkDuplicatedNick(nickname);
             doNothing().when(validationUtil).checkPassword(password, checkPassword);
@@ -82,19 +89,19 @@ public class MemberServiceTest {
             });
 
             // When
-            memberService.signup(requestDto);
+            memberService.signup(signupRequestDto);
 
             // Then
             ArgumentCaptor<Member> memberCaptor = ArgumentCaptor.forClass(Member.class);
             verify(memberRepository, times(1)).save(memberCaptor.capture());
             Member savedMember = memberCaptor.getValue();
-            assertEquals(requestDto.getUsername(), savedMember.getUsername());
+            assertEquals(signupRequestDto.getUsername(), savedMember.getUsername());
             assertEquals("encodedPassword", savedMember.getPassword());
 
             ArgumentCaptor<MemberDetail> memberDetailCaptor = ArgumentCaptor.forClass(MemberDetail.class);
             verify(memberDetailRepository, times(1)).save(memberDetailCaptor.capture());
             MemberDetail savedMemberDetail = memberDetailCaptor.getValue();
-            assertEquals(requestDto.getNickname(), savedMemberDetail.getNickname());
+            assertEquals(signupRequestDto.getNickname(), savedMemberDetail.getNickname());
         }
     }
 }

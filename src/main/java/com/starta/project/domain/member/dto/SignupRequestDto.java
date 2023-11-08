@@ -1,5 +1,6 @@
 package com.starta.project.domain.member.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -7,6 +8,7 @@ import javax.validation.constraints.Pattern;
 
 
 @Getter
+@AllArgsConstructor
 public class SignupRequestDto {
 
     @Pattern(
@@ -37,12 +39,12 @@ public class SignupRequestDto {
     private boolean admin = false; // 기본값은 "USER"로 설정
 
 
-    @Builder
-    public SignupRequestDto(String username, String nickname, String password, String checkPassword, boolean admin) {
-        this.username = username;
-        this.nickname = nickname;
-        this.password = password;
-        this.checkPassword = checkPassword;
-        this.admin = admin;
-    }
+//    @Builder
+//    public SignupRequestDto(String username, String nickname, String password, String checkPassword, boolean admin) {
+//        this.username = username;
+//        this.nickname = nickname;
+//        this.password = password;
+//        this.checkPassword = checkPassword;
+//        this.admin = admin;
+//    }
 }

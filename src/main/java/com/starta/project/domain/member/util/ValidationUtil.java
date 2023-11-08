@@ -72,6 +72,7 @@ public class ValidationUtil {
             throw new IllegalArgumentException("패스워드 확인이 일치하지 않습니다.");
         }
     }
+
     public Member findMember(Long id){
         return memberRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("회원을 찾을 수 없습니다."));
