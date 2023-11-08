@@ -1,5 +1,6 @@
 package com.starta.project.domain.quiz.entity;
 
+import com.starta.project.domain.member.entity.MemberDetail;
 import com.starta.project.domain.quiz.dto.CreateQuizRequestDto;
 import lombok.Getter;
 
@@ -72,11 +73,20 @@ public class Quiz {
         this.display = b;
     }
 
+    public void complain() {
+        this.complainInt += 1;
+        if (this.complainInt >= 3) {
+            this.display = false; // 3번 이상 신고되면 숨김 처리
+        }
+    }
+
+
 //    public void update(CreateQuizRequestDto quizRequestDto) {
 //        this.title = quizRequestDto.getTitle();
 //        this.content = quizRequestDto.getContent();
 //        this.category = quizRequestDto.getCategory();
 //        this.image = quizRequestDto.getImage();
 //    }
+
 }
 

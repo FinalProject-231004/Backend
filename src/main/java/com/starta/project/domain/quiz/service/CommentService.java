@@ -1,6 +1,7 @@
 package com.starta.project.domain.quiz.service;
 
 import com.starta.project.domain.member.entity.Member;
+import com.starta.project.domain.member.entity.UserRoleEnum;
 import com.starta.project.domain.member.repository.MemberRepository;
 import com.starta.project.domain.notification.entity.Notification;
 import com.starta.project.domain.notification.entity.NotificationType;
@@ -38,6 +39,11 @@ public class CommentService {
 
     //댓글 생성
     public MsgDataResponse createComment(CommentCreateRequestDto requestDto, Member member) {
+        // 권한체크
+        if (member.getRole() == UserRoleEnum.BLOCK) {
+            throw new IllegalArgumentException("신고 누적으로 댓글 작성 권한이 차단되었습니다.");
+        }
+
         Quiz quiz = quizRepository.findById(requestDto.getQuizId()).orElseThrow( () -> new NullPointerException("해당 퀴즈가 없습니다. "));
         Comment comment = new Comment();
         comment.set(quiz, requestDto, member);
@@ -54,12 +60,12 @@ public class CommentService {
             String content = "";
 
             // 3글자 아닐때 문제가 발생해서 그거 예외처리 해야함
-            if(title.length() < 4){
+            if(title.length() < 6){
                 if(comment.getComment().length() < 4) {
                     content = "["
                             + title
                             + "]"
-                            + "게시글에 댓글이 달렸습니다: "
+                            + " 댓글이 달렸습니다: "
                             + "["
                             + comment.getComment()
                             + "]";
@@ -67,7 +73,7 @@ public class CommentService {
                     content = "["
                             + title
                             + "]"
-                            + "게시글에 댓글이 달렸습니다: "
+                            + " 댓글이 달렸습니다: "
                             + "["
                             + comment.getComment().substring(0, 3) + "..."
                             + "]";
@@ -75,23 +81,22 @@ public class CommentService {
             } else {
                 if(comment.getComment().length() < 4) {
                     content = "["
-                            + title.substring(0, 3) + "..."
+                            + title.substring(0, 6) + "..."
                             + "]"
-                            + "게시글에 댓글이 달렸습니다: "
+                            + " 댓글이 달렸습니다: "
                             + "["
                             + comment.getComment()
                             + "]";
                 } else {
                     content = "["
-                            + title.substring(0, 3) + "..."
+                            + title.substring(0, 6) + "..."
                             + "]"
-                            + "게시글에 댓글이 달렸습니다: "
+                            + " 댓글이 달렸습니다: "
                             + "["
                             + comment.getComment().substring(0, 3) + "..."
                             + "]";
                 }
             }
-
             String type = NotificationType.COMMENT.getAlias();
 
             Notification notification = Notification.builder()
@@ -99,7 +104,7 @@ public class CommentService {
                     .receiver(receiver)
                     .content(content)
                     .notificationType(type)
-                    .url("/api/quiz/" + quiz.getId())
+                    .url("/quiz/" + quiz.getId())
                     .readYn('N')
                     .deletedYn('N')
                     .created_at(LocalDateTime.now())

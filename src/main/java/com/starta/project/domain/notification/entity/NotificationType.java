@@ -2,9 +2,9 @@ package com.starta.project.domain.notification.entity;
 
 public enum NotificationType {
 
-    COMMENT("/api/quiz/{id}", "comment"),
+    COMMENT("/quiz/{id}", "comment"),
     NOTICE("/", "notice"),
-    LIKEQUIZ("/api/quiz/{id}", "likemember");
+    LIKEQUIZ("/quiz/{id}", "likemember");
 
 
 

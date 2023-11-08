@@ -4,6 +4,7 @@ import com.starta.project.domain.quiz.dto.CategoryDto;
 import com.starta.project.domain.quiz.dto.ShowQuestionResponseDto;
 import com.starta.project.domain.quiz.dto.SimpleQuizDto;
 import com.starta.project.domain.quiz.dto.TitleListsDto;
+import com.starta.project.domain.quiz.entity.QuizCategoryEnum;
 import com.starta.project.domain.quiz.entity.QuizQuestion;
 import com.starta.project.domain.quiz.service.ReadService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,9 +22,9 @@ public class ReadController {
     private final ReadService readService;
 
     @Operation(summary = "카테고리별 조회")
-    @PostMapping("/quiz/category")
-    public ResponseEntity<List<SimpleQuizDto>> categoryList(@RequestBody CategoryDto categoryDto ) {
-        return ResponseEntity.ok(readService.readByCategory(categoryDto));
+    @GetMapping("/quiz/category/{categoryName}")
+    public ResponseEntity<List<SimpleQuizDto>> categoryList(@PathVariable QuizCategoryEnum categoryName) {
+        return ResponseEntity.ok(readService.readByCategory(categoryName));
     }
 
     @Operation(summary = "최신 기준 조회")

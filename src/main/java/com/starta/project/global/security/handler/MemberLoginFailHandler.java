@@ -3,8 +3,10 @@ package com.starta.project.global.security.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -41,7 +43,10 @@ public class MemberLoginFailHandler implements AuthenticationFailureHandler {
             setErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "내부적으로 발생한 시스템 문제로 인해 요청을 처리할 수 없습니다. 관리자에게 문의하세요.");
         } else if (exception instanceof AuthenticationCredentialsNotFoundException) {
             setErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, "인증 요청이 거부되었습니다. 관리자에게 문의하세요.");
-        } else {
+        } else if (exception instanceof DisabledException) {
+            setErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, "신고누적으로 계정이 차단되었습니다.");
+        }
+        else{
             setErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "알 수 없는 이유로 로그인에 실패하였습니다. 관리자에게 문의하세요.");
         }
     }

@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface QuizChoicesRepository extends JpaRepository<QuizChoices, Long> {
     List<QuizChoices> findAllByQuizQuestion(QuizQuestion quizQuestion);
+
+    QuizChoices findByQuizQuestionAndChecksIsTrue(QuizQuestion question);
 }

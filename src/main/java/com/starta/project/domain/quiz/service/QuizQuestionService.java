@@ -1,6 +1,12 @@
 package com.starta.project.domain.quiz.service;
 
 import com.starta.project.domain.member.entity.Member;
+import com.starta.project.domain.member.entity.MemberDetail;
+import com.starta.project.domain.member.entity.UserRoleEnum;
+import com.starta.project.domain.member.repository.MemberDetailRepository;
+import com.starta.project.domain.mypage.entity.MileageGetHistory;
+import com.starta.project.domain.mypage.entity.TypeEnum;
+import com.starta.project.domain.mypage.repository.MileageGetHistoryRepository;
 import com.starta.project.domain.quiz.dto.*;
 import com.starta.project.domain.quiz.entity.Quiz;
 import com.starta.project.domain.quiz.entity.QuizChoices;
@@ -17,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +36,8 @@ public class QuizQuestionService {
     private final QuizChoicesRepository quizChoicesRepository;
     private final QuizQuestionRepository quizQuestionRepository;
     private final AmazonS3Service amazonS3Service;
+    private final MileageGetHistoryRepository getHistoryRepository;
+    private final MemberDetailRepository memberDetailRepository;
 
     //퀴즈 생성
     @Transactional
@@ -37,6 +46,11 @@ public class QuizQuestionService {
             List<MultipartFile> images,
             List<CreateQuestionRequestDto> questionListRequestDto,
             Member member) {
+
+        // 권한 체크
+        if (member.getRole() == UserRoleEnum.BLOCK) {
+            throw new IllegalArgumentException("신고 누적으로 퀴즈 생성이 권한이 차단되었습니다.");
+        }
 
         //퀴즈 찾기
         Quiz quiz = findQuiz(id);
@@ -54,10 +68,12 @@ public class QuizQuestionService {
             String img = "";
             if (imageIndex < images.size()) {
                 MultipartFile imageFile = images.get(imageIndex);
-                try {
-                    img = amazonS3Service.upload(imageFile);
-                } catch (java.io.IOException e) {
-                    throw new RuntimeException("이미지 업로드에 문제가 있습니다!  "); // 또는 적절한 예외 클래스를 사용하세요.
+                if (!imageFile.getOriginalFilename().equals("noimage01.jpg")) {
+                    try {
+                        img = amazonS3Service.upload(imageFile);
+                    } catch (java.io.IOException e) {
+                        throw new RuntimeException("이미지 업로드에 문제가 있습니다!  "); // 또는 적절한 예외 클래스를 사용하세요.
+                    }
                 }
             }
 
@@ -87,6 +103,22 @@ public class QuizQuestionService {
             imageIndex++;
         }
         quiz.playOn(true);
+        LocalDateTime localDate = LocalDateTime.now();
+
+        Optional<MileageGetHistory> getHistory = getHistoryRepository.findFirstByDateAndMemberDetailAndType(localDate,
+                member.getMemberDetail(),TypeEnum.QUIZ_CREATE);
+
+        if(getHistory.isEmpty()){
+            MemberDetail memberDetail = member.getMemberDetail();
+            Integer i = 50;
+            memberDetail.gainMileagePoint(i);
+            memberDetailRepository.save(memberDetail);
+            MileageGetHistory mileageGetHistory = new MileageGetHistory();
+            String des = "오늘의 퀴즈 생성";
+            mileageGetHistory.getFromQuiz(memberDetail,i,des);
+            getHistoryRepository.save(mileageGetHistory);
+        }
+
         quizRepository.save(quiz);
         return ResponseEntity.ok(new MsgResponse("문제 생성을 성공 하셨습니다!"));
     }

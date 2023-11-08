@@ -12,6 +12,7 @@ import com.starta.project.domain.member.entity.MemberDetail;
 import com.starta.project.domain.member.entity.UserRoleEnum;
 import com.starta.project.domain.member.repository.MemberDetailRepository;
 import com.starta.project.domain.member.repository.MemberRepository;
+import com.starta.project.global.exception.custom.CustomKakaoBlockException;
 import com.starta.project.global.jwt.JwtUtil;
 import com.starta.project.global.messageDto.MsgResponse;
 import com.starta.project.global.security.UserDetailsImpl;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -62,6 +64,8 @@ public class KakaoService {
         String accessToken = getToken(code);
         KakaoUserInfoDto kakaoMemberInfo = getKakaoUserInfo(accessToken);
         Map<String, Object> result = registerKakaoUserIfNeeded(kakaoMemberInfo);
+
+
 
         Member kakaoMember = (Member) result.get("member");
         String message = (String) result.get("message");
@@ -145,12 +149,16 @@ public class KakaoService {
 
 
     public Map<String, Object> registerKakaoUserIfNeeded(KakaoUserInfoDto kakaoUserInfo) {
-        log.info("registerKakaoUserIfNeeded 시작");
         Long kakaoId = kakaoUserInfo.getId();
         String email = kakaoUserInfo.getEmail();
         String message;
 
         Member kakaoMember = memberRepository.findByKakaoId(kakaoId).orElse(null);
+
+        // 기존 사용자가 BLOCK 상태인지 확인
+        if (kakaoMember != null && kakaoMember.getRole() == UserRoleEnum.BLOCK) {
+            throw new CustomKakaoBlockException("신고누적으로 계정이 차단되었습니다."); // 적절한 예외를 던집니다.
+        } message = "기존유저입니다.";
 
         // 1. 카카오 신규로그인
         if (kakaoMember == null) {
@@ -173,22 +181,17 @@ public class KakaoService {
             memberDetailRepository.save(memberDetail);
 
             message = "신규유저입니다.";
-        } else {
-            message = "기존유저입니다.";
         }
+
 
         Map<String, Object> result = new HashMap<>();
         result.put("member", kakaoMember);
         result.put("message", message);
 
-        log.info("member : " + kakaoMember);
-        log.info("message : " + message);
-
         return result;
     }
 
     private String generateCustomNickname() {
-        log.info("generateCustomNickname 시작");
         Random random = new Random();
         StringBuilder nickname = new StringBuilder();
 
@@ -197,8 +200,7 @@ public class KakaoService {
         for (int i = 0; i < 4; i++) {
             nickname.append(alphabetAndDigits.charAt(random.nextInt(alphabetAndDigits.length())));
         }
-        log.info("generateCustomNickname 끝");
+
         return nickname.toString();
     }
-
 }

@@ -1,6 +1,5 @@
 package com.starta.project.domain.notification.service;
 
-import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.notification.entity.Notification;
 import com.starta.project.domain.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,7 @@ public class NotificationService {
      */
     @Transactional(readOnly = true)
     public List<Notification> getAllNotificationByUsername(String username) {
-        List<Notification> notificationList = notificationRepository.findAllByReceiver(username);
+        List<Notification> notificationList = notificationRepository.findAllByReceiverAndDeletedYn(username, 'N');
         return notificationList.stream().map(Notification::of).collect(Collectors.toList());
     }
 
@@ -40,6 +39,7 @@ public class NotificationService {
     /**
      * [DB 연동]단일 알림 삭제 상태 업데이트
      */
+    @Transactional
     public void updateNotificationDeleteStatusById(String notificationId) {
         notificationRepository.bulkDeletedUpdate(notificationId);
     }
@@ -61,8 +61,8 @@ public class NotificationService {
     @Transactional
     public void sendNotifications(List<Notification> notificationList) {
         notificationList.forEach(notification -> {
-            notificationRepository.save(notification); //DB 저장
-            sseService.send(notification.getReceiver(), notification.getContent(), notification.getNotificationType(), notification.getUrl());
+            Notification notificationResult = notificationRepository.save(notification); //DB 저장
+            sseService.send(notificationResult);
         });
     }
 
@@ -71,7 +71,15 @@ public class NotificationService {
      */
     @Transactional
     public void sendNotification(Notification notification) {
-        notificationRepository.save(notification); //DB 저장
-        sseService.send(notification.getReceiver(), notification.getContent(), notification.getNotificationType(), notification.getUrl());
+        Notification notificationResult = notificationRepository.save(notification); //DB 저장
+        sseService.send(notificationResult);
+    }
+
+    /**
+     * [DB 연동]단일 알림 삭제
+     */
+    @Transactional
+    public void deleteNotification(Long id) {
+        notificationRepository.deleteById(id);
     }
 }
