@@ -117,7 +117,7 @@ class ValidationUtilTest {
         assertEquals("중복된 nickname 입니다.", exception.getMessage());
     }
     @Test
-    @DisplayName("5. 비밀번호 확인 - 불일치로 예외발생")
+    @DisplayName("5. 비밀번호 확인 - 불일치 예외발생")
     void checkPassword_ThrowsExceptionIfPasswordsDoNotMatch() {
         // Given
         String password = "password";
@@ -131,4 +131,19 @@ class ValidationUtilTest {
         assertEquals("패스워드 확인이 일치하지 않습니다.", exception.getMessage());
     }
 
+    @Test
+    @DisplayName("6. 회원찾기 검증 - 회원이 존재하지 않아서 예외발생")
+    void findMember_ThrowsExceptionIfMemberDoesNotExist() {
+        // Given
+        Long memberId = 1L;
+        when(memberRepository.findById(memberId))
+                .thenReturn(Optional.empty());
+
+        // When / Then
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> validationUtil.findMember(memberId)
+        );
+        assertEquals("회원을 찾을 수 없습니다.", exception.getMessage());
+    }
 }
