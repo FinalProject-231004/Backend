@@ -1,14 +1,21 @@
 package com.starta.project.domain.liveQuiz.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 @Configuration
 @EnableWebSocketMessageBroker
+@EnableWebSocket
+@RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+//    private final WebSocketHandler webSocketHandler;
+
     // 메시지 브로커가 /topic으로 시작하는 메시지가 메시지를 구독하는 클라이언트에게 라우팅 되도록 정의
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -20,4 +27,5 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/api/ws").setAllowedOrigins("*");
     }
+
 }
