@@ -33,7 +33,7 @@ public class ValidationUtil {
         }
         return Optional.empty();
     }
-    public Optional<ResponseEntity<MsgResponse>> checkKakaoValid(BindingResult bindingResult) {
+    public Optional<ResponseEntity<MsgResponse>> checkKakaoFirstLoginValid(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String errorMessage = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
             return Optional.of(ResponseEntity.badRequest().body(new MsgResponse(errorMessage)));

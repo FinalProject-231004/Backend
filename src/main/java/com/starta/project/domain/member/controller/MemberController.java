@@ -49,7 +49,7 @@ public class MemberController {
     public ResponseEntity<MsgResponse> kakaoFirstLogin(@Valid @RequestBody KaKaoFirstLoginDto requestDto,
                                                        BindingResult bindingResult,
                                                        @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return validationUtil.checkKakaoValid(bindingResult)
+        return validationUtil.checkKakaoFirstLoginValid(bindingResult)
                 .orElseGet(() -> ResponseEntity.ok(memberService.kakaoFirstLogin(requestDto, userDetails.getMember().getId())));
     }
     @Operation(summary = "마이페이지 내 정보 불러오기(프로필, 닉네임, 비밀번호)")
