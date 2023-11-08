@@ -54,7 +54,6 @@ dependencies {
 
 	// time 락 용
 	implementation 'com.google.guava:guava:31.1-jre'
-
 }
 
 tasks.named('test') {

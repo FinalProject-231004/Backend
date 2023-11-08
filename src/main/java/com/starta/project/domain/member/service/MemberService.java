@@ -150,6 +150,4 @@ public class MemberService {
 
         return new MsgResponse("탈퇴완료.");
     }
-
-
 }
