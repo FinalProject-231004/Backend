@@ -47,7 +47,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         // 리프레시 토큰 재발급 API
         if ("/api/token/reissue".equals(requestURI) && refreshTokenValue != null) {
             try {
-                jwtUtil.checkUsingRefreshToken(accessTokenValue, refreshTokenValue, res);
+                jwtUtil.checkUsingRefreshToken(refreshTokenValue, res);
                 return;
             }  catch (CustomInvalidJwtException e) {
                 setErrorResponse(res, HttpServletResponse.SC_BAD_REQUEST, "Expired Refresh Token. 유효하지 않은 JWT 토큰 입니다.");
@@ -64,7 +64,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 log.info("validateToken 시작");
 
                 try {
-                    if (jwtUtil.validateToken(accessTokenValue, res)) {
+                    if (jwtUtil.validateToken(accessTokenValue)) {
                         Claims info = jwtUtil.getUserInfoFromToken(accessTokenValue);
                         log.info("Claims info" + info);
                         setAuthentication(info.getSubject());

@@ -21,7 +21,7 @@ public class RefreshTokenService {
 
     public static final String REFRESH_PREFIX = "refresh:";
 
-    private final long REFRESH_TOKEN_TIME = 21 * 24 * 60 * 60L;  // 서버용 2주
+    private final long REFRESH_TOKEN_TIME = 21 * 24 * 60 * 60L;  // 2주
     public String createRefreshToken(String userName, UserRoleEnum role) {
 
         UUID uuid = UUID.randomUUID();

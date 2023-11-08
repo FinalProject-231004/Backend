@@ -22,7 +22,6 @@ import org.springframework.util.StringUtils;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
@@ -42,11 +41,10 @@ public class JwtUtil {
     // Token 식별자
     public static final String BEARER_PREFIX = "Bearer ";
     // 토큰 만료시간
-    // private final long TOKEN_TIME = 14 * 24 * 60 * 60 * 1000L; // 테스트용 2주, 밀리세컨드
-   private final long TOKEN_TIME = 3 * 60 * 1000L; // TEST용 3분, 밀리세컨드
+    private final long TOKEN_TIME = 3 * 60 * 60 * 1000L;  // 3시간
+
 
     private final RedisRepository redisRepository;
-
     private final RefreshTokenService refreshTokenService;
 
     @Value("${jwt.secret.key}") // Base64 Encode 한 SecretKey
@@ -93,7 +91,7 @@ public class JwtUtil {
 
 
     // 토큰 검증, JWT 위변조 확인
-    public boolean validateToken(String accessToken, HttpServletResponse res) {
+    public boolean validateToken(String accessToken) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken);
             log.info("validateToken 1번");
@@ -115,7 +113,7 @@ public class JwtUtil {
     }
 
 
-    public String checkUsingRefreshToken(String accessToken, String refreshTokenValue, HttpServletResponse res) throws JwtException {
+    public String checkUsingRefreshToken(String refreshTokenValue, HttpServletResponse res) throws JwtException {
         String value = redisRepository.getValue(REFRESH_PREFIX + refreshTokenValue);
         if (value == null) { // refresh 만료
             log.error(REFRESH_PREFIX + refreshTokenValue);
@@ -131,7 +129,7 @@ public class JwtUtil {
             String username = refreshToken.getUsername();
             UserRoleEnum role = refreshToken.getRole();
             //access 토큰 다시 발급 (Bearer ~~)
-            accessToken = createToken(username, role);
+            String accessToken = createToken(username, role);
 
             //Refresh Token Rotation (기존 Refresh 토큰 제거 후 새로 발급)
             Long refreshExpireTime = refreshTokenService.getRefreshTokenTimeToLive(REFRESH_PREFIX + refreshTokenValue);
