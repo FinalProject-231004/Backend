@@ -35,10 +35,10 @@ public class NotificationController {
     }
 
     @Operation(summary = "알림삭제")
-    @PutMapping("/notification/{notificationId}/delete")
-    public ResponseEntity<List<Notification>> updateNotificationDeleteStatusById(@PathVariable String notificationId) {
-        notificationService.updateNotificationDeleteStatusById(notificationId);
-        String username = notificationService.checkUsernameByNotificationId(notificationId);
+    @DeleteMapping ("/notification/{id}/delete")
+    public ResponseEntity<List<Notification>> updateNotificationDeleteStatusById(@PathVariable Long id, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        notificationService.deleteNotification(id);
+        String username = userDetails.getUsername();
         return ResponseEntity.ok().body(notificationService.getAllNotificationByUsername(username)); //수정 후 새롭게 전달
     }
 }

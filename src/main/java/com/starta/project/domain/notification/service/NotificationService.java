@@ -1,6 +1,5 @@
 package com.starta.project.domain.notification.service;
 
-import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.notification.entity.Notification;
 import com.starta.project.domain.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -74,5 +73,13 @@ public class NotificationService {
     public void sendNotification(Notification notification) {
         Notification notificationResult = notificationRepository.save(notification); //DB 저장
         sseService.send(notificationResult);
+    }
+
+    /**
+     * [DB 연동]단일 알림 삭제
+     */
+    @Transactional
+    public void deleteNotification(Long id) {
+        notificationRepository.deleteById(id);
     }
 }
