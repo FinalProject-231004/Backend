@@ -50,14 +50,15 @@ public class Member {
     public void updatePassword(String newPassword) {
         this.password = newPassword;
     }
-
     public void setBlock(boolean block) {
         this.block = block;
     }
-
     public void setRole(UserRoleEnum role) {
         this.role = role;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 }
 

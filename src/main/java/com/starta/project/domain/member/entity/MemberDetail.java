@@ -89,5 +89,9 @@ public class MemberDetail {
     }
     public void addComplaint() {
         this.complaint += 1; }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }
 

@@ -9,6 +9,7 @@ import com.starta.project.domain.quiz.entity.Quiz;
 import com.starta.project.domain.quiz.repository.CommentRepository;
 import com.starta.project.domain.quiz.repository.QuizRepository;
 import com.starta.project.global.messageDto.MsgResponse;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;

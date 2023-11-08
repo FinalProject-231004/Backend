@@ -54,6 +54,12 @@ dependencies {
 
 	// time 락 용
 	implementation 'com.google.guava:guava:31.1-jre'
+
+	// spring-security-test 의존성 추가
+	testImplementation 'org.mockito:mockito-core'
+	testImplementation 'org.mockito:mockito-junit-jupiter'
+	testImplementation 'org.springframework.security:spring-security-test'
+	
 }
 
 tasks.named('test') {
