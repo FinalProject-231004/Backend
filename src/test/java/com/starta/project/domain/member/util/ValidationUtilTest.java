@@ -102,7 +102,7 @@ class ValidationUtilTest {
 
 
     @Test
-    @DisplayName("4. 닉네임 중복 검사 - 중복된 닉네임 존재로 예외 발생")
+    @DisplayName("4. 닉네임 중복 검사 - 중복예외 발생")
     void checkDuplicatedNick_ThrowsExceptionIfNicknameExists() {
         // Given
         String nickname = "nickname";
@@ -115,6 +115,20 @@ class ValidationUtilTest {
                 () -> validationUtil.checkDuplicatedNick(nickname)
         );
         assertEquals("중복된 nickname 입니다.", exception.getMessage());
+    }
+    @Test
+    @DisplayName("5. 비밀번호 확인 - 불일치로 예외발생")
+    void checkPassword_ThrowsExceptionIfPasswordsDoNotMatch() {
+        // Given
+        String password = "password";
+        String checkPassword = "differentPassword";
+
+        // When / Then
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> validationUtil.checkPassword(password, checkPassword)
+        );
+        assertEquals("패스워드 확인이 일치하지 않습니다.", exception.getMessage());
     }
 
 }
