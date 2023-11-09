@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentMap;
 
 @Component
 public class ActiveUsersManager {
+
     private ConcurrentMap<String, String> activeUsers = new ConcurrentHashMap<>();
 
     public void addUser(String sessionId, String nickName) {
