@@ -43,8 +43,8 @@
 ## 1. 퀴즈 풀기
 
 <p align="center">
-  <img src="https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F080bd133-dafa-4a76-9d6a-97cfa8527823%2F9df02b65-71f3-4837-8177-68407d48c22c%2F%25EC%258A%25A4%25ED%2581%25AC%25EB%25A6%25B0%25EC%2583%25B7_2023-11-08_134320.png?table=block&id=ac7a43a6-ff12-4e1d-bdb2-7e957d13dbcd&spaceId=080bd133-dafa-4a76-9d6a-97cfa8527823&width=2000&userId=353f1212-549d-4134-87c5-3735c507862f&cache=v2" width="400" style="margin-right: 20px;" />
-  <img src="https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F080bd133-dafa-4a76-9d6a-97cfa8527823%2F98e70914-f2d1-48fd-8672-f59bb2372a94%2F%25EC%258A%25A4%25ED%2581%25AC%25EB%25A6%25B0%25EC%2583%25B7_2023-11-08_134331.png?table=block&id=47b5c60d-5c6c-4a2f-a8b9-b985c8c843fb&spaceId=080bd133-dafa-4a76-9d6a-97cfa8527823&width=2000&userId=353f1212-549d-4134-87c5-3735c507862f&cache=v2"  width="550" />
+  <img src="https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F080bd133-dafa-4a76-9d6a-97cfa8527823%2F9df02b65-71f3-4837-8177-68407d48c22c%2F%25EC%258A%25A4%25ED%2581%25AC%25EB%25A6%25B0%25EC%2583%25B7_2023-11-08_134320.png?table=block&id=ac7a43a6-ff12-4e1d-bdb2-7e957d13dbcd&spaceId=080bd133-dafa-4a76-9d6a-97cfa8527823&width=2000&userId=353f1212-549d-4134-87c5-3735c507862f&cache=v2" width="360" style="margin-right: 20px;" />
+  <img src="https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F080bd133-dafa-4a76-9d6a-97cfa8527823%2F98e70914-f2d1-48fd-8672-f59bb2372a94%2F%25EC%258A%25A4%25ED%2581%25AC%25EB%25A6%25B0%25EC%2583%25B7_2023-11-08_134331.png?table=block&id=47b5c60d-5c6c-4a2f-a8b9-b985c8c843fb&spaceId=080bd133-dafa-4a76-9d6a-97cfa8527823&width=2000&userId=353f1212-549d-4134-87c5-3735c507862f&cache=v2"  width="440" />
 </p>
 📌 퀴즈를 풀면 한 문제당 +10M의 마일리지를 얻을 수 있습니다.<br>
 📌 비회원도 문제 풀이가 가능합니다!<br>
@@ -85,7 +85,7 @@
 ## 6. 마일리지샵
 <p align="center">
   <img src="https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F080bd133-dafa-4a76-9d6a-97cfa8527823%2F1315bf72-bf51-44e4-b09a-0b1a8f89b834%2F%25EC%258A%25A4%25ED%2581%25AC%25EB%25A6%25B0%25EC%2583%25B7_2023-11-08_135653.png?table=block&id=736f6b42-25af-4429-98b0-7f18c6a4a0a8&spaceId=080bd133-dafa-4a76-9d6a-97cfa8527823&width=2000&userId=353f1212-549d-4134-87c5-3735c507862f&cache=v2" width="400" style="margin-right:20px;" />
-  <img src="https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F080bd133-dafa-4a76-9d6a-97cfa8527823%2Ff0bfa6ff-a66e-4132-93a2-7e58b4f5fcc9%2F%25EC%258A%25A4%25ED%2581%25AC%25EB%25A6%25B0%25EC%2583%25B7_2023-11-08_135702.png?table=block&id=ee613687-f7c4-4535-815c-8e5d01485967&spaceId=080bd133-dafa-4a76-9d6a-97cfa8527823&width=2000&userId=353f1212-549d-4134-87c5-3735c507862f&cache=v2"  width="480" />
+  <img src="https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F080bd133-dafa-4a76-9d6a-97cfa8527823%2Ff0bfa6ff-a66e-4132-93a2-7e58b4f5fcc9%2F%25EC%258A%25A4%25ED%2581%25AC%25EB%25A6%25B0%25EC%2583%25B7_2023-11-08_135702.png?table=block&id=ee613687-f7c4-4535-815c-8e5d01485967&spaceId=080bd133-dafa-4a76-9d6a-97cfa8527823&width=2000&userId=353f1212-549d-4134-87c5-3735c507862f&cache=v2"  width="400" />
 </p>
 📌 사이트를 이용하면서 얻은 마일리지는 다양한 상품으로 교환할 수 있습니다.<br>
 📌 구매시 구매할 항목, 수량, 수령가능한 이메일을 기입합니다.<br>
