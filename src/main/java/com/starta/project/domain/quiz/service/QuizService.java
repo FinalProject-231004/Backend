@@ -1,12 +1,8 @@
 package com.starta.project.domain.quiz.service;
 
 import com.starta.project.domain.member.entity.Member;
-import com.starta.project.domain.member.entity.MemberDetail;
-import com.starta.project.domain.member.repository.MemberDetailRepository;
+import com.starta.project.domain.member.entity.UserRoleEnum;
 import com.starta.project.domain.member.repository.MemberRepository;
-import com.starta.project.domain.mypage.entity.MileageGetHistory;
-import com.starta.project.domain.mypage.entity.TypeEnum;
-import com.starta.project.domain.mypage.repository.MileageGetHistoryRepository;
 import com.starta.project.domain.notification.entity.Notification;
 import com.starta.project.domain.notification.entity.NotificationType;
 import com.starta.project.domain.notification.service.NotificationService;
@@ -21,13 +17,13 @@ import com.starta.project.global.messageDto.MsgResponse;
 
 import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,29 +39,16 @@ public class QuizService {
     private final QuizChoicesRepository quizChoicesRepository;
     private final LikesRepository likesRepository;
     private final AmazonS3Service amazonS3Service;
-    private final MemberDetailRepository memberDetailRepository;
     private final NotificationService notificationService;
     private final MemberRepository memberRepository;
-    private final MileageGetHistoryRepository getHistoryRepository;
 
     //퀴즈 만들기
     @Transactional
     public ResponseEntity<MsgDataResponse> createQuiz(MultipartFile multipartFile, CreateQuizRequestDto quizRequestDto,
                                                       Member member) {
-        LocalDateTime localDate = LocalDateTime.now();
-
-        Optional<MileageGetHistory> getHistory = getHistoryRepository.findFirstByMemberDetailAndTypeOrderByDateDesc(
-                 member.getMemberDetail(), TypeEnum.QUIZ_CREATE);
-
-        if(getHistory.isEmpty() || getHistory.get().getDate().isEqual(localDate)){
-            MemberDetail memberDetail = member.getMemberDetail();
-            Integer i = 50;
-            memberDetail.gainMileagePoint(i);
-            memberDetailRepository.save(memberDetail);
-            MileageGetHistory mileageGetHistory = new MileageGetHistory();
-            String des = "오늘의 퀴즈 생성";
-            mileageGetHistory.getFromQuiz(memberDetail,i,des);
-            getHistoryRepository.save(mileageGetHistory);
+        // 권한 체크
+        if (member.getRole() == UserRoleEnum.BLOCK) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new MsgDataResponse("신고 누적으로 퀴즈 생성 권한이 차단되었습니다.", null));
         }
 
         Quiz quiz = new Quiz();
@@ -179,10 +162,19 @@ public class QuizService {
             String receiver = memberOptional.get().getUsername();
             String notificationId = receiver + "_" + System.currentTimeMillis();
             String title = quiz.getTitle();
-            String content = "["
-                    + title
-                    + "]"
-                    + "게시글 좋아요가 추가되었습니다. ";
+            String content = "";
+            if(title.length() < 6) {
+                content = "["
+                        + title
+                        + "]"
+                        + " 좋아요가 추가되었습니다. ";
+            } else {
+                content = "["
+                        + title.substring(0, 6) + "..."
+                        + "]"
+                        + " 좋아요가 추가되었습니다. ";
+            }
+
             String type = NotificationType.LIKEQUIZ.getAlias();
 
             Notification notification = Notification.builder()
@@ -190,7 +182,7 @@ public class QuizService {
                     .receiver(receiver)
                     .content(content)
                     .notificationType(type)
-                    .url("/api/quiz/" + quiz.getId())
+                    .url("/quiz/" + quiz.getId())
                     .readYn('N')
                     .deletedYn('N')
                     .created_at(LocalDateTime.now())

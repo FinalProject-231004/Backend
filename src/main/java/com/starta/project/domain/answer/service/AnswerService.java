@@ -2,6 +2,7 @@ package com.starta.project.domain.answer.service;
 
 import com.starta.project.domain.answer.dto.ChoiceRequestDto;
 import com.starta.project.domain.answer.dto.ResultResponseDto;
+import com.starta.project.domain.answer.dto.WhatWrongResponseDto;
 import com.starta.project.domain.answer.entity.MemberAnswer;
 import com.starta.project.domain.answer.repository.MemberAnswerRepository;
 import com.starta.project.domain.member.entity.Member;
@@ -12,13 +13,13 @@ import com.starta.project.domain.mypage.entity.TypeEnum;
 import com.starta.project.domain.mypage.repository.MileageGetHistoryRepository;
 import com.starta.project.domain.quiz.entity.Quiz;
 import com.starta.project.domain.quiz.entity.QuizChoices;
+import com.starta.project.domain.quiz.entity.QuizQuestion;
 import com.starta.project.domain.quiz.repository.QuizChoicesRepository;
 import com.starta.project.domain.quiz.repository.QuizQuestionRepository;
 import com.starta.project.domain.quiz.repository.QuizRepository;
 import com.starta.project.global.messageDto.MsgDataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,8 +48,7 @@ public class AnswerService {
     @Transactional     // 퀴즈 선택지 (응답)
     public void choice  (ChoiceRequestDto choiceRequestDto, Member member) {
         //선택지 찾아오기
-        QuizChoices quizChoices = quizChoicesRepository.findById(choiceRequestDto.getChoiceId()).orElseThrow(
-                () -> new NullPointerException("해당 선택지는 잘못된 선택지입니다. ㅋ "));
+        QuizChoices quizChoices = findQuizChoice(choiceRequestDto.getChoiceId());
         //필요 변수
         Long quizId = quizChoices.getQuizQuestion().getQuiz().getId();
         Integer quizQuestionNum = quizChoices.getQuizQuestion().getQuestionNum();
@@ -80,7 +80,7 @@ public class AnswerService {
         }
         memberAnswer.set(quizChoices.isChecks());
         //응답 저장
-        memberAnswer.answer(quizId,member.getId(),quizQuestionNum);
+        memberAnswer.answer(quizId,member.getId(),quizQuestionNum, quizChoices);
         // cascade를 위해 응답이 있는 조건과 없는 조건를 두고 상황에 따라 구별하여 저장함
         if (answer.isEmpty()) memberDetail.answer(memberAnswer);
         else {
@@ -91,17 +91,13 @@ public class AnswerService {
 
     public void noMemberChoice(ChoiceRequestDto choiceRequestDto, HttpServletRequest httpServletRequest) throws NoSuchAlgorithmException {
         //선택지 찾아오기
-        QuizChoices quizChoices = quizChoicesRepository.findById(choiceRequestDto.getChoiceId()).orElseThrow(
-                () -> new NullPointerException("해당 선택지는 잘못된 선택지입니다. ㅋ "));
+        QuizChoices quizChoices = findQuizChoice(choiceRequestDto.getChoiceId());
+
         //필요 변수
         String quizId = quizChoices.getQuizQuestion().getQuiz().getId().toString();
         String quizQuestionNum = quizChoices.getQuizQuestion().getQuestionNum().toString();
-        String ipAddress = httpServletRequest.getRemoteAddr();
-        // IP 주소를 알고리즘을 활용하여 보안 처리
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        md.update(ipAddress.getBytes());
-        byte[] digest = md.digest();
-        String hashedIP = DatatypeConverter.printHexBinary(digest).toUpperCase();
+        String hashedIP = hashIP(httpServletRequest);
+
         //레디스에서 값을 조회함
         List<String> checkList = redisTemplate.opsForList().range(hashedIP+"_0"+quizId, 0, -1 );
         // 정답인 경우 레디스에 값을 저장하고 데이터의 잔존 시간을 30분으로 규정
@@ -117,11 +113,10 @@ public class AnswerService {
 
 
     //결과창 보기
-    public ResponseEntity<MsgDataResponse> result(Long id, Member member) {
+    @Transactional
+    public MsgDataResponse result(Long id, Member member) {
 
-        Quiz quiz = quizRepository.findById(id).orElseThrow(
-                () -> new NullPointerException("해당 퀴즈는 없는 퀴즈입니다. ")
-        );
+        Quiz quiz = findQuiz(id);
         Long quizId = quiz.getId();
 
         int totalQuiz = quizQuestionRepository.countByQuiz(quiz);
@@ -129,24 +124,18 @@ public class AnswerService {
         ResultResponseDto resultResponseDto = new ResultResponseDto();
         resultResponseDto.set(quiz);
 
-        return ResponseEntity.ok(new MsgDataResponse
-                ( quiz.getTitle()+" 문제에서 " + totalQuiz+ "개의 문제 중 " + correctQuiz +"개 정답! ", resultResponseDto ));
+        return new MsgDataResponse
+                ( quiz.getTitle()+" 문제에서 " + totalQuiz+ "개의 문제 중 " + correctQuiz +"개 정답! ", resultResponseDto );
     }
 
 
-    public ResponseEntity<MsgDataResponse> noMemberResult(Long id, HttpServletRequest httpServletRequest) throws NoSuchAlgorithmException {
-        Quiz quiz = quizRepository.findById(id).orElseThrow(
-                () -> new NullPointerException("해당 퀴즈는 없는 퀴즈입니다. ")
-        );
+    @Transactional
+    public MsgDataResponse noMemberResult(Long id, HttpServletRequest httpServletRequest) throws NoSuchAlgorithmException {
 
+        Quiz quiz = findQuiz(id);
 
         String quizId = id.toString();
-        String ipAddress = httpServletRequest.getRemoteAddr();
-
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        md.update(ipAddress.getBytes());
-        byte[] digest = md.digest();
-        String hashedIP = DatatypeConverter.printHexBinary(digest).toUpperCase();
+        String hashedIP = hashIP(httpServletRequest);
         int correctQuiz = 0;
 
         List<String> correctQuizList = redisTemplate.opsForList().range(hashedIP + "_0" + quizId, 0, -1);
@@ -157,9 +146,56 @@ public class AnswerService {
         int totalQuiz = quizQuestionRepository.countByQuiz(quiz);
         ResultResponseDto resultResponseDto = new ResultResponseDto();
         resultResponseDto.set(quiz);
-        redisTemplate.opsForList().leftPop(hashedIP + "_0" + quizId, correctQuiz);
-        return ResponseEntity.ok(new MsgDataResponse
-                ( quiz.getTitle()+" 문제에서 " + totalQuiz+ "개의 문제 중 " + correctQuiz +"개 정답! ", resultResponseDto ));
+        redisTemplate.expire(hashedIP + "_0" + quizId,0,TimeUnit.SECONDS);
+
+        return new MsgDataResponse (quiz.getTitle()+" 문제에서 " + totalQuiz+ "개의 문제 중 " + correctQuiz +"개 정답! ", resultResponseDto );
     }
 
+    @Transactional
+    public MsgDataResponse whatWrong(Long quizId, Member member) {
+        Quiz quiz = findQuiz(quizId);
+        MemberDetail memberDetail = member.getMemberDetail();
+
+
+        if(memberDetail.getMileagePoint() < 50) throw new IllegalArgumentException("마일리지가 부족합니다. ");
+        else {
+            memberDetail.changeMileagePoint(50);
+            memberDetailRepository.save(memberDetail);
+            MileageGetHistory mileageGetHistory = new MileageGetHistory();
+            String des = quiz.getTitle() + "퀴즈 정답 보기";
+            mileageGetHistory.spendMileage(des,50,memberDetail);
+            mileageGetHistoryRepository.save(mileageGetHistory);
+        }
+        List<WhatWrongResponseDto> list = new ArrayList<>();
+        List<QuizQuestion> quizQuestionList = quizQuestionRepository.findAllByQuiz(quiz);
+        for (QuizQuestion quizQuestion : quizQuestionList) {
+            MemberAnswer memberAnswer = memberAnswerRepository.findByMemberDetailAndQuizIdAndQuizQuestionNum(memberDetail,quizId,quizQuestion.getQuestionNum());
+            QuizChoices quizChoices = quizChoicesRepository.findByQuizQuestionAndChecksIsTrue(quizQuestion);
+            WhatWrongResponseDto whatWrongResponseDto = new WhatWrongResponseDto(quizQuestion,quizChoices,memberAnswer);
+            list.add(whatWrongResponseDto);
+        }
+
+        return new MsgDataResponse(quiz.getTitle()+ " 퀴즈의 정답입니다. 다시 풀어주세요! ", list);
+    }
+
+
+    private Quiz findQuiz (Long id) {
+        return quizRepository.findById(id).orElseThrow(
+                () -> new NullPointerException("해당 퀴즈는 없는 퀴즈입니다. ")
+        );
+    }
+
+    private String hashIP (HttpServletRequest httpServletRequest) throws NoSuchAlgorithmException {
+        String ipAddress = httpServletRequest.getRemoteAddr();
+
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        md.update(ipAddress.getBytes());
+        byte[] digest = md.digest();
+        return DatatypeConverter.printHexBinary(digest).toUpperCase();
+    }
+
+    private QuizChoices findQuizChoice(Long id) {
+        return quizChoicesRepository.findById(id).orElseThrow(
+                () -> new NullPointerException("해당 선택지는 잘못된 선택지입니다. ㅋ "));
+    }
 }

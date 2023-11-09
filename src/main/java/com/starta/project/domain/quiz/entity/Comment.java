@@ -19,6 +19,7 @@ public class Comment {
     @Column(nullable = false)
     private String comment;
 
+    @Getter
     @Column
     private Integer complainInt = 0;
 
@@ -52,5 +53,10 @@ public class Comment {
     public void update(String content) {
         this.comment = content;
     }
+
+    public void complain() {
+        this.complainInt += 1; // 신고 횟수 증가
+    }
+
 }
 
