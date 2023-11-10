@@ -27,37 +27,11 @@ public class LiveQuizController {
     private final WebSocketEventListener webSocketEventListener;
     private final LiveQuizService liveQuizService;
     private final SimpMessageSendingOperations messagingTemplate;
-    private static final RateLimiter rateLimiter = RateLimiter.create(2);
 
     @MessageMapping("/liveChatRoom")
     @SendTo("/topic/liveChatRoom")
     public ChatMessageDto sendMessage(ChatMessageDto chatMessage) {
-        try {
-            if (!rateLimiter.tryAcquire()) {
-                liveQuizService.muteUser(chatMessage.getNickName());
-                throw new CustomRateLimiterException("도배 금지!");
-            }
-        } catch (CustomRateLimiterException e) {
-            // 사용자에게 에러 메시지를 포함한 ChatMessageDto 생성
-            ChatMessageDto errorResponse = new ChatMessageDto(
-                    chatMessage.getNickName(),
-                    e.getMessage(),
-                    LocalDateTime.now(),
-                    ChatMessageDto.MessageType.ERROR
-            );
-
-            // 에러 메시지를 해당 사용자에게만 보내기 위해 convertAndSendToUser 메서드 사용
-            // 사용자의 고유 세션 ID 또는 식별자를 사용해야 함
-            messagingTemplate.convertAndSendToUser(
-                    chatMessage.getNickName(), // 이 부분은 사용자를 식별할 수 있는 고유 값으로 변경해야 함
-                    "/queue/errors", // 클라이언트가 구독할 에러 메시지를 받을 엔드포인트
-                    errorResponse
-            );
-            return errorResponse;
-        }
-
-        // 정상적인 메시지 처리
-        return liveQuizService.processMessage(chatMessage);
+        return liveQuizService.processIncomingMessage(chatMessage, messagingTemplate);
     }
 
     @MessageMapping("/users.request")

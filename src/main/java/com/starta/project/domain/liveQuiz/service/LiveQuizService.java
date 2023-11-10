@@ -1,6 +1,7 @@
 package com.starta.project.domain.liveQuiz.service;
 
 
+import com.google.common.util.concurrent.RateLimiter;
 import com.starta.project.domain.liveQuiz.component.ActiveUsersManager;
 import com.starta.project.domain.liveQuiz.dto.AnswerDto;
 import com.starta.project.domain.liveQuiz.dto.ChatMessageDto;
@@ -15,6 +16,7 @@ import com.starta.project.domain.mypage.repository.MileageGetHistoryRepository;
 import com.starta.project.global.exception.custom.CustomRateLimiterException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.HtmlUtils;
@@ -34,15 +36,16 @@ public class LiveQuizService {
     private final MemberDetailRepository memberDetailRepository;
     private final ActiveUsersManager activeUsersManager;
     private final MileageGetHistoryRepository mileageGetHistoryRepository;
+    private final RateLimiter rateLimiter = RateLimiter.create(2);
 
     private String correctAnswer;
-    private int winnerCount = 0;
+    private int winnerCount = 3;
     private int currentWinnersCount = 0;
-    private int mileagePoint = 0;
+    private int mileagePoint = 1000;
     private final Map<String, LocalDateTime> userMuteTimes = new ConcurrentHashMap<>();
     private Set<String> correctAnsweredUsers = new HashSet<>(); // 정답을 맞춘 사용자들의 목록
 
-
+    // 정답 세팅
     public void setCorrectAnswer(AnswerDto answerDto) {
         MemberDetail findMember = findMemberDetail(answerDto.getNickName());
         UserRoleEnum role = findMember.getMember().getRole();
@@ -56,9 +59,29 @@ public class LiveQuizService {
         this.currentWinnersCount = 0;
 
         // 새로운 정답과 정답자 수 설정, 마일리지 포인트
-        this.correctAnswer = answerDto.getMessage();
+        this.correctAnswer = answerDto.getAnswer();
         this.winnerCount = answerDto.getWinnersCount();
         this.mileagePoint = answerDto.getMileagePoint();
+    }
+
+    @Transactional
+    public ChatMessageDto processIncomingMessage(ChatMessageDto chatMessage, SimpMessageSendingOperations messagingTemplate) {
+        try {
+            if (!rateLimiter.tryAcquire()) {
+                muteUser(chatMessage.getNickName());
+                throw new CustomRateLimiterException("도배 금지!");
+            }
+        } catch (CustomRateLimiterException e) {
+            // 에러 메시지 생성 및 전송 로직
+            ChatMessageDto errorResponse = createErrorResponse(chatMessage.getNickName(), e.getMessage());
+            messagingTemplate.convertAndSendToUser(
+                    chatMessage.getNickName(),
+                    "/queue/errors",
+                    errorResponse
+            );
+            return errorResponse;
+        }
+        return processMessage(chatMessage);
     }
 
     @Transactional
@@ -76,12 +99,12 @@ public class LiveQuizService {
             chatMessage.setMessage(escapedMessage);
 
             // 정답을 맞춘 상태에서 정답을 스포할 경우
-            if (escapedMessage.equalsIgnoreCase(correctAnswer) && correctAnsweredUsers.contains(chatMessage.getNickName())) {
+            if (escapedMessage.equalsIgnoreCase("뀨") && correctAnsweredUsers.contains(chatMessage.getNickName())) {
                 chatMessage = new ChatMessageDto(chatMessage.getNickName(), (chatMessage.getNickName()) + "님 이미 정답을 맞추셨습니다!", LocalDateTime.now());
             }
 
             // 정답 맞췄을 때
-            if (escapedMessage.equalsIgnoreCase(correctAnswer) && currentWinnersCount < winnerCount && !correctAnsweredUsers.contains(chatMessage.getNickName())) {
+            if (escapedMessage.equalsIgnoreCase("뀨") && currentWinnersCount < winnerCount && !correctAnsweredUsers.contains(chatMessage.getNickName())) {
                 correctAnsweredUsers.add(chatMessage.getNickName());
                 chatMessage = new ChatMessageDto(chatMessage.getNickName(), (chatMessage.getNickName()) + "님 정답!", LocalDateTime.now());
                 currentWinnersCount++;
@@ -96,6 +119,15 @@ public class LiveQuizService {
     // 사용자를 금지 상태로 설정하는 메서드
     public void muteUser(String nickName) {
         userMuteTimes.put(nickName, LocalDateTime.now().plusSeconds(30));
+    }
+
+    private ChatMessageDto createErrorResponse(String nickName, String errorMessage) {
+        return new ChatMessageDto(
+                nickName,
+                errorMessage,
+                LocalDateTime.now(),
+                ChatMessageDto.MessageType.ERROR
+        );
     }
 
     // 마일리지 지급
