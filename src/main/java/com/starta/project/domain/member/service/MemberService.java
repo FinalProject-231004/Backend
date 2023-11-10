@@ -151,5 +151,10 @@ public class MemberService {
         return new MsgResponse("탈퇴완료.");
     }
 
-
+    public MsgResponse checkAdmin(Member member) {
+        if (member.getRole() == UserRoleEnum.ADMIN) {
+            return new MsgResponse(UserRoleEnum.ADMIN.toString());
+        }
+        return new MsgResponse(UserRoleEnum.USER.toString());
+    }
 }

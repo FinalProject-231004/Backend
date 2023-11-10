@@ -14,6 +14,7 @@ import com.starta.project.domain.mypage.entity.MileageGetHistory;
 import com.starta.project.domain.mypage.entity.TypeEnum;
 import com.starta.project.domain.mypage.repository.MileageGetHistoryRepository;
 import com.starta.project.global.exception.custom.CustomRateLimiterException;
+import com.starta.project.global.exception.custom.CustomUserBlockedException;
 import com.starta.project.global.messageDto.MsgResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,11 +70,17 @@ public class LiveQuizService {
     @Transactional
     public ChatMessageDto processIncomingMessage(ChatMessageDto chatMessage, SimpMessageSendingOperations messagingTemplate) {
         try {
+            UserRoleEnum role = memberRepository.findUserRoleByNickName(chatMessage.getNickName());
+            // 사용자가 BLOCK 상태인 경우, 메시지 전송 차단
+            if (role == UserRoleEnum.BLOCK) {
+                throw new CustomUserBlockedException("차단된 유저입니다.");
+            }
+
             if (!rateLimiter.tryAcquire()) {
                 muteUser(chatMessage.getNickName());
                 throw new CustomRateLimiterException("도배 금지!");
             }
-        } catch (CustomRateLimiterException e) {
+        } catch (CustomUserBlockedException | CustomRateLimiterException e) {
             // 에러 메시지 생성 및 전송 로직
             ChatMessageDto errorResponse = createErrorResponse(chatMessage.getNickName(), e.getMessage());
             messagingTemplate.convertAndSendToUser(
