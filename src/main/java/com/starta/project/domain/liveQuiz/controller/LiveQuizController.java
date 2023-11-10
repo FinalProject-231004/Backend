@@ -24,7 +24,8 @@ public class LiveQuizController {
 
     @MessageMapping("/liveChatRoom")
     @SendTo("/topic/liveChatRoom")
-    public ChatMessageDto sendMessage(ChatMessageDto chatMessage) {
+    public ChatMessageDto sendMessage(ChatMessageDto chatMessage) throws Exception {
+        Thread.sleep(200);
         return liveQuizService.processMessage(chatMessage);
     }
 
