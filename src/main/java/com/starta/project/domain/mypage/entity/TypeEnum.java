@@ -5,5 +5,6 @@ public enum TypeEnum {
     QUIZ_SOLVE,
     QUIZ_CREATE,
     SPEND,
-    BUY_ITEM
+    BUY_ITEM,
+    LIVE_QUIZ
 }
