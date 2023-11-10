@@ -11,6 +11,7 @@ import com.starta.project.domain.quiz.repository.CommentRepository;
 import com.starta.project.domain.quiz.repository.QuizRepository;
 import com.starta.project.global.messageDto.MsgResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -29,12 +30,16 @@ public class ReportService {
 
     // 게시글 신고
     @Transactional
-    public MsgResponse reportPost(Long quizId, Long reporterId) {
-
+    public ResponseEntity<MsgResponse> reportPost(Long quizId, Long reporterId) {
         // 신고자
         validationUtil.findMember(reporterId);
         // 신고한 퀴즈
         Quiz reportedQuiz = validationUtil.findQuiz(quizId);
+
+        // 신고자가 퀴즈 작성자와 동일한지 확인
+        ResponseEntity<MsgResponse> body = getMsgResponseResponseEntity(reporterId, reportedQuiz.getMemberId());
+        if (body != null) return body;
+
         // 불량퀴즈 작성유저
         Member reportedMember = validationUtil.findMember(reportedQuiz.getMemberId());
 
@@ -46,17 +51,21 @@ public class ReportService {
             handleMemberComplaint(reportedMember.getMemberDetail()); // 회원의 신고 횟수 증가 및 처리
         }
 
-        return new MsgResponse("게시글 신고 처리되었습니다.");
+        return ResponseEntity.ok(new MsgResponse("게시글 신고 처리되었습니다."));
     }
 
     // 댓글 신고
     @Transactional
-    public MsgResponse reportComment(Long commentId, Long reporterId) {
-
+    public ResponseEntity<MsgResponse> reportComment(Long commentId, Long reporterId) {
         // 신고자
         validationUtil.findMember(reporterId);
         // 신고한 댓글
         Comment reportedComment = validationUtil.findComment(commentId);
+
+        // 신고자가 댓글 작성자와 동일한지 확인
+        ResponseEntity<MsgResponse> body = getMsgResponseResponseEntity(reporterId, reportedComment.getMemberId());
+        if (body != null) return body;
+
         // 불량댓글 작성유저
         Member reportedMember = validationUtil.findMember(reportedComment.getMemberId());
 
@@ -68,20 +77,27 @@ public class ReportService {
             handleMemberComplaint(reportedMember.getMemberDetail()); // 회원의 신고 횟수 증가 및 처리
             commentRepository.delete(reportedComment);
         }
-        return new MsgResponse("댓글 신고 처리되었습니다.");
+        return ResponseEntity.ok(new MsgResponse("댓글 신고 처리되었습니다."));
     }
 
     @Transactional
-    public MsgResponse reportliveChat(String chatNickname, Long reporterId) {
+    public ResponseEntity<MsgResponse> reportliveChat(String chatNickname, Long reporterId) {
         // 신고자
         Member reportedMember = validationUtil.findMember(reporterId);
         // 불량채팅 작성유저
         MemberDetail reportedMemberDetail = validationUtil.findMemberDetailByNickname(chatNickname);
-        Long memberId = reportedMemberDetail.getMember().getId();
-        // 중복 신고 확인 및 신고 기록 저장
-        validateAndSaveReportForChat(reporterId, memberId, ReportType.LIVECHAT);
+        Long reportedMemberId = reportedMemberDetail.getMember().getId();
 
-        long reportCount = reportRepository.countByReportedIdAndReportType(memberId, ReportType.LIVECHAT);
+        // 신고자가 채팅 참여자와 동일한지 확인
+        ResponseEntity<MsgResponse> body = getMsgResponseResponseEntity(reporterId, reportedMemberId);
+        if (body != null) return body;
+
+        // 중복 신고 확인 및 신고 기록 저장
+        System.out.println("시작");
+        validateAndSaveReportForChat(reporterId, reportedMemberId);
+        System.out.println("끝");
+
+        long reportCount = reportRepository.countByReportedIdAndReportType(reportedMemberId, ReportType.LIVECHAT);
         System.out.println("신고횟수 : " + reportCount);
 
         if (reportCount >= MAX_COMPLAINTS) {
@@ -89,7 +105,17 @@ public class ReportService {
             reportedMember.setBlock(true); // 회원 차단
             reportedMember.setRole(UserRoleEnum.BLOCK); // 회원 역할 변경
         }
-        return new MsgResponse("채팅 신고 처리되었습니다.");
+        return ResponseEntity.ok(new MsgResponse("채팅 신고 처리되었습니다."));
+    }
+
+    // 본인은 신고불가
+    private static ResponseEntity<MsgResponse> getMsgResponseResponseEntity(Long reporterId, Long reportedMemberId) {
+        if (reportedMemberId.equals(reporterId)) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MsgResponse("본인은 신고할 수 없습니다."));
+        }
+        return null;
     }
 
     private void handleMemberComplaint(MemberDetail memberDetail) {
@@ -111,11 +137,11 @@ public class ReportService {
     }
 
     // 중복 신고 확인 및 신고 기록 저장 (채팅)
-    private void validateAndSaveReportForChat(Long reporterId, Long reportedId, ReportType reportType) {
-        if (reportRepository.existsByReporterIdAndReportedIdAndReportType(reporterId, reportedId, reportType)) {
+    private void validateAndSaveReportForChat(Long reporterId, Long reportedId) {
+        if (reportRepository.existsByReporterIdAndReportedIdAndReportType(reporterId, reportedId, ReportType.LIVECHAT)) {
             throw new IllegalArgumentException("이미 신고한 대상입니다.");
         }
-        Report report = new Report(reporterId, reportedId, 0L, reportType);
+        Report report = new Report(reporterId, reportedId, -1L, ReportType.LIVECHAT);
         reportRepository.save(report);
     }
 }
