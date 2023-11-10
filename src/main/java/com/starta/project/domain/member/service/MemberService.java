@@ -142,7 +142,6 @@ public class MemberService {
         MemberDetail memberDetail = member.getMemberDetail();
         if (memberDetail != null) {
             mileageGetHistoryRepository.deleteAllByMemberDetail(memberDetail);
-//            purchaseHistoryRepository.deleteAllByMemberDetail(memberDetail);
             memberAnswerRepository.deleteAllByMemberDetail(memberDetail);
         }
         attendanceCheckRepository.deleteAllByMember(member);
