@@ -4,10 +4,9 @@ import lombok.Getter;
 
 @Getter
 public class DrawMessage {
-    private double startX;
-    private double startY;
-    private double endX;
-    private double endY;
+    private String type;
+    private double offsetX;
+    private double offsetY;
     private String color;
     private double lineWidth;
 }
