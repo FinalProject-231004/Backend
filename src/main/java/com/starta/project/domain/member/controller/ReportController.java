@@ -20,16 +20,16 @@ public class ReportController {
     @PostMapping("/quiz/{quizId}")
     public ResponseEntity<MsgResponse> reportPost(@PathVariable Long quizId,
                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(reportService.reportPost(quizId, userDetails.getMember().getId()));
+        return reportService.reportPost(quizId, userDetails.getMember().getId());
     }
     @PostMapping("/comment/{commentId}")
     public ResponseEntity<MsgResponse> reportComment(@PathVariable Long commentId,
                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(reportService.reportComment(commentId, userDetails.getMember().getId()));
+        return reportService.reportComment(commentId, userDetails.getMember().getId());
     }
     @PostMapping("/liveChat/{chatNickname}")
     public ResponseEntity<MsgResponse> reportliveChat(@PathVariable String chatNickname,
                                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(reportService.reportliveChat(chatNickname, userDetails.getMember().getId()));
+        return reportService.reportliveChat(chatNickname, userDetails.getMember().getId());
     }
 }
