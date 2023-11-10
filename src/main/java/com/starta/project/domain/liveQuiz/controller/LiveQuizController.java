@@ -71,7 +71,7 @@ public class LiveQuizController {
         return new ResponseEntity<>(uniqueNickNames, HttpStatus.OK);
     }
 
-    @PostMapping("/api/quiz/submitAnswer")
+    @PostMapping("/api/quiz/liveSubmitAnswer")
     public void submitAnswer(AnswerDto answerDto) {
         liveQuizService.setCorrectAnswer(answerDto);
     }
