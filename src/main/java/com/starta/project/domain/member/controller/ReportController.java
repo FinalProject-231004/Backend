@@ -27,4 +27,9 @@ public class ReportController {
                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(reportService.reportComment(commentId, userDetails.getMember().getId()));
     }
+    @PostMapping("/liveChat/{chatNickname}")
+    public ResponseEntity<MsgResponse> reportliveChat(@PathVariable String chatNickname,
+                                                     @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(reportService.reportliveChat(chatNickname, userDetails.getMember().getId()));
+    }
 }

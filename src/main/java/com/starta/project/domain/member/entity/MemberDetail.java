@@ -88,6 +88,11 @@ public class MemberDetail {
         }
     }
     public void addComplaint() {
-        this.complaint += 1; }
+        this.complaint += 1;
+    }
+
+    public void setComplaint() {
+        this.complaint = 3;
+    }
 }
 
