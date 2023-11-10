@@ -1,5 +1,6 @@
 package com.starta.project.domain.liveQuiz.controller;
 
+import com.starta.project.domain.liveQuiz.dto.AnswerDto;
 import com.starta.project.domain.liveQuiz.dto.ChatMessageDto;
 import com.starta.project.domain.liveQuiz.handler.WebSocketEventListener;
 import com.starta.project.domain.liveQuiz.service.LiveQuizService;
@@ -24,7 +25,7 @@ public class LiveQuizController {
     @MessageMapping("/liveChatRoom")
     @SendTo("/topic/liveChatRoom")
     public ChatMessageDto sendMessage(ChatMessageDto chatMessage) {
-        return liveQuizService.sendMessage(chatMessage);
+        return liveQuizService.processMessage(chatMessage);
     }
 
     @MessageMapping("/users.request")
@@ -36,6 +37,11 @@ public class LiveQuizController {
     public ResponseEntity<Set<String>> getCurrentActiveUsers() {
         Set<String> uniqueNickNames = liveQuizService.getCurrentActiveUsers(); // 변경된 부분
         return new ResponseEntity<>(uniqueNickNames, HttpStatus.OK);
+    }
+
+    @MessageMapping("/submitAnswer")
+    public void submitAnswer(AnswerDto answerDto) {
+        liveQuizService.setCorrectAnswer(answerDto);
     }
 
 }
