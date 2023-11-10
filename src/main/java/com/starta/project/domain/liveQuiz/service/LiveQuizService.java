@@ -12,6 +12,7 @@ import com.starta.project.domain.member.repository.MemberRepository;
 import com.starta.project.domain.mypage.entity.MileageGetHistory;
 import com.starta.project.domain.mypage.entity.TypeEnum;
 import com.starta.project.domain.mypage.repository.MileageGetHistoryRepository;
+import com.starta.project.global.exception.custom.CustomRateLimiterException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,9 @@ import org.springframework.web.util.HtmlUtils;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
@@ -36,6 +39,7 @@ public class LiveQuizService {
     private int winnerCount = 0;
     private int currentWinnersCount = 0;
     private int mileagePoint = 0;
+    private final Map<String, LocalDateTime> userMuteTimes = new ConcurrentHashMap<>();
     private Set<String> correctAnsweredUsers = new HashSet<>(); // 정답을 맞춘 사용자들의 목록
 
 
@@ -59,6 +63,13 @@ public class LiveQuizService {
 
     @Transactional
     public synchronized ChatMessageDto processMessage(ChatMessageDto chatMessage) {
+
+        // 사용자 챗금 상태 확인
+        LocalDateTime muteExpiry = userMuteTimes.get(chatMessage.getNickName());
+        if (muteExpiry != null && LocalDateTime.now().isBefore(muteExpiry)) {
+            throw new CustomRateLimiterException("채팅 금지 상태입니다.");
+        }
+
         if (chatMessage != null && chatMessage.getMessage() != null) {
             // 메시지 내용 이스케이프 처리
             String escapedMessage = HtmlUtils.htmlEscape(chatMessage.getMessage());
@@ -79,7 +90,12 @@ public class LiveQuizService {
             }
 
         }
-        return chatMessage;
+        return new ChatMessageDto(chatMessage.getNickName(), chatMessage.getMessage(), LocalDateTime.now());
+    }
+
+    // 사용자를 금지 상태로 설정하는 메서드
+    public void muteUser(String nickName) {
+        userMuteTimes.put(nickName, LocalDateTime.now().plusSeconds(30));
     }
 
     // 마일리지 지급
