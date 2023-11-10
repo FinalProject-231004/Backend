@@ -75,6 +75,11 @@ public class ValidationUtil {
         return memberRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("회원을 찾을 수 없습니다."));
     }
+    public MemberDetail findMemberDetailByNickname(String nickname) {
+        return memberDetailRepository.findByNickname(nickname).orElseThrow(() ->
+                new IllegalArgumentException("회원을 찾을 수 없습니다."));
+    }
+
     public MemberDetail findMemberDetail(Long id){
         return memberDetailRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("회원을 찾을 수 없습니다."));

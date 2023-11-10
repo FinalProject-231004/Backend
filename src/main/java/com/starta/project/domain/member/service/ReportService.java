@@ -31,9 +31,11 @@ public class ReportService {
     @Transactional
     public MsgResponse reportPost(Long quizId, Long reporterId) {
 
-        // 신고자와 신고된 게시글, 게시 유저의 유효성 검증
+        // 신고자
         validationUtil.findMember(reporterId);
+        // 신고한 퀴즈
         Quiz reportedQuiz = validationUtil.findQuiz(quizId);
+        // 불량퀴즈 작성유저
         Member reportedMember = validationUtil.findMember(reportedQuiz.getMemberId());
 
         // 중복 신고 확인 및 신고 기록 저장
@@ -51,10 +53,12 @@ public class ReportService {
     @Transactional
     public MsgResponse reportComment(Long commentId, Long reporterId) {
 
-        // 신고자와 신고된 댓글, 댓글 유저를 검증
-        Comment reportedComment = validationUtil.findComment(commentId);  // 신고한 댓글
-        Member reporter = validationUtil.findMember(reporterId);   // 신고자
-        Member reportedMember = validationUtil.findMember(reportedComment.getMemberId()); // 불량댓글 작성유저
+        // 신고자
+        validationUtil.findMember(reporterId);
+        // 신고한 댓글
+        Comment reportedComment = validationUtil.findComment(commentId);
+        // 불량댓글 작성유저
+        Member reportedMember = validationUtil.findMember(reportedComment.getMemberId());
 
         // 중복 신고 확인 및 신고 기록 저장
         validateAndSaveReport(reporterId, reportedMember.getId(), commentId, ReportType.COMMENT);
@@ -67,9 +71,29 @@ public class ReportService {
         return new MsgResponse("댓글 신고 처리되었습니다.");
     }
 
+    @Transactional
+    public MsgResponse reportliveChat(String chatNickname, Long reporterId) {
+        // 신고자
+        Member reportedMember = validationUtil.findMember(reporterId);
+        // 불량채팅 작성유저
+        MemberDetail reportedMemberDetail = validationUtil.findMemberDetailByNickname(chatNickname);
+        Long memberId = reportedMemberDetail.getMember().getId();
+        // 중복 신고 확인 및 신고 기록 저장
+        validateAndSaveReportForChat(reporterId, memberId, ReportType.LIVECHAT);
+
+        long reportCount = reportRepository.countByReportedIdAndReportType(memberId, ReportType.LIVECHAT);
+        System.out.println("신고횟수 : " + reportCount);
+
+        if (reportCount >= MAX_COMPLAINTS) {
+            reportedMemberDetail.setComplaint(); // this.complaint = 3
+            reportedMember.setBlock(true); // 회원 차단
+            reportedMember.setRole(UserRoleEnum.BLOCK); // 회원 역할 변경
+        }
+        return new MsgResponse("채팅 신고 처리되었습니다.");
+    }
+
     private void handleMemberComplaint(MemberDetail memberDetail) {
         memberDetail.addComplaint(); // 회원 신고 횟수 증가
-
         if (memberDetail.getComplaint() >= MAX_COMPLAINTS) {
             Member member = memberDetail.getMember();
             member.setBlock(true); // 회원 차단
@@ -77,12 +101,21 @@ public class ReportService {
         }
     }
 
-     // 중복 신고 확인 및 신고 기록 저장
+     // 중복 신고 확인 및 신고 기록 저장 (퀴즈, 댓글)
     private void validateAndSaveReport(Long reporterId, Long reportedId, Long postId, ReportType reportType) {
         if (reportRepository.existsByReporterIdAndPostedIdAndReportType(reporterId, postId, reportType)) {
             throw new IllegalArgumentException("이미 신고한 대상입니다.");
         }
         Report report = new Report(reporterId, reportedId, postId, reportType);
+        reportRepository.save(report);
+    }
+
+    // 중복 신고 확인 및 신고 기록 저장 (채팅)
+    private void validateAndSaveReportForChat(Long reporterId, Long reportedId, ReportType reportType) {
+        if (reportRepository.existsByReporterIdAndReportedIdAndReportType(reporterId, reportedId, reportType)) {
+            throw new IllegalArgumentException("이미 신고한 대상입니다.");
+        }
+        Report report = new Report(reporterId, reportedId, 0L, reportType);
         reportRepository.save(report);
     }
 }
