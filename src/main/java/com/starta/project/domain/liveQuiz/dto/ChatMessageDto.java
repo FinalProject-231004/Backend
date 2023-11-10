@@ -17,7 +17,8 @@ public class ChatMessageDto {
     private String type;
 
     public enum MessageType {
-        ERROR
+        ERROR,
+        NOTIFICATION
     }
 
     public ChatMessageDto(String nickName, String message, LocalDateTime timestamp) {
