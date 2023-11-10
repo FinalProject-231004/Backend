@@ -104,4 +104,10 @@ public class MemberController {
                                                     @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(memberService.deleteMember(requestDto.getEnterPassword(), userDetails.getMember()));
     }
+
+    @Operation(summary = "ADMIN 권한 조회")
+    @GetMapping("/admin/check")
+    public ResponseEntity<MsgResponse> checkAdmin(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(memberService.checkAdmin(userDetails.getMember()));
+    }
 }
