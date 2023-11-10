@@ -14,8 +14,10 @@ import com.starta.project.domain.mypage.entity.MileageGetHistory;
 import com.starta.project.domain.mypage.entity.TypeEnum;
 import com.starta.project.domain.mypage.repository.MileageGetHistoryRepository;
 import com.starta.project.global.exception.custom.CustomRateLimiterException;
+import com.starta.project.global.messageDto.MsgResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,17 +41,16 @@ public class LiveQuizService {
     private final RateLimiter rateLimiter = RateLimiter.create(2);
 
     private String correctAnswer;
-    private int winnerCount = 3;
-    private int currentWinnersCount = 0;
-    private int mileagePoint = 1000;
+    private Integer winnerCount;
+    private Integer currentWinnersCount;
+    private Integer mileagePoint;
     private final Map<String, LocalDateTime> userMuteTimes = new ConcurrentHashMap<>();
     private Set<String> correctAnsweredUsers = new HashSet<>(); // 정답을 맞춘 사용자들의 목록
 
     // 정답 세팅
-    public void setCorrectAnswer(AnswerDto answerDto) {
-        MemberDetail findMember = findMemberDetail(answerDto.getNickName());
-        UserRoleEnum role = findMember.getMember().getRole();
-
+    public MsgResponse setCorrectAnswer(Member member, AnswerDto answerDto) {
+        Member findMember = memberRepository.findByUsername(member.getUsername()).orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+        UserRoleEnum role = findMember.getRole();
         if (!(role == UserRoleEnum.ADMIN)) {
             throw new IllegalArgumentException("관리자가 아닙니다.");
         }
@@ -62,6 +63,8 @@ public class LiveQuizService {
         this.correctAnswer = answerDto.getAnswer();
         this.winnerCount = answerDto.getWinnersCount();
         this.mileagePoint = answerDto.getMileagePoint();
+
+        return new MsgResponse("정답이 설정되었습니다.");
     }
 
     @Transactional
@@ -99,12 +102,12 @@ public class LiveQuizService {
             chatMessage.setMessage(escapedMessage);
 
             // 정답을 맞춘 상태에서 정답을 스포할 경우
-            if (escapedMessage.equalsIgnoreCase("뀨") && correctAnsweredUsers.contains(chatMessage.getNickName())) {
+            if (escapedMessage.equalsIgnoreCase(correctAnswer) && correctAnsweredUsers.contains(chatMessage.getNickName())) {
                 chatMessage = new ChatMessageDto(chatMessage.getNickName(), (chatMessage.getNickName()) + "님 이미 정답을 맞추셨습니다!", LocalDateTime.now());
             }
 
             // 정답 맞췄을 때
-            if (escapedMessage.equalsIgnoreCase("뀨") && currentWinnersCount < winnerCount && !correctAnsweredUsers.contains(chatMessage.getNickName())) {
+            if (escapedMessage.equalsIgnoreCase(correctAnswer) && currentWinnersCount < winnerCount && !correctAnsweredUsers.contains(chatMessage.getNickName())) {
                 correctAnsweredUsers.add(chatMessage.getNickName());
                 chatMessage = new ChatMessageDto(chatMessage.getNickName(), (chatMessage.getNickName()) + "님 정답!", LocalDateTime.now());
                 currentWinnersCount++;
@@ -151,6 +154,7 @@ public class LiveQuizService {
     }
 
     private MemberDetail findMemberDetail(String nickName) {
+        System.out.println("닉네임 : " + nickName);
         return memberDetailRepository.findByNickname(nickName).orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
     }
 
