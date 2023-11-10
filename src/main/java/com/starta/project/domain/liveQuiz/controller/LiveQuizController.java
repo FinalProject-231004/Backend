@@ -53,8 +53,6 @@ public class LiveQuizController {
     public ResponseEntity<MsgResponse> submitAnswer(
             @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody AnswerDto answerDto) {
-        return ResponseEntity.status(HttpStatus.OK).body(liveQuizService.setCorrectAnswer(userDetails.getMember(), answerDto));
+        return ResponseEntity.status(HttpStatus.OK).body(liveQuizService.setCorrectAnswer(userDetails.getMember(), answerDto, messagingTemplate));
     }
-
-
 }
