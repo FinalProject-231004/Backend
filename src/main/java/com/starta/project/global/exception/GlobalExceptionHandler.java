@@ -86,4 +86,13 @@ public class GlobalExceptionHandler {
         MsgResponse errorResponse = new MsgResponse(ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
+
+    @ExceptionHandler({CustomUserBlockedException.class})
+    public ResponseEntity<RestApiException> customUserBlockedException(CustomUserBlockedException ex) {
+        RestApiException restApiException = new RestApiException(ex.getMessage(), HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(
+                restApiException,
+                HttpStatus.BAD_REQUEST
+        );
+    }
 }
