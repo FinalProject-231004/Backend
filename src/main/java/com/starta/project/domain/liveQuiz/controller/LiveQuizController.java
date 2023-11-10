@@ -2,6 +2,7 @@ package com.starta.project.domain.liveQuiz.controller;
 
 import com.starta.project.domain.liveQuiz.dto.AnswerDto;
 import com.starta.project.domain.liveQuiz.dto.ChatMessageDto;
+import com.starta.project.domain.liveQuiz.dto.LiveQuizUserInfoDto;
 import com.starta.project.domain.liveQuiz.handler.WebSocketEventListener;
 import com.starta.project.domain.liveQuiz.service.LiveQuizService;
 import com.starta.project.global.messageDto.MsgResponse;
@@ -42,17 +43,24 @@ public class LiveQuizController {
         webSocketEventListener.handleUserListRequest(headerAccessor);
     }
 
-    @GetMapping("/api/quiz/liveQuizUsers")
+    @GetMapping("/api/liveQuiz/userLists")
     public ResponseEntity<Set<String>> getCurrentActiveUsers() {
         Set<String> uniqueNickNames = liveQuizService.getCurrentActiveUsers(); // 변경된 부분
         return new ResponseEntity<>(uniqueNickNames, HttpStatus.OK);
     }
 
     @Operation(summary = "라이브퀴즈 문제만들기")
-    @PostMapping("/api/quiz/liveSubmitAnswer")
+    @PostMapping("/api/liveQuiz/liveSubmitAnswer")
     public ResponseEntity<MsgResponse> submitAnswer(
             @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody AnswerDto answerDto) {
         return ResponseEntity.status(HttpStatus.OK).body(liveQuizService.setCorrectAnswer(userDetails.getMember(), answerDto, messagingTemplate));
+    }
+
+    @Operation(summary = "라이브퀴즈 유저조회")
+    @GetMapping("/api/liveQuiz/userInfo")
+    public ResponseEntity<LiveQuizUserInfoDto> liveQuizUserInfo(
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.status(HttpStatus.OK).body(liveQuizService.liveQuizUserInfo(userDetails.getMember()));
     }
 }

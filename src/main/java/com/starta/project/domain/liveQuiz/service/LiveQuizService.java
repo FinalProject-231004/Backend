@@ -5,6 +5,8 @@ import com.google.common.util.concurrent.RateLimiter;
 import com.starta.project.domain.liveQuiz.component.ActiveUsersManager;
 import com.starta.project.domain.liveQuiz.dto.AnswerDto;
 import com.starta.project.domain.liveQuiz.dto.ChatMessageDto;
+import com.starta.project.domain.liveQuiz.dto.LiveQuizUserInfoDto;
+import com.starta.project.domain.liveQuiz.dto.QuizUpdateDto;
 import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.member.entity.MemberDetail;
 import com.starta.project.domain.member.entity.UserRoleEnum;
@@ -49,7 +51,7 @@ public class LiveQuizService {
 
     // 정답 세팅
     public MsgResponse setCorrectAnswer(Member member, AnswerDto answerDto, SimpMessageSendingOperations messagingTemplate) {
-        Member findMember = memberRepository.findByUsername(member.getUsername()).orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+        Member findMember = findMember(member.getUsername());
         UserRoleEnum role = findMember.getRole();
         if (!(role == UserRoleEnum.ADMIN)) {
             throw new IllegalArgumentException("관리자가 아닙니다.");
@@ -63,6 +65,7 @@ public class LiveQuizService {
         this.correctAnswer = answerDto.getAnswer();
         this.winnerCount = answerDto.getWinnersCount();
         this.mileagePoint = answerDto.getMileagePoint();
+        sendQuizUpdate(messagingTemplate);
         messagingTemplate.convertAndSend("/topic/liveChatRoom", new ChatMessageDto("공지",findMember.getMemberDetail().getNickname() + "님께서 문제를 출제하였습니다.", LocalDateTime.now()));
         return new MsgResponse("정답이 설정되었습니다.");
     }
@@ -78,6 +81,7 @@ public class LiveQuizService {
 
             if (!rateLimiter.tryAcquire()) {
                 muteUser(chatMessage.getNickName());
+                System.out.println("도배자" + chatMessage.getNickName() + "차단됨");
                 throw new CustomRateLimiterException("도배 금지!");
             }
         } catch (CustomUserBlockedException | CustomRateLimiterException e) {
@@ -112,6 +116,7 @@ public class LiveQuizService {
             if (escapedMessage.equalsIgnoreCase(correctAnswer) && currentWinnersCount < winnerCount && !correctAnsweredUsers.contains(chatMessage.getNickName())) {
                 correctAnsweredUsers.add(chatMessage.getNickName());
                 currentWinnersCount++;
+                sendQuizUpdate(messagingTemplate);
 
                 // 포인트 지급
                 awardMileagePoints(chatMessage.getNickName());
@@ -135,6 +140,17 @@ public class LiveQuizService {
         );
     }
 
+    // 정답자 목록 업데이트
+    private void sendQuizUpdate(SimpMessageSendingOperations messagingTemplate) {
+        QuizUpdateDto quizUpdate = new QuizUpdateDto(
+                correctAnsweredUsers,
+                winnerCount - currentWinnersCount,
+                correctAnswer.length(),
+                mileagePoint
+        );
+        messagingTemplate.convertAndSend("/topic/quizUpdate", quizUpdate);
+    }
+
     // 정답 알림
     private void sendAnswerNotification(ChatMessageDto chatMessage, SimpMessageSendingOperations messagingTemplate) {
         ChatMessageDto answerMessage = new ChatMessageDto(chatMessage.getNickName(), chatMessage.getNickName() + "님 정답!", LocalDateTime.now());
@@ -149,7 +165,7 @@ public class LiveQuizService {
 
     // 모든 정답자 알림
     private void sendAllWinnersNotification(SimpMessageSendingOperations messagingTemplate) {
-        ChatMessageDto allWinnersMessage = new ChatMessageDto("공지", "모든 정답자가 나왔습니다.", LocalDateTime.now());
+        ChatMessageDto allWinnersMessage = new ChatMessageDto("공지", "모든 정답자가 나왔습니다. 정답은 " +correctAnswer +" 입니다" , LocalDateTime.now());
         messagingTemplate.convertAndSend("/topic/liveChatRoom", allWinnersMessage);
     }
 
@@ -160,6 +176,15 @@ public class LiveQuizService {
         findMember.gainMileagePoint(mileagePoint);
         MileageGetHistory mileageGetHistory = new MileageGetHistory("라이브 퀴즈 정답 포인트", TypeEnum.LIVE_QUIZ, mileagePoint, findMember);
         mileageGetHistoryRepository.save(mileageGetHistory);
+    }
+
+    public LiveQuizUserInfoDto liveQuizUserInfo(Member member) {
+        Member findMember = findMember(member.getUsername());
+        return new LiveQuizUserInfoDto(findMember.getRole(), findMember.getMemberDetail().getNickname());
+    }
+
+    private Member findMember(String username) {
+        return memberRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
     }
 
     public String findNickName(String username) {
