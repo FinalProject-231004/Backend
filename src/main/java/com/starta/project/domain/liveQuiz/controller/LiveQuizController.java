@@ -1,9 +1,11 @@
 package com.starta.project.domain.liveQuiz.controller;
 
+import com.google.common.util.concurrent.RateLimiter;
 import com.starta.project.domain.liveQuiz.dto.AnswerDto;
 import com.starta.project.domain.liveQuiz.dto.ChatMessageDto;
 import com.starta.project.domain.liveQuiz.handler.WebSocketEventListener;
 import com.starta.project.domain.liveQuiz.service.LiveQuizService;
+import com.starta.project.global.exception.custom.CustomRateLimiterException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +23,12 @@ public class LiveQuizController {
 
     private final WebSocketEventListener webSocketEventListener;
     private final LiveQuizService liveQuizService;
+    private static final RateLimiter rateLimiter = RateLimiter.create(0.25);
 
     @MessageMapping("/liveChatRoom")
     @SendTo("/topic/liveChatRoom")
-    public ChatMessageDto sendMessage(ChatMessageDto chatMessage) throws Exception {
-        Thread.sleep(200);
+    public ChatMessageDto sendMessage(ChatMessageDto chatMessage) {
+        if(!rateLimiter.tryAcquire()) throw new CustomRateLimiterException("도배 금지!");
         return liveQuizService.processMessage(chatMessage);
     }
 
