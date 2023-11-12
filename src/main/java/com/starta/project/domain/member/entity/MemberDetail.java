@@ -91,7 +91,7 @@ public class MemberDetail {
         this.complaint += 1;
     }
 
-    public void setComplaint() {
+    public void setLiveComplaint() {
         this.complaint = 3;
     }
 }
