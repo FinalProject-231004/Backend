@@ -83,25 +83,24 @@ public class ReportService {
     @Transactional
     public ResponseEntity<MsgResponse> reportliveChat(String chatNickname, Long reporterId) {
         // 신고자
-        Member reportedMember = validationUtil.findMember(reporterId);
+        validationUtil.findMember(reporterId);
         // 불량채팅 작성유저
         MemberDetail reportedMemberDetail = validationUtil.findMemberDetailByNickname(chatNickname);
-        Long reportedMemberId = reportedMemberDetail.getMember().getId();
+        Member reportedMember = reportedMemberDetail.getMember();
+        Long reportedMemberId = reportedMember.getId();
 
         // 신고자가 채팅 참여자와 동일한지 확인
         ResponseEntity<MsgResponse> body = getMsgResponseResponseEntity(reporterId, reportedMemberId);
         if (body != null) return body;
 
         // 중복 신고 확인 및 신고 기록 저장
-        System.out.println("시작");
         validateAndSaveReportForChat(reporterId, reportedMemberId);
-        System.out.println("끝");
 
         long reportCount = reportRepository.countByReportedIdAndReportType(reportedMemberId, ReportType.LIVECHAT);
         System.out.println("신고횟수 : " + reportCount);
 
         if (reportCount >= MAX_COMPLAINTS) {
-            reportedMemberDetail.setComplaint(); // this.complaint = 3
+            reportedMemberDetail.setLiveComplaint(); // this.complaint = 3
             reportedMember.setBlock(true); // 회원 차단
             reportedMember.setRole(UserRoleEnum.BLOCK); // 회원 역할 변경
         }
