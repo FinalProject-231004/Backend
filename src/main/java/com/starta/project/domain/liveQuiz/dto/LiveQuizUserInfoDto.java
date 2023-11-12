@@ -7,9 +7,11 @@ import lombok.Getter;
 public class LiveQuizUserInfoDto {
     UserRoleEnum role;
     String nickName;
+    QuizUpdateDto quizUpdateDto;
 
-    public LiveQuizUserInfoDto(UserRoleEnum role, String nickname) {
+    public LiveQuizUserInfoDto(UserRoleEnum role, String nickname, QuizUpdateDto quizUpdateDto){
         this.role = role;
         this.nickName = nickname;
+        this.quizUpdateDto = quizUpdateDto;
     }
 }

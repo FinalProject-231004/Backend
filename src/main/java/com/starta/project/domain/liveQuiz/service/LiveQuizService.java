@@ -42,10 +42,10 @@ public class LiveQuizService {
     private final MileageGetHistoryRepository mileageGetHistoryRepository;
     private final RateLimiter rateLimiter = RateLimiter.create(2);
 
-    private String correctAnswer;
-    private Integer winnerCount;
-    private Integer currentWinnersCount;
-    private Integer mileagePoint;
+    private String correctAnswer = "";
+    private Integer winnerCount = 0;
+    private Integer currentWinnersCount = 0;
+    private Integer mileagePoint = 0;
     private final Map<String, LocalDateTime> userMuteTimes = new ConcurrentHashMap<>();
     private Set<String> correctAnsweredUsers = new HashSet<>();
 
@@ -180,7 +180,13 @@ public class LiveQuizService {
 
     public LiveQuizUserInfoDto liveQuizUserInfo(Member member) {
         Member findMember = findMember(member.getUsername());
-        return new LiveQuizUserInfoDto(findMember.getRole(), findMember.getMemberDetail().getNickname());
+        QuizUpdateDto quizUpdate = new QuizUpdateDto(
+                correctAnsweredUsers,
+                winnerCount - currentWinnersCount,
+                correctAnswer.length(),
+                mileagePoint
+        );
+        return new LiveQuizUserInfoDto(findMember.getRole(), findMember.getMemberDetail().getNickname(), quizUpdate);
     }
 
     private Member findMember(String username) {
