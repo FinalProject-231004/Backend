@@ -35,7 +35,7 @@ public class MyPageService {
     @Transactional(readOnly = true)
     public MsgDataResponse getPurchaseHistory(Member member) {
         return new MsgDataResponse("조회에 성공하셨습니다.",
-                mileageGetHistoryRepository.findByMemberDetailIdOrderByDateDesc(member.getId()).stream()
+                mileageGetHistoryRepository.findByMemberDetailIdOrderByDateDesc(member.getMemberDetail().getId()).stream()
                         .filter(historyItem -> historyItem.getPoints() < 0) // points 컬럼이 음수인 항목만 필터링
                         .map(PurchaseHistoryItemDto::new)
                         .collect(Collectors.toList()));
