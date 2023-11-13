@@ -29,4 +29,8 @@ public class RedisRepository {
     public Long getTimeToLive(String key) {
         return redisTemplate.getExpire(key);
     }
+
+    public void deleteValue(String key) {
+        redisTemplate.delete(key);
+    }
 }
