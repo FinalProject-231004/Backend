@@ -28,10 +28,9 @@ import org.springframework.web.util.HtmlUtils;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -81,9 +80,10 @@ public class LiveQuizService {
         return new MsgResponse("정답이 설정되었습니다.");
     }
 
-    // 사용자 뮤트 시간 관리 관련 메서드
     public void muteUser(String nickName) {
-        redisTemplate.opsForHash().put(USER_MUTE_TIMES_KEY, nickName, LocalDateTime.now().plusSeconds(30).toString());
+        String muteTime = LocalDateTime.now().plusSeconds(30).toString();
+        redisTemplate.opsForHash().put(USER_MUTE_TIMES_KEY, nickName, muteTime);
+        redisTemplate.expire(USER_MUTE_TIMES_KEY, 30, TimeUnit.SECONDS);
     }
 
     public LocalDateTime getUserMuteTime(String nickName) {
@@ -178,7 +178,7 @@ public class LiveQuizService {
             }
             return null;
         }
-        return chatMessage;
+        return new ChatMessageDto(chatMessage.getNickName(), chatMessage.getMessage(), LocalDateTime.now());
     }
     // 에러 메시지 생성
     private ChatMessageDto createErrorResponse(String nickName, String errorMessage) {
