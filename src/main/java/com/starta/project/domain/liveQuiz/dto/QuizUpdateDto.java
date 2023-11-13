@@ -2,10 +2,11 @@ package com.starta.project.domain.liveQuiz.dto;
 
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.Set;
 
 @Getter
-public class QuizUpdateDto {
+public class QuizUpdateDto implements Serializable {
     private Set<String> correctAnsweredUsers;
     private Integer remainingWinners;
     private Integer answerLength;
