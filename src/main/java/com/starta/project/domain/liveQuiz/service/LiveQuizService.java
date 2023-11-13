@@ -20,34 +20,48 @@ import com.starta.project.global.exception.custom.CustomUserBlockedException;
 import com.starta.project.global.messageDto.MsgResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.HtmlUtils;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class LiveQuizService {
-
     private final MemberRepository memberRepository;
     private final MemberDetailRepository memberDetailRepository;
     private final ActiveUsersManager activeUsersManager;
     private final MileageGetHistoryRepository mileageGetHistoryRepository;
     private final RateLimiter rateLimiter = RateLimiter.create(2);
+    private final StringRedisTemplate redisTemplate;
 
-    private String correctAnswer = "";
-    private Integer winnerCount = 0;
-    private Integer currentWinnersCount = 0;
-    private Integer mileagePoint = 0;
-    private final Map<String, LocalDateTime> userMuteTimes = new ConcurrentHashMap<>();
-    private Set<String> correctAnsweredUsers = new HashSet<>();
+    private static final String QUIZ_STATE_KEY = "QuizState";
+    private static final String USER_MUTE_TIMES_KEY = "UserMuteTimes";
+    private static final String CORRECT_ANSWERED_USERS_KEY = "CorrectAnsweredUsers";
+
+    // 퀴즈 상태 설정
+    public void setQuizState(String correctAnswer, Integer winnerCount, Integer mileagePoint) {
+        Map<String, String> quizState = new HashMap<>();
+        quizState.put("correctAnswer", correctAnswer);
+        quizState.put("winnerCount", winnerCount.toString());
+        quizState.put("currentWinnersCount", "0");  // 초기화
+        quizState.put("mileagePoint", mileagePoint.toString());
+
+        redisTemplate.opsForHash().putAll(QUIZ_STATE_KEY, quizState);
+    }
+
+    // 퀴즈 상태 가져오기
+    public Map<String, String> getQuizState() {
+        return redisTemplate.<String, String>opsForHash().entries(QUIZ_STATE_KEY);
+    }
 
     // 정답 세팅
     public MsgResponse setCorrectAnswer(Member member, AnswerDto answerDto, SimpMessageSendingOperations messagingTemplate) {
@@ -57,17 +71,42 @@ public class LiveQuizService {
             throw new IllegalArgumentException("관리자가 아닙니다.");
         }
 
-        // 새로운 문제가 설정될 때, 정답자 목록과 카운트를 초기화
-        this.correctAnsweredUsers.clear();
-        this.currentWinnersCount = 0;
-
         // 새로운 정답과 정답자 수 설정, 마일리지 포인트
-        this.correctAnswer = answerDto.getAnswer();
-        this.winnerCount = answerDto.getWinnersCount();
-        this.mileagePoint = answerDto.getMileagePoint();
+        setQuizState(answerDto.getAnswer(), answerDto.getWinnersCount(), answerDto.getMileagePoint());
+        clearCorrectAnsweredUsers();
+
         sendQuizUpdate(messagingTemplate);
-        messagingTemplate.convertAndSend("/topic/liveChatRoom", new ChatMessageDto("공지",findMember.getMemberDetail().getNickname() + "님께서 문제를 출제하였습니다.", LocalDateTime.now()));
+        messagingTemplate.convertAndSend("/topic/liveChatRoom", new ChatMessageDto("공지", findMember.getMemberDetail().getNickname() + "님께서 문제를 출제하였습니다.", LocalDateTime.now()));
         return new MsgResponse("정답이 설정되었습니다.");
+    }
+
+    public void muteUser(String nickName) {
+        String muteTime = LocalDateTime.now().plusSeconds(30).toString();
+        redisTemplate.opsForHash().put(USER_MUTE_TIMES_KEY, nickName, muteTime);
+        redisTemplate.expire(USER_MUTE_TIMES_KEY, 30, TimeUnit.SECONDS);
+    }
+
+    public LocalDateTime getUserMuteTime(String nickName) {
+        String time = (String) redisTemplate.opsForHash().get(USER_MUTE_TIMES_KEY, nickName);
+        return time != null ? LocalDateTime.parse(time) : null;
+    }
+
+    // 정답을 맞춘 사용자 목록 관리 관련 메서드
+    public void addCorrectAnsweredUser(String nickName) {
+        redisTemplate.opsForSet().add(CORRECT_ANSWERED_USERS_KEY, nickName);
+    }
+
+    public Set<String> getCorrectAnsweredUsers() {
+        return redisTemplate.opsForSet().members(CORRECT_ANSWERED_USERS_KEY);
+    }
+
+    public void clearCorrectAnsweredUsers() {
+        redisTemplate.delete(CORRECT_ANSWERED_USERS_KEY);
+    }
+
+    // 현재 정답자 수 업데이트
+    private void updateCurrentWinnersCount(int currentWinnersCount) {
+        redisTemplate.opsForHash().put(QUIZ_STATE_KEY, "currentWinnersCount", String.valueOf(currentWinnersCount));
     }
 
     @Transactional
@@ -81,7 +120,6 @@ public class LiveQuizService {
 
             if (!rateLimiter.tryAcquire()) {
                 muteUser(chatMessage.getNickName());
-                System.out.println("도배자" + chatMessage.getNickName() + "차단됨");
                 throw new CustomRateLimiterException("도배 금지!");
             }
         } catch (CustomUserBlockedException | CustomRateLimiterException e) {
@@ -96,40 +134,51 @@ public class LiveQuizService {
         return processMessage(chatMessage, messagingTemplate);
     }
 
+    // 메시지 처리 메서드
     @Transactional
     public synchronized ChatMessageDto processMessage(ChatMessageDto chatMessage, SimpMessageSendingOperations messagingTemplate) {
         // 사용자 챗금 상태 확인
-        LocalDateTime muteExpiry = userMuteTimes.get(chatMessage.getNickName());
+        LocalDateTime muteExpiry = getUserMuteTime(chatMessage.getNickName());
         if (muteExpiry != null && LocalDateTime.now().isBefore(muteExpiry)) throw new CustomRateLimiterException("채팅 금지 상태입니다.");
-        if (chatMessage != null && chatMessage.getMessage() != null) {
-            // 메시지 내용 이스케이프 처리
-            String escapedMessage = HtmlUtils.htmlEscape(chatMessage.getMessage());
-            chatMessage.setMessage(escapedMessage);
 
-            // 정답을 맞춘 상태에서 정답을 스포할 경우
-            if (escapedMessage.equalsIgnoreCase(correctAnswer) && correctAnsweredUsers.contains(chatMessage.getNickName())) {
-                chatMessage = new ChatMessageDto(chatMessage.getNickName(), chatMessage.getNickName() + "님 이미 정답을 맞추셨습니다!", LocalDateTime.now());
-                return chatMessage;
+        // 메시지 내용 이스케이프 처리
+        String escapedMessage = HtmlUtils.htmlEscape(chatMessage.getMessage());
+        chatMessage.setMessage(escapedMessage);
+
+        Map<String, String> quizState = getQuizState();
+        String correctAnswer = quizState.get("correctAnswer");
+        int winnerCount = Integer.parseInt(quizState.get("winnerCount"));
+        int currentWinnersCount = Integer.parseInt(quizState.get("currentWinnersCount"));
+
+        Set<String> correctAnsweredUsers = getCorrectAnsweredUsers();
+
+        // 정답을 맞춘 상태에서 정답을 스포할 경우
+        if (escapedMessage.equalsIgnoreCase(correctAnswer) && correctAnsweredUsers.contains(chatMessage.getNickName())) {
+            return new ChatMessageDto(chatMessage.getNickName(), "이미 정답을 맞추셨습니다!", LocalDateTime.now());
+        }
+
+        // 정답 맞췄을 때
+        if (escapedMessage.equalsIgnoreCase(correctAnswer) && currentWinnersCount < winnerCount && !correctAnsweredUsers.contains(chatMessage.getNickName())) {
+            addCorrectAnsweredUser(chatMessage.getNickName());
+            currentWinnersCount++;
+            updateCurrentWinnersCount(currentWinnersCount);
+
+            sendQuizUpdate(messagingTemplate);
+
+            // 포인트 지급
+            awardMileagePoints(chatMessage.getNickName());
+            sendAnswerNotification(chatMessage, messagingTemplate);
+
+            int remainingWinners = winnerCount - currentWinnersCount;
+            if (remainingWinners > 0) {
+                sendRemainingWinnersNotification(remainingWinners, messagingTemplate);
+            } else {
+                sendAllWinnersNotification(messagingTemplate);
             }
-
-            // 정답 맞췄을 때
-            if (escapedMessage.equalsIgnoreCase(correctAnswer) && currentWinnersCount < winnerCount && !correctAnsweredUsers.contains(chatMessage.getNickName())) {
-                correctAnsweredUsers.add(chatMessage.getNickName());
-                currentWinnersCount++;
-                sendQuizUpdate(messagingTemplate);
-
-                // 포인트 지급
-                awardMileagePoints(chatMessage.getNickName());
-                sendAnswerNotification(chatMessage, messagingTemplate);
-
-                int remainingWinners = winnerCount - currentWinnersCount;
-                if (remainingWinners > 0) {sendRemainingWinnersNotification(remainingWinners, messagingTemplate);}
-                else {sendAllWinnersNotification(messagingTemplate);}
-                return null;}
+            return null;
         }
         return new ChatMessageDto(chatMessage.getNickName(), chatMessage.getMessage(), LocalDateTime.now());
     }
-
     // 에러 메시지 생성
     private ChatMessageDto createErrorResponse(String nickName, String errorMessage) {
         return new ChatMessageDto(
@@ -142,6 +191,14 @@ public class LiveQuizService {
 
     // 정답자 목록 업데이트
     private void sendQuizUpdate(SimpMessageSendingOperations messagingTemplate) {
+        Map<String, String> quizState = getQuizState();
+        Set<String> correctAnsweredUsers = getCorrectAnsweredUsers();
+
+        int winnerCount = Integer.parseInt(quizState.get("winnerCount"));
+        int currentWinnersCount = Integer.parseInt(quizState.get("currentWinnersCount"));
+        int mileagePoint = Integer.parseInt(quizState.get("mileagePoint"));
+        String correctAnswer = quizState.get("correctAnswer");
+
         QuizUpdateDto quizUpdate = new QuizUpdateDto(
                 correctAnsweredUsers,
                 winnerCount - currentWinnersCount,
@@ -165,7 +222,8 @@ public class LiveQuizService {
 
     // 모든 정답자 알림
     private void sendAllWinnersNotification(SimpMessageSendingOperations messagingTemplate) {
-        ChatMessageDto allWinnersMessage = new ChatMessageDto("공지", "모든 정답자가 나왔습니다. 정답은 " +correctAnswer +" 입니다" , LocalDateTime.now());
+        String correctAnswer = getQuizState().get("correctAnswer");
+        ChatMessageDto allWinnersMessage = new ChatMessageDto("공지", "모든 정답자가 나왔습니다. 정답은 " + correctAnswer + " 입니다", LocalDateTime.now());
         messagingTemplate.convertAndSend("/topic/liveChatRoom", allWinnersMessage);
     }
 
@@ -173,6 +231,7 @@ public class LiveQuizService {
     @Transactional
     public void awardMileagePoints(String nickName) {
         MemberDetail findMember = findMemberDetail(nickName);
+        int mileagePoint = Integer.parseInt(getQuizState().get("mileagePoint"));
         findMember.gainMileagePoint(mileagePoint);
         MileageGetHistory mileageGetHistory = new MileageGetHistory("라이브 퀴즈 정답 포인트", TypeEnum.LIVE_QUIZ, mileagePoint, findMember);
         mileageGetHistoryRepository.save(mileageGetHistory);
@@ -180,6 +239,14 @@ public class LiveQuizService {
 
     public LiveQuizUserInfoDto liveQuizUserInfo(Member member) {
         Member findMember = findMember(member.getUsername());
+        Map<String, String> quizState = getQuizState();
+        Set<String> correctAnsweredUsers = getCorrectAnsweredUsers();
+
+        int winnerCount = Integer.parseInt(quizState.get("winnerCount"));
+        int currentWinnersCount = Integer.parseInt(quizState.get("currentWinnersCount"));
+        int mileagePoint = Integer.parseInt(quizState.get("mileagePoint"));
+        String correctAnswer = quizState.get("correctAnswer");
+
         QuizUpdateDto quizUpdate = new QuizUpdateDto(
                 correctAnsweredUsers,
                 winnerCount - currentWinnersCount,
@@ -196,11 +263,6 @@ public class LiveQuizService {
     public String findNickName(String username) {
         Member findMember = memberRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
         return findMember.getMemberDetail().getNickname();
-    }
-
-    // 사용자를 금지 상태로 설정하는 메서드
-    public void muteUser(String nickName) {
-        userMuteTimes.put(nickName, LocalDateTime.now().plusSeconds(30));
     }
 
     // 현재 접속자 명단
