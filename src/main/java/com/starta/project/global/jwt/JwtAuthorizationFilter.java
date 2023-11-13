@@ -1,5 +1,6 @@
 package com.starta.project.global.jwt;
 
+import com.starta.project.domain.member.repository.RedisRepository;
 import com.starta.project.global.exception.custom.CustomExpiredJwtException;
 import com.starta.project.global.exception.custom.CustomInvalidJwtException;
 import com.starta.project.global.exception.custom.CustomMalformedJwtException;
@@ -22,6 +23,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j(topic = "JWT 검증 및 인가")
 @RequiredArgsConstructor
@@ -29,6 +32,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsServiceImpl userDetailsService;
+    private final RedisRepository redisRepository;
 
     private void setErrorResponse(HttpServletResponse res, int statusCode, String msg) throws IOException {
         res.setContentType("application/json");
@@ -54,6 +58,22 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             }catch (JwtException jwtEx) {
                 setErrorResponse(res, HttpServletResponse.SC_UNAUTHORIZED, "Expired Refresh Token. 토큰이 만료되었습니다");
                 return;
+            }
+        }
+
+        // 로그아웃 요청 처리
+        if ("/api/member/logout".equals(requestURI)) {
+            if (StringUtils.hasText(refreshTokenValue)) {
+                try {
+                    redisRepository.deleteValue(JwtUtil.REFRESH_PREFIX + refreshTokenValue);
+                    res.setContentType("application/json");
+                    res.setCharacterEncoding("utf-8");
+                    res.setStatus(HttpServletResponse.SC_OK);
+                    res.getWriter().write("{\"msg\":\"로그아웃 되었습니다.\"}");
+                    return;
+                } catch (Exception e) {
+                    return;
+                }
             }
         }
 
