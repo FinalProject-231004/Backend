@@ -15,7 +15,8 @@ public class DrawService {
     private static final String KEY = "DrawMessages";
 
     public void saveDrawMessage(DrawMessage drawMessage) {
-        redisTemplate.opsForList().rightPush(KEY, drawMessage);
+        if (!("clear".equals(drawMessage.getType()))) redisTemplate.opsForList().rightPush(KEY, drawMessage);
+        else redisTemplate.delete(KEY);
     }
 
     public List<DrawMessage> getAllDrawMessages() {
