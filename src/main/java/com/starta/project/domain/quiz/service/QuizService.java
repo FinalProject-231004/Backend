@@ -99,10 +99,10 @@ public class QuizService {
         //이전의 것과 마찬가지 입니다.
         Quiz quiz = findQuiz(id);
         //유저 확인
-        if (!member.getId().equals(quiz.getMemberId())) {
-            MsgResponse msgResponse = new MsgResponse("퀴즈 생성자가 아닙니다. ");
-            return ResponseEntity.badRequest().body(msgResponse);
-        }
+//        if (!member.getId().equals(quiz.getMemberId())) {
+//            MsgResponse msgResponse = new MsgResponse("퀴즈 생성자가 아닙니다. ");
+//            return ResponseEntity.badRequest().body(msgResponse);
+//        }
 
         //하위 항목 + 이미지 찾아서 리스트 만들기
         List<Likes> likes = likesRepository.findAllByQuiz(quiz);
@@ -119,7 +119,7 @@ public class QuizService {
         imageList.add(quiz.getImage());
         for (String image : imageList) {
             try {
-                amazonS3Service.deleteFile(image) ;
+                if (image.length() > 2) amazonS3Service.deleteFile(image) ;
             } catch (java.io.IOException e) {
                 throw new IOException("이미지 삭제 실패 ",e);
             }
