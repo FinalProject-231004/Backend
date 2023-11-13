@@ -120,7 +120,6 @@ public class LiveQuizService {
 
             if (!rateLimiter.tryAcquire()) {
                 muteUser(chatMessage.getNickName());
-                System.out.println("도배자" + chatMessage.getNickName() + "차단됨");
                 throw new CustomRateLimiterException("도배 금지!");
             }
         } catch (CustomUserBlockedException | CustomRateLimiterException e) {
