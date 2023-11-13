@@ -1,6 +1,7 @@
 package com.starta.project.global.config;
 
 
+import com.starta.project.domain.member.repository.RedisRepository;
 import com.starta.project.domain.member.service.RefreshTokenService;
 import com.starta.project.global.jwt.JwtAuthenticationFilter;
 import com.starta.project.global.jwt.JwtAuthorizationFilter;
@@ -34,6 +35,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final MemberLoginFailHandler memberLoginFailHandler;
+    private final RedisRepository redisRepository;
 
     public static final String ALLOWED_METHOD_NAMES = "GET,HEAD,POST,PUT,DELETE,TRACE,OPTIONS,PATCH";
 
@@ -71,7 +73,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtUtil, userDetailsService);
+        return new JwtAuthorizationFilter(jwtUtil, userDetailsService, redisRepository);
     }
 
     @Bean
