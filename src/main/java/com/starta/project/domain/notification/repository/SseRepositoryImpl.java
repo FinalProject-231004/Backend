@@ -54,6 +54,12 @@ public class SseRepositoryImpl implements SseRepository{
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
+    @Override
+    public Map<String, SseEmitter> findAllEmitter() {
+        return emitters.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
     /**
      * specific user 관련 단일 emitter 삭제
      */

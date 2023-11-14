@@ -4,7 +4,9 @@ public enum NotificationType {
 
     COMMENT("/quiz/{id}", "comment"),
     NOTICE("/", "notice"),
+    LIVEQUIZ("/live-quiz","livequiz"),
     LIKEQUIZ("/quiz/{id}", "likemember");
+
 
 
 

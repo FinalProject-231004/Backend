@@ -6,6 +6,7 @@ import com.starta.project.domain.notification.entity.NotificationType;
 import com.starta.project.domain.notification.repository.SseRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -26,8 +27,8 @@ public class SseService {
     /**
      * [SSE 통신]연결
      */
-    public SseEmitter subscribe(Member member, String lastEventId) {
-        String emitterId = member.getUsername() + "_" + System.currentTimeMillis();
+    public SseEmitter subscribe(String userName, String lastEventId) {
+        String emitterId = userName + "_" + System.currentTimeMillis();
 
         SseEmitter sseEmitter = sseRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
 //        log.info("new emitter added : {}", sseEmitter);
@@ -39,11 +40,11 @@ public class SseService {
         sseEmitter.onError((e) -> sseRepository.deleteEmitterById(emitterId));
 
         /* 503 Service Unavailable 방지용 dummy event 전송 */
-        send(sseEmitter, emitterId, createDummyNotification(member.getUsername()));
+        send(sseEmitter, emitterId, createDummyNotification(userName));
 
         /* client가 미수신한 event 목록이 존재하는 경우 */
         if(!lastEventId.isEmpty()) { //client가 미수신한 event가 존재하는 경우 이를 전송하여 유실 예방
-            Map<String, Object> eventCaches = sseRepository.findAllEventCacheStartsWithUsername(member.getUsername()); //id에 해당하는 eventCache 조회
+            Map<String, Object> eventCaches = sseRepository.findAllEventCacheStartsWithUsername(userName); //id에 해당하는 eventCache 조회
             eventCaches.entrySet().stream() //미수신 상태인 event 목록 전송
                     .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
                     .forEach(entry -> emitEventToClient(sseEmitter, entry.getKey(), entry.getValue()));
@@ -84,6 +85,23 @@ public class SseService {
                 .build();
     }
 
+    /**
+     * [SSE 통신]라이브퀴즈 알림 data 생성
+     *
+     */
+    private Notification createLiveQuizNotification(String receiver) {
+        String sseReceiver = StringUtils.substringBefore(receiver, "_");
+        return Notification.builder()
+                .notificationId(receiver)
+                .receiver(sseReceiver)
+                .content("send live quiz data to client.")
+                .notificationType(NotificationType.LIVEQUIZ.getAlias())
+                .url(NotificationType.LIVEQUIZ.getPath())
+                .readYn('N')
+                .deletedYn('N')
+                .created_at(LocalDateTime.now())
+                .build();
+    }
     /**
      * [SSE 통신]notification type별 data 생성
      */
@@ -153,6 +171,21 @@ public class SseService {
         } catch (Exception e) {
             sseRepository.deleteEmitterById(emitterId);
             throw new RuntimeException("Connection Failed.");
+        }
+    }
+
+    public void liveQuizSend(Member member) {
+        String role = String.valueOf(member.getRole());
+        if(role.equals("ADMIN")){
+            Map<String, SseEmitter> sseEmitters = sseRepository.findAllEmitter();
+            sseEmitters.forEach(
+                    (key, sseEmitter) -> {
+                        Notification notification = createLiveQuizNotification(key);
+                        //log.info("key, notification : {}, {}", key, notification);
+                        sseRepository.saveEventCache(key, notification); //저장
+                        emitEventToClient(sseEmitter, key, notification); //전송
+                    }
+            );
         }
     }
 }

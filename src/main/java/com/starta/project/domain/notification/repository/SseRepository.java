@@ -13,6 +13,8 @@ public interface SseRepository {
 
     Map<String, Object> findAllEventCacheStartsWithUsername(String username); //specific user 관련 모든 event 조회
 
+    Map<String, SseEmitter> findAllEmitter();
+
     void deleteEmitterById(String id); //emitterId 기준 emitter 삭제
 
     void deleteAllEmitterStartsWithId(String id); //emitterId 기준 모든 emitter 삭제

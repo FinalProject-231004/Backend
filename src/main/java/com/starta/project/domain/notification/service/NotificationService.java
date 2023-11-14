@@ -1,7 +1,9 @@
 package com.starta.project.domain.notification.service;
 
+import com.starta.project.domain.member.entity.Member;
 import com.starta.project.domain.notification.entity.Notification;
 import com.starta.project.domain.notification.repository.NotificationRepository;
+import com.starta.project.global.messageDto.MsgResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -59,11 +61,9 @@ public class NotificationService {
      * [DB 연동]다수 알림 전송
      */
     @Transactional
-    public void sendNotifications(List<Notification> notificationList) {
-        notificationList.forEach(notification -> {
-            Notification notificationResult = notificationRepository.save(notification); //DB 저장
-            sseService.send(notificationResult);
-        });
+    public MsgResponse sendNotifications(Member member) {
+        sseService.liveQuizSend(member);
+        return new MsgResponse("라이브퀴즈 알람성공");
     }
 
     /**
