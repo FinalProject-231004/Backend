@@ -24,15 +24,11 @@ public class SseService {
 
     private final SseRepositoryImpl sseRepository;
 
-    /**
-     * [SSE 통신]연결
-     */
+    //[SSE 통신]연결
     public SseEmitter subscribe(String userName, String lastEventId) {
         String emitterId = userName + "_" + System.currentTimeMillis();
 
         SseEmitter sseEmitter = sseRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
-//        log.info("new emitter added : {}", sseEmitter);
-//        log.info("lastEventId : {}", lastEventId);
 
         /* 상황별 emitter 삭제 처리 */
         sseEmitter.onCompletion(() -> sseRepository.deleteEmitterById(emitterId)); //완료 시, 타임아웃 시, 에러 발생 시
@@ -53,26 +49,20 @@ public class SseService {
         return sseEmitter;
     }
 
-    /**
-     * [SSE 통신]specific user에게 알림 전송
-     */
+    //[SSE 통신]specific user에게 알림 전송
     public void send(Notification notificationResult) {
         Notification notification = createNotification(notificationResult);
         /* 로그인한 client의 sseEmitter 전체 호출 */
         Map<String, SseEmitter> sseEmitters = sseRepository.findAllEmitterStartsWithUsername(notificationResult.getReceiver());
         sseEmitters.forEach(
                 (key, sseEmitter) -> {
-                    //log.info("key, notification : {}, {}", key, notification);
                     sseRepository.saveEventCache(key, notification); //저장
                     emitEventToClient(sseEmitter, key, notification); //전송
                 }
         );
     }
 
-    /**
-     * [SSE 통신]dummy data 생성
-     * : 503 Service Unavailable 방지
-     */
+    //[SSE 통신]dummy data 생성 : 503 Service Unavailable 방지
     private Notification createDummyNotification(String receiver) {
         return Notification.builder()
                 .notificationId(receiver + "_" + System.currentTimeMillis())
@@ -85,10 +75,7 @@ public class SseService {
                 .build();
     }
 
-    /**
-     * [SSE 통신]라이브퀴즈 알림 data 생성
-     *
-     */
+    //[SSE 통신]라이브퀴즈 알림 data 생성
     private Notification createLiveQuizNotification(String receiver) {
         String sseReceiver = StringUtils.substringBefore(receiver, "_");
         return Notification.builder()
@@ -102,9 +89,8 @@ public class SseService {
                 .created_at(LocalDateTime.now())
                 .build();
     }
-    /**
-     * [SSE 통신]notification type별 data 생성
-     */
+
+    //[SSE 통신]notification type별 data 생성
     private Notification createNotification(Notification notificationResult) {
         if(notificationResult.getNotificationType().equals(NotificationType.COMMENT.getAlias())) { //댓글
             return Notification.builder()
@@ -130,26 +116,12 @@ public class SseService {
                     .deletedYn('N')
                     .created_at(LocalDateTime.now())
                     .build();
-        } else if(notificationResult.getNotificationType().equals(NotificationType.NOTICE.getAlias())) { //공지
-            return Notification.builder()
-                    .id(notificationResult.getId())
-                    .notificationId(notificationResult.getNotificationId())
-                    .receiver(notificationResult.getReceiver())
-                    .content(notificationResult.getContent())
-                    .notificationType(NotificationType.NOTICE.getAlias())
-                    .url(notificationResult.getUrl())
-                    .readYn('N')
-                    .deletedYn('N')
-                    .created_at(LocalDateTime.now())
-                    .build();
         } else {
             return null;
         }
     }
 
-    /**
-     * [SSE 통신]notification type별 event 전송
-     */
+    //[SSE 통신]notification type별 event 전송
     private void send(SseEmitter sseEmitter, String emitterId, Object data) {
         try {
             sseEmitter.send(SseEmitter.event()
@@ -162,9 +134,7 @@ public class SseService {
         }
     }
 
-    /**
-     * [SSE 통신]
-     */
+    //[SSE 통신]
     private void emitEventToClient(SseEmitter sseEmitter, String emitterId, Object data) {
         try {
             send(sseEmitter, emitterId, data);
@@ -174,6 +144,7 @@ public class SseService {
         }
     }
 
+    //[SSE 통신] 라이브 퀴즈 알림
     public void liveQuizSend(Member member) {
         String role = String.valueOf(member.getRole());
         if(role.equals("ADMIN")){
@@ -181,7 +152,6 @@ public class SseService {
             sseEmitters.forEach(
                     (key, sseEmitter) -> {
                         Notification notification = createLiveQuizNotification(key);
-                        //log.info("key, notification : {}, {}", key, notification);
                         sseRepository.saveEventCache(key, notification); //저장
                         emitEventToClient(sseEmitter, key, notification); //전송
                     }

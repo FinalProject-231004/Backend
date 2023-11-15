@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,14 +22,13 @@ import java.util.Random;
 public class SseController {
     private final SseService sseService;
 
-    /**
-     * 로그인 시 SSE 구독(연결)
-     */
+    //SSE 구독(연결)
     @Operation(summary = "sse세션연결")
     @GetMapping(value = "/api/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> subscribe(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails,
                                                 @RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId) {
 
+        //비회원시 유저 이름 랜덤 생성
         String userName = "";
         if(userDetails == null ) {
             int leftLimit = 48; // numeral '0'

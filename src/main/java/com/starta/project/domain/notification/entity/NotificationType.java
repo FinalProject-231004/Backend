@@ -7,9 +7,6 @@ public enum NotificationType {
     LIVEQUIZ("/live-quiz","livequiz"),
     LIKEQUIZ("/quiz/{id}", "likemember");
 
-
-
-
     private final String path;
     private final String alias;
 
