@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 //		SecurityAutoConfiguration.class,
 		org.springframework.cloud.aws.autoconfigure.context.ContextInstanceDataAutoConfiguration.class,
 		org.springframework.cloud.aws.autoconfigure.context.ContextStackAutoConfiguration.class,
-		org.springframework.cloud.aws.autoconfigure.context.ContextRegionProviderAutoConfiguration.class}) // 시큐리티 임시차단
+		org.springframework.cloud.aws.autoconfigure.context.ContextRegionProviderAutoConfiguration.class})
 @EnableJpaAuditing
 public class ProjectApplication {
 
