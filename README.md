@@ -10,7 +10,7 @@
 퀴즈팝은 "노는게 이득일 수는 없을까?" 라는 의문에서 시작하여 킬링타임에 마일리지 제도를 도입한 퀴즈풀이 기반의 서비스를 제공하고 있습니다.
 
 
-- 📅 프로젝트 개발기간: 2022.10.04 ~ 2022.11.14
+- 📅 프로젝트 개발기간: 2023.10.04 ~ 2023.11.14
 - [💙 퀴즈팝 이용하기](https://www.quizpop.net)
 - [📕 팀 노션](https://www.notion.so/doopal/Quizpop-6e0d5d3640934407a628131dea31daf9)
 
@@ -172,6 +172,16 @@
 <br>
 <br>
 
+
+| 역할  | 이름  | 분담  |
+| --- | ---    | --- |
+| FE ✨​ | 지유진(VL) | ‣ 메인 페이지 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 신규 / 인기 / 조회순 퀴즈 조회 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 카테고리 별 퀴즈 조회<br> ‣ 퀴즈 관련 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 퀴즈 제작 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 퀴즈 상세 정보 페이지 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 퀴즈 문항 제작 페이지 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 퀴즈 풀이 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 퀴즈 상세 조회 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 댓글 / 좋아요 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 퀴즈 결과 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 링크 복사 / 카카오 공유기능 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 라이브 퀴즈 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 그림판 기능 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 웹소켓 기반 실시간 채팅 |
+| FE  | 김민경 | ‣ 헤더 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 로그인 (JWT: Access/Refresh) <br>&nbsp;&nbsp;&nbsp;&nbsp;- 카카오 소셜로그인 / 회원가입 <br>&nbsp;&nbsp;&nbsp;&nbsp;- Sse 기반 실시간 알림 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-전체 읽음 및 삭제 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 검색 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 출석체크 <br>‣ 마이페이지 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 프로필, 닉네임, 비밀번호 변경 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 회원 탈퇴 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 마일리지 내역 조회 <br> ‣ 마일리지샵 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 상품 조회 및 구매 |
+| BE✨​ | 노지현(L) | ‣ spring Security 적용 <br>‣ 유저관련 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 회원가입 기능 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 로그인 기능 (JWT: Access/Refresh) <br>&nbsp;&nbsp;&nbsp;&nbsp;- OAuth 2.0 카카오 소셜로그인 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 유저 신고 및 권한차단 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 유저 테스트코드 작성 <br>‣ Redis <br>‣ 마이페이지 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 유저정보 변경(프로필, 닉네임, 비밀번호) <br>&nbsp;&nbsp;&nbsp;&nbsp;- 회원탈퇴 |
+| BE  | 백상용 | ‣ Server-Sent Events <br>&nbsp;&nbsp;&nbsp;&nbsp;- 실시간 알림 기능 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 댓글, 좋아요 알림 기능 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 알림 전체 읽음 및 삭제 기능 |
+| BE  | 양승민 | ‣ 전반적 퀴즈 서비스 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 퀴즈 CRUD <br>&nbsp;&nbsp;&nbsp;&nbsp;- 퀴즈 풀이 응답 저장 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 퀴즈 풀이 결과 보기 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 퀴즈 비회원 기능 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 퀴즈 생성 시 마일리지 획득 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 퀴즈 풀이 시 마일리시 획득 |
+| BE  | 진민지 | ‣ 라이브퀴즈 웹소켓기반 기능 구현 <br>‣ 마일리지샵 CRUD <br>‣ CICD 무중단 배포 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 테스트서버(CloudType) <br>&nbsp;&nbsp;&nbsp;&nbsp;- 메인서버 무중단 배포(AWS EC2, Nginx, Docker 외) <br>‣ log 관리 (logback, Sentry) <br>‣ DB 관리 (백업, 복원) <br>‣ Swagger |
+| Design | 문지우 | ‣ 디자인 총괄 반응형 구도작업 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 헤더 디자인 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 파비콘 & 로고 디자인 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 배너 & 캐릭터 디자인 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 전체페이지 반응형 디자인 <br>&nbsp;&nbsp;&nbsp;&nbsp;- 영상용 커버 및 자막배경 디자인 |
 
 
 ## 🛠 아키텍쳐
