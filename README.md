@@ -171,6 +171,18 @@
 </table>
 <br>
 <br>
+
+
+
+## 🛠 아키텍쳐
+
+<img src="https://teamsparta.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F83c75a39-3aba-4ba4-a792-7aefe4b07895%2F1d4777eb-a529-4e9b-8679-a56ece171ca9%2FKakaoTalk_20231110_134551769.png?table=block&id=d5d62675-15dc-4169-9079-e98f089a82a8&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=2000&userId=&cache=v2" >
+
+
+<br>
+
+<br>
+
 ## 🛠 Tools
 
 
@@ -193,8 +205,8 @@
 <img src="https://img.shields.io/badge/Amazon S3-569A31?style=for-the-badge&logo=AmazonS3&logoColor=white">
 <img src="https://img.shields.io/badge/code deploy-4B612C?style=for-the-badge&logo=codedeploy&logoColor=white">
 <img src="https://img.shields.io/badge/Github Actions-2088FF?style=for-the-badge&logo=Github Actions&logoColor=white">
-
-
+<img src="https://img.shields.io/badge/SSE-61DAFB?style=for-the-badge&logo=SSE&logoColor=white">
+<img src="https://img.shields.io/badge/websocket-61DAFB?style=for-the-badge&logo=websocket&logoColor=white">
 
 </p>
 
@@ -202,7 +214,9 @@
 
 <br>
 
+
 #### Dev tools
+
 
 <p> 
   <img src="https://img.shields.io/badge/intellij idea-000000.svg?style=for-the-badge&logo=intellij idea&logoColor=white">
