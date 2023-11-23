@@ -62,16 +62,6 @@ public class WebSocketEventListener {
         }
     }
 
-    public void handleUserListRequest(StompHeaderAccessor headerAccessor) {
-        String sessionId = headerAccessor.getSessionId();
-        Set<String> uniqueNickNames = activeUsersManager.getUniqueNickNames();
-        messagingTemplate.convertAndSendToUser(
-                sessionId,
-                "/queue/users",
-                uniqueNickNames
-        );
-    }
-
     private void broadcastUserList() {
         Set<String> uniqueUsernames = activeUsersManager.getUniqueNickNames();
         messagingTemplate.convertAndSend("/topic/users", uniqueUsernames);

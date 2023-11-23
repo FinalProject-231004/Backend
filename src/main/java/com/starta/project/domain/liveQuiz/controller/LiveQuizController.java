@@ -28,7 +28,6 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class LiveQuizController {
 
-    private final WebSocketEventListener webSocketEventListener;
     private final LiveQuizService liveQuizService;
     private final SimpMessageSendingOperations messagingTemplate;
 
@@ -37,12 +36,6 @@ public class LiveQuizController {
     public ChatMessageDto sendMessage(ChatMessageDto chatMessage) {
         return liveQuizService.processIncomingMessage(chatMessage, messagingTemplate);
     }
-
-    @MessageMapping("/users.request")
-    public void handleUserListRequest(StompHeaderAccessor headerAccessor) {
-        webSocketEventListener.handleUserListRequest(headerAccessor);
-    }
-
     @GetMapping("/api/liveQuiz/userLists")
     public ResponseEntity<Set<String>> getCurrentActiveUsers() {
         Set<String> uniqueNickNames = liveQuizService.getCurrentActiveUsers(); // 변경된 부분
